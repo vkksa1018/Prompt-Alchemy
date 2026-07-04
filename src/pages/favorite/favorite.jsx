@@ -1,93 +1,32 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PromptCard from "../../components/PromptCard/promptCard";
+import { initialPrompts } from "../prompt/skills";
+import useAuth from "../../hooks/useAuth";
 
 export default function Favorite() {
   const navigate = useNavigate();
-  const [favoritePrompts, setFavoritePrompts] = useState([
-    {
-      id: 1,
-      title: "後端 API 審查",
-      description: "檢查 Express / Next.js API 的錯誤處理、安全性與回傳結構。",
-      likes: 32,
-      uses: 125,
-      tags: ["後端", "#API", "#Security"]
-    },
-    {
-      id: 2,
-      title: "前端 Debug 助手",
-      description: "協助找出 React / Next.js 專案的錯誤原因與除錯線索。",
-      likes: 21,
-      uses: 98,
-      tags: ["前端", "#React", "#Debug"]
-    },
-    {
-      id: 3,
-      title: "SQL 查詢優化",
-      description: "分析 SQL 查詢效能瓶頸與最佳化建議。",
-      likes: 18,
-      uses: 77,
-      tags: ["後端", "#SQL", "#Database"]
-    },
-    {
-      id: 4,
-      title: "資安漏洞檢查清單",
-      description: "檢查常見的 Web 與雲端環境風險掃描方式。",
-      likes: 15,
-      uses: 63,
-      tags: ["資安", "#Security", "#Web"]
-    }
-  ]);
+  const { favorites, clearFavorites, resetFavorites } = useAuth();
+
+  const favoritePrompts = initialPrompts.filter((prompt) =>
+    favorites.includes(prompt.id)
+  );
 
   const handleClearAll = () => {
-    setFavoritePrompts([]);
+    clearFavorites();
   };
 
   const handleReset = () => {
-    setFavoritePrompts([
-      {
-        id: 1,
-        title: "後端 API 審查",
-        description: "檢查 Express / Next.js API 的錯誤處理、安全性與回傳結構。",
-        likes: 32,
-        uses: 125,
-        tags: ["後端", "#API", "#Security"]
-      },
-      {
-        id: 2,
-        title: "前端 Debug 助手",
-        description: "協助找出 React / Next.js 專案的錯誤原因與除錯線索。",
-        likes: 21,
-        uses: 98,
-        tags: ["前端", "#React", "#Debug"]
-      },
-      {
-        id: 3,
-        title: "SQL 查詢優化",
-        description: "分析 SQL 查詢效能瓶頸與最佳化建議。",
-        likes: 18,
-        uses: 77,
-        tags: ["後端", "#SQL", "#Database"]
-      },
-      {
-        id: 4,
-        title: "資安漏洞檢查清單",
-        description: "檢查常見的 Web 與雲端環境風險掃描方式。",
-        likes: 15,
-        uses: 63,
-        tags: ["資安", "#Security", "#Web"]
-      }
-    ]);
+    resetFavorites();
   };
 
   return (
     <div
       data-pencil-name="Favorites Main"
-      className="box-border w-full h-full flex flex-col gap-[18px] p-[8px_6px] justify-start items-start font-['JetBrains_Mono',system-ui,sans-serif]"
+      className="box-border w-full h-full flex flex-col gap-4.5 p-[8px_6px] justify-start items-start font-['JetBrains_Mono',system-ui,sans-serif]"
     >
       <div
         data-pencil-name="Favorites Header"
-        className="box-border w-full h-fit shrink-0 flex flex-col gap-[6px] justify-start items-start"
+        className="box-border w-full h-fit shrink-0 flex flex-col gap-1.5 justify-start items-start"
       >
         <div className="flex flex-row justify-between items-center w-full">
           <div
@@ -129,7 +68,7 @@ export default function Favorite() {
       {favoritePrompts.length > 0 ? (
         <div
           data-pencil-name="Favorites Grid"
-          className="box-border w-full h-fit shrink-0 grid grid-cols-1 md:grid-cols-2 gap-[18px] justify-start items-start"
+          className="box-border w-full h-fit shrink-0 grid grid-cols-1 md:grid-cols-2 gap-4.5 justify-start items-start"
         >
           {favoritePrompts.map((prompt) => (
             <PromptCard key={prompt.id} prompt={prompt} />
@@ -139,7 +78,7 @@ export default function Favorite() {
         /* Empty State */
         <div
           data-pencil-name="Empty State Wrap"
-          className="box-border w-full flex-1 flex flex-col gap-[14px] justify-center items-center py-12 mx-auto"
+          className="box-border w-full flex-1 flex flex-col gap-3.5 justify-center items-center py-12 mx-auto"
         >
           <div
             data-pencil-name="Empty Icon"
@@ -149,7 +88,7 @@ export default function Favorite() {
           </div>
           <div
             data-pencil-name="Empty Text"
-            className="text-[16px]/[26px] box-border w-[360px] text-[#7DCEA0] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-center"
+            className="text-[16px]/[26px] box-border w-90 text-[#7DCEA0] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-center"
           >
             你還沒有收藏任何 Prompt / Skill
             <br />
@@ -159,7 +98,7 @@ export default function Favorite() {
             type="button"
             onClick={() => navigate("/skills")}
             data-pencil-name="Browse CTA"
-            className="box-border w-fit h-fit shrink-0 flex flex-row gap-0 py-[12px] px-[20px] justify-start items-start bg-[#39FF14] rounded-[8px] border-none cursor-pointer hover:bg-[#39FF14]/90 transition-colors"
+            className="box-border w-fit h-fit shrink-0 flex flex-row gap-0 py-3 px-5 justify-start items-start bg-[#39FF14] rounded-lg border-none cursor-pointer hover:bg-[#39FF14]/90 transition-colors"
           >
             <div
               data-pencil-name="Browse CTA Label"

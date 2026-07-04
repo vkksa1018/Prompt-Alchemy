@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import PromptCard from "../../components/PromptCard/promptCard";
 
-const initialPrompts = [
+export const initialPrompts = [
   {
     id: 1,
     title: "後端 API 審查",
@@ -11,10 +11,11 @@ const initialPrompts = [
     uses: 125,
     category: "後端開發",
     tags: ["#API", "#Security"],
-    content: "請審查以下後端 API 程式碼的錯誤處理、安全性與 RESTful 回傳結構：\n\n[在此輸入程式碼]",
+    content:
+      "請審查以下後端 API 程式碼的錯誤處理、安全性與 RESTful 回傳結構：\n\n[在此輸入程式碼]",
     date: "2026-07-01",
     isNew: true,
-    isHot: true
+    isHot: true,
   },
   {
     id: 2,
@@ -24,10 +25,11 @@ const initialPrompts = [
     uses: 98,
     category: "前端開發",
     tags: ["#React", "#Debug"],
-    content: "請分析以下 React/Next.js 錯誤訊息，並給出可能的修復方案及除錯步驟：\n\n[在此輸入錯誤訊息]",
+    content:
+      "請分析以下 React/Next.js 錯誤訊息，並給出可能的修復方案及除錯步驟：\n\n[在此輸入錯誤訊息]",
     date: "2026-06-28",
     isNew: false,
-    isHot: true
+    isHot: true,
   },
   {
     id: 3,
@@ -37,10 +39,11 @@ const initialPrompts = [
     uses: 77,
     category: "後端開發",
     tags: ["#SQL"],
-    content: "請分析以下 SQL 查詢的效能瓶頸，並提供最佳化建議及索引設計：\n\n[在此輸入 SQL 語句]",
+    content:
+      "請分析以下 SQL 查詢的效能瓶頸，並提供最佳化建議及索引設計：\n\n[在此輸入 SQL 語句]",
     date: "2026-06-25",
     isNew: false,
-    isHot: false
+    isHot: false,
   },
   {
     id: 4,
@@ -50,10 +53,11 @@ const initialPrompts = [
     uses: 63,
     category: "資安相關",
     tags: ["#Security"],
-    content: "請提供一份針對以下環境的 Web 應用程式安全檢測清單與常見漏洞防範建議：\n\n[在此說明技術棧環境]",
+    content:
+      "請提供一份針對以下環境的 Web 應用程式安全檢測清單與常見漏洞防範建議：\n\n[在此說明技術棧環境]",
     date: "2026-06-20",
     isNew: false,
-    isHot: false
+    isHot: false,
   },
   {
     id: 5,
@@ -63,10 +67,11 @@ const initialPrompts = [
     uses: 180,
     category: "翻譯助手",
     tags: ["#Translation"],
-    content: "請將以下中文技術內容翻譯成專業、自然的英文，並提供 Academic 與 Professional 兩種口吻：\n\n[在此輸入內容]",
+    content:
+      "請將以下中文技術內容翻譯成專業、自然的英文，並提供 Academic 與 Professional 兩種口吻：\n\n[在此輸入內容]",
     date: "2026-07-02",
     isNew: true,
-    isHot: true
+    isHot: true,
   },
   {
     id: 6,
@@ -76,11 +81,12 @@ const initialPrompts = [
     uses: 110,
     category: "小工具",
     tags: ["#Debug"],
-    content: "請根據以下條件生成一個高效的正則表達式，並附上測試案例說明：\n- 匹配：[條件]\n- 排除：[條件]\n\n輸入字串範例：",
+    content:
+      "請根據以下條件生成一個高效的正則表達式，並附上測試案例說明：\n- 匹配：[條件]\n- 排除：[條件]\n\n輸入字串範例：",
     date: "2026-06-15",
     isNew: false,
-    isHot: false
-  }
+    isHot: false,
+  },
 ];
 
 export default function Skills() {
@@ -102,7 +108,8 @@ export default function Skills() {
       // Category filter
       if (selectedCategory === "最新技能") return prompt.isNew;
       if (selectedCategory === "熱門分類") return prompt.isHot;
-      if (selectedCategory !== "全部" && prompt.category !== selectedCategory) return false;
+      if (selectedCategory !== "全部" && prompt.category !== selectedCategory)
+        return false;
 
       // Tag filter
       if (selectedTag && !prompt.tags.includes(selectedTag)) return false;
@@ -134,16 +141,46 @@ export default function Skills() {
     { name: "資安相關", icon: null },
     { name: "除錯技巧", icon: null },
     { name: "翻譯助手", icon: null },
-    { name: "小工具", icon: null }
+    { name: "小工具", icon: null },
   ];
 
   const sidebarTags = [
-    { label: "#API", bg: "bg-[#0A1520]", border: "border-[#00FFFF]", text: "text-[#00FFFF]" },
-    { label: "#React", bg: "bg-[#1A0A15]", border: "border-[#FF00FF]", text: "text-[#FF00FF]" },
-    { label: "#SQL", bg: "bg-[#1A1A0A]", border: "border-[#FFD700]", text: "text-[#FFD700]" },
-    { label: "#Security", bg: "bg-[#0A1F1A]", border: "border-[#39FF14]", text: "text-[#39FF14]" },
-    { label: "#Debug", bg: "bg-[#1A0A0A]", border: "border-[#FF8C00]", text: "text-[#FF8C00]" },
-    { label: "#Node.js", bg: "bg-[#1A0A15]", border: "border-[#FF3366]", text: "text-[#FF3366]" }
+    {
+      label: "#API",
+      bg: "bg-[#0A1520]",
+      border: "border-[#00FFFF]",
+      text: "text-[#00FFFF]",
+    },
+    {
+      label: "#React",
+      bg: "bg-[#1A0A15]",
+      border: "border-[#FF00FF]",
+      text: "text-[#FF00FF]",
+    },
+    {
+      label: "#SQL",
+      bg: "bg-[#1A1A0A]",
+      border: "border-[#FFD700]",
+      text: "text-[#FFD700]",
+    },
+    {
+      label: "#Security",
+      bg: "bg-[#0A1F1A]",
+      border: "border-[#39FF14]",
+      text: "text-[#39FF14]",
+    },
+    {
+      label: "#Debug",
+      bg: "bg-[#1A0A0A]",
+      border: "border-[#FF8C00]",
+      text: "text-[#FF8C00]",
+    },
+    {
+      label: "#Node.js",
+      bg: "bg-[#1A0A15]",
+      border: "border-[#FF3366]",
+      text: "text-[#FF3366]",
+    },
   ];
 
   const handleCategorySelect = (categoryName) => {
@@ -158,12 +195,12 @@ export default function Skills() {
     <div className="w-full min-h-screen bg-[#0A0E1A] text-[#E0F0E8] font-['JetBrains_Mono',system-ui,sans-serif] py-8 px-6 flex flex-col items-center">
       <div
         data-pencil-name="List Content"
-        className="box-border w-full max-w-[1200px] flex flex-col lg:flex-row gap-[24px] justify-start items-start"
+        className="box-border w-full max-w-300 flex flex-col lg:flex-row gap-6 justify-start items-start"
       >
         {/* Filters Sidebar */}
         <div
           data-pencil-name="Filters Sidebar"
-          className="box-border w-full lg:w-[250px] shrink-0 flex flex-col gap-[14px] p-[18px] justify-start items-start bg-[#111827] border border-[#1A3A2A] rounded-[16px]"
+          className="box-border w-full lg:w-62.5 shrink-0 flex flex-col gap-3.5 p-4.5 justify-start items-start bg-[#111827] border border-[#1A3A2A] rounded-2xl"
         >
           <div
             data-pencil-name="Sidebar Heading"
@@ -179,16 +216,22 @@ export default function Skills() {
                 key={cat.name}
                 type="button"
                 onClick={() => handleCategorySelect(cat.name)}
-                className={`box-border w-full h-fit flex flex-row gap-[8px] py-[10px] px-[12px] justify-start items-center border-0 rounded-[8px] cursor-pointer transition-all duration-200 ${
-                  isSelected ? "bg-[#39FF14] text-[#0A0E1A] font-semibold" : "bg-transparent text-[#7DCEA0] hover:bg-[#39FF14]/10"
+                className={`box-border w-full h-fit flex flex-row gap-2 py-2.5 px-3 justify-start items-center border-0 rounded-lg cursor-pointer transition-all duration-200 ${
+                  isSelected
+                    ? "bg-[#39FF14] text-[#0A0E1A] font-semibold"
+                    : "bg-transparent text-[#7DCEA0] hover:bg-[#39FF14]/10"
                 }`}
               >
                 {cat.icon && (
-                  <span className={`text-[12px]/[normal] ${isSelected ? "text-[#0A0E1A]" : cat.iconColor}`}>
+                  <span
+                    className={`text-[12px]/[normal] ${isSelected ? "text-[#0A0E1A]" : cat.iconColor}`}
+                  >
                     {cat.icon}
                   </span>
                 )}
-                <span className="text-[14px]/[normal] whitespace-nowrap">{cat.name}</span>
+                <span className="text-[14px]/[normal] whitespace-nowrap">
+                  {cat.name}
+                </span>
               </button>
             );
           })}
@@ -202,7 +245,7 @@ export default function Skills() {
 
           <div
             data-pencil-name="Tag Column"
-            className="box-border w-full h-fit flex flex-wrap gap-[8px] justify-start items-start"
+            className="box-border w-full h-fit flex flex-wrap gap-2 justify-start items-start"
           >
             {sidebarTags.map((tag) => {
               const isSelected = selectedTag === tag.label;
@@ -211,13 +254,15 @@ export default function Skills() {
                   key={tag.label}
                   type="button"
                   onClick={() => handleTagToggle(tag.label)}
-                  className={`box-border w-fit h-fit flex flex-row gap-0 py-[6px] px-[10px] justify-start items-start rounded-[999px] border cursor-pointer transition-all ${
+                  className={`box-border w-fit h-fit flex flex-row gap-0 py-1.5 px-2.5 justify-start items-start rounded-[999px] border cursor-pointer transition-all ${
                     isSelected
                       ? `bg-transparent ${tag.border} ring-2 ring-offset-2 ring-offset-[#111827] ring-[#00FFFF]`
                       : `${tag.bg} ${tag.border} hover:opacity-80`
                   }`}
                 >
-                  <span className={`text-[12px]/[normal] ${tag.text} whitespace-nowrap`}>
+                  <span
+                    className={`text-[12px]/[normal] ${tag.text} whitespace-nowrap`}
+                  >
                     {tag.label}
                   </span>
                 </button>
@@ -229,7 +274,7 @@ export default function Skills() {
         {/* Skill List Region */}
         <div
           data-pencil-name="Skill List Region"
-          className="box-border flex-1 w-full flex flex-col gap-[18px] justify-start items-start"
+          className="box-border flex-1 w-full flex flex-col gap-4.5 justify-start items-start"
         >
           {/* List Search Bar */}
           <div
@@ -238,7 +283,7 @@ export default function Skills() {
           >
             <div
               data-pencil-name="Search Field"
-              className="box-border w-full sm:w-[420px] shrink-0 h-fit flex flex-row gap-[10px] py-[10px] px-[14px] justify-start items-center bg-[#0F1F18] border border-[#1A3A2A] rounded-[10px]"
+              className="box-border w-full sm:w-105 shrink-0 h-fit flex flex-row gap-2.5 py-2.5 px-3.5 justify-start items-center bg-[#0F1F18] border border-[#1A3A2A] rounded-[10px]"
             >
               <input
                 type="text"
@@ -251,7 +296,7 @@ export default function Skills() {
 
             <div
               data-pencil-name="Sort Group"
-              className="box-border w-fit shrink-0 h-fit flex flex-row gap-[8px] justify-start items-center"
+              className="box-border w-fit shrink-0 h-fit flex flex-row gap-2 justify-start items-center"
             >
               <div
                 data-pencil-name="Sort Label"
@@ -262,22 +307,28 @@ export default function Skills() {
               <button
                 type="button"
                 onClick={() => setSortBy("date")}
-                className={`box-border w-fit shrink-0 h-fit flex flex-row gap-[6px] py-[8px] px-[14px] justify-start items-center border-0 rounded-[8px] cursor-pointer transition-all ${
-                  sortBy === "date" ? "bg-[#39FF14] text-[#0A0E1A] font-semibold" : "bg-transparent text-[#7DCEA0] hover:bg-[#39FF14]/10"
+                className={`box-border w-fit shrink-0 h-fit flex flex-row gap-1.5 py-2 px-3.5 justify-start items-center border-0 rounded-lg cursor-pointer transition-all ${
+                  sortBy === "date"
+                    ? "bg-[#39FF14] text-[#0A0E1A] font-semibold"
+                    : "bg-transparent text-[#7DCEA0] hover:bg-[#39FF14]/10"
                 }`}
               >
-                <span className="text-[13px]/[normal] whitespace-nowrap">依日期</span>
+                <span className="text-[13px]/[normal] whitespace-nowrap">
+                  依日期
+                </span>
               </button>
               <button
                 type="button"
                 onClick={() => setSortBy("popularity")}
-                className={`box-border w-fit shrink-0 h-fit flex flex-row gap-[6px] py-[8px] px-[14px] justify-start items-center border rounded-[8px] cursor-pointer transition-all ${
+                className={`box-border w-fit shrink-0 h-fit flex flex-row gap-1.5 py-2 px-3.5 justify-start items-center border rounded-lg cursor-pointer transition-all ${
                   sortBy === "popularity"
                     ? "bg-[#39FF14] border-[#39FF14] text-[#0A0E1A] font-semibold"
                     : "bg-transparent border-[#1A3A2A] text-[#7DCEA0] hover:bg-[#39FF14]/10"
                 }`}
               >
-                <span className="text-[13px]/[normal] whitespace-nowrap">依熱門度</span>
+                <span className="text-[13px]/[normal] whitespace-nowrap">
+                  依熱門度
+                </span>
               </button>
             </div>
           </div>
@@ -285,7 +336,7 @@ export default function Skills() {
           {/* List Cards */}
           <div
             data-pencil-name="List Cards"
-            className="box-border w-full h-fit flex flex-col gap-[16px] justify-start items-start"
+            className="box-border w-full h-fit flex flex-col gap-4 justify-start items-start"
           >
             {filteredPrompts.length > 0 ? (
               filteredPrompts.map((prompt) => (
