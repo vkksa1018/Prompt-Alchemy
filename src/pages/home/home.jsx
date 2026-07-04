@@ -17,7 +17,8 @@ export default function Home() {
       likes: 32,
       uses: 125,
       tags: ["後端", "#API", "#Security"],
-      content: "請審查以下後端 API 程式碼的錯誤處理、安全性（如 SQL injection, XSS）與 RESTful 回傳結構：\n\n[在此輸入程式碼]"
+      content:
+        "請審查以下後端 API 程式碼的錯誤處理、安全性（如 SQL injection, XSS）與 RESTful 回傳結構：\n\n[在此輸入程式碼]",
     },
     {
       id: 2,
@@ -26,7 +27,8 @@ export default function Home() {
       likes: 21,
       uses: 98,
       tags: ["前端", "#React", "#Debug"],
-      content: "請分析以下 React/Next.js 錯誤訊息，並給出可能的修復方案及除錯步驟：\n\n[在此輸入錯誤訊息]"
+      content:
+        "請分析以下 React/Next.js 錯誤訊息，並給出可能的修復方案及除錯步驟：\n\n[在此輸入錯誤訊息]",
     },
     {
       id: 3,
@@ -35,65 +37,70 @@ export default function Home() {
       likes: 18,
       uses: 77,
       tags: ["後端", "#SQL", "#Database"],
-      content: "請分析以下 SQL 查詢的效能瓶頸，並提供最佳化建議及索引設計：\n\n[在此輸入 SQL 語句]"
-    }
+      content:
+        "請分析以下 SQL 查詢的效能瓶頸，並提供最佳化建議及索引設計：\n\n[在此輸入 SQL 語句]",
+    },
   ];
 
   return (
-    <div className="min-h-screen bg-[#0A0E1A] text-[#E0F0E8] font-['JetBrains_Mono',system-ui,sans-serif] px-6 py-8 flex flex-col items-center">
+    <div className="w-full bg-[#0A0E1A] text-[#E0F0E8] font-['JetBrains_Mono',system-ui,sans-serif] px-6 py-8 flex flex-col items-center">
       {/* Hero Zone */}
       <div
         data-pencil-name="Hero Zone"
-        className="box-border w-full max-w-[1100px] h-auto md:h-[340px] shrink-0 opacity-[0.9] flex flex-row gap-0 justify-between items-center py-8 md:py-0 border-b border-[#39FF14]/10"
+        className="relative box-border w-full max-w-[1280px] h-auto md:h-[340px] shrink-0 overflow-hidden border-b border-[#39FF14]/10"
       >
-        <div
-          data-pencil-name="Hero Copy"
-          className="box-border w-full max-w-[925px] shrink-0 h-fit flex flex-col gap-[22px] justify-start items-start"
-        >
+        <div className="absolute inset-0 bg-[url('/bg_01.gif')] bg-cover bg-center bg-no-repeat opacity-75" />
+        <div className="absolute inset-0 bg-[#0A0E1A]/45" />
+        <div className="relative z-10 flex h-full w-full flex-row gap-0 justify-between items-center py-8 md:py-0">
           <div
-            data-pencil-name="Hero Title"
-            className="text-[36px]/[42px] sm:text-[52px]/[57px] box-border w-full text-[#FFFFFF] font-['JetBrains_Mono',system-ui,sans-serif] font-bold text-left"
+            data-pencil-name="Hero Copy"
+            className="box-border w-full max-w-[925px] shrink-0 h-fit flex flex-col gap-[22px] justify-start items-start"
           >
-            整理你的
-            <br />
-            AI Prompt 與 Skill
-          </div>
-          <div
-            data-pencil-name="Hero Body"
-            className="text-[16px]/[24px] sm:text-[18px]/[27px] box-border w-full text-[#7DCEA0] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left"
-          >
-            把常用指令分類、搜尋、收藏，
-            <br />
-            下一次不再翻聊天室紀錄。
-          </div>
-          <div
-            data-pencil-name="Hero Actions"
-            className="box-border w-fit h-fit shrink-0 flex flex-row gap-[14px] justify-start items-start"
-          >
-            <Link
-              to="/skills"
-              data-pencil-name="Primary CTA"
-              className="box-border w-fit shrink-0 h-fit flex flex-row gap-0 py-[14px] px-[24px] justify-start items-start bg-[#39FF14] hover:bg-[#32dd10] active:scale-95 transition-all rounded-[8px] no-underline cursor-pointer"
+            <div
+              data-pencil-name="Hero Title"
+              className="text-[36px]/[42px] sm:text-[52px]/[57px] box-border w-full text-[#FFFFFF] font-['JetBrains_Mono',system-ui,sans-serif] font-bold text-left"
             >
-              <div
-                data-pencil-name="Primary CTA Label"
-                className="text-[16px]/[normal] box-border text-[#0A0E1A] font-['JetBrains_Mono',system-ui,sans-serif] font-bold text-left whitespace-nowrap"
-              >
-                開始探索
-              </div>
-            </Link>
-            <a
-              href="#featured-skills"
-              data-pencil-name="Secondary CTA"
-              className="box-border w-fit shrink-0 h-fit flex flex-row gap-0 py-[14px] px-[24px] justify-start items-start bg-transparent border border-[#00FFFF] hover:bg-[#00FFFF]/10 active:scale-95 transition-all rounded-[8px] no-underline cursor-pointer"
+              整理你的
+              <br />
+              AI Prompt 與 Skill
+            </div>
+            <div
+              data-pencil-name="Hero Body"
+              className="text-[16px]/[24px] sm:text-[18px]/[27px] box-border w-full text-[#7DCEA0] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left"
             >
-              <div
-                data-pencil-name="Secondary CTA Label"
-                className="text-[16px]/[normal] box-border text-[#00FFFF] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap"
+              把常用指令分類、搜尋、收藏，
+              <br />
+              下一次不再翻聊天室紀錄。
+            </div>
+            <div
+              data-pencil-name="Hero Actions"
+              className="box-border w-fit h-fit shrink-0 flex flex-row gap-[14px] justify-start items-start"
+            >
+              <Link
+                to="/skills"
+                data-pencil-name="Primary CTA"
+                className="box-border w-fit shrink-0 h-fit flex flex-row gap-0 py-[14px] px-[24px] justify-start items-start bg-[#39FF14] hover:bg-[#32dd10] active:scale-95 transition-all rounded-[8px] no-underline cursor-pointer"
               >
-                查看範例
-              </div>
-            </a>
+                <div
+                  data-pencil-name="Primary CTA Label"
+                  className="text-[16px]/[normal] box-border text-[#0A0E1A] font-['JetBrains_Mono',system-ui,sans-serif] font-bold text-left whitespace-nowrap"
+                >
+                  開始探索
+                </div>
+              </Link>
+              <a
+                href="#featured-skills"
+                data-pencil-name="Secondary CTA"
+                className="box-border w-fit shrink-0 h-fit flex flex-row gap-0 py-[14px] px-[24px] justify-start items-start bg-transparent border border-[#00FFFF] hover:bg-[#00FFFF]/10 active:scale-95 transition-all rounded-[8px] no-underline cursor-pointer"
+              >
+                <div
+                  data-pencil-name="Secondary CTA Label"
+                  className="text-[16px]/[normal] box-border text-[#00FFFF] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap"
+                >
+                  查看範例
+                </div>
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -101,7 +108,7 @@ export default function Home() {
       {/* Category Section */}
       <div
         data-pencil-name="Category Section"
-        className="box-border w-full max-w-[1100px] h-fit shrink-0 flex flex-col gap-[20px] justify-start items-start mt-12"
+        className="box-border w-full max-w-[1280px] h-fit shrink-0 flex flex-col gap-[20px] justify-start items-start mt-12"
       >
         <div
           data-pencil-name="Category Heading"
@@ -305,7 +312,7 @@ export default function Home() {
       {/* Featured Prompts Section */}
       <section
         id="featured-skills"
-        className="w-full max-w-[1100px] mt-16 flex flex-col gap-6"
+        className="w-full max-w-[1280px] mt-16 flex flex-col gap-6"
       >
         <div className="flex justify-between items-center border-b border-[#39FF14]/15 pb-3">
           <h2
