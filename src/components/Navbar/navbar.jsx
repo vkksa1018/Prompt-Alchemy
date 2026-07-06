@@ -33,7 +33,7 @@ export default function Navbar() {
           data-pencil-name="Brand Text"
           className="text-[20px]/[normal] box-border text-[#39FF14] font-['JetBrains_Mono',system-ui,sans-serif] font-bold text-left whitespace-nowrap"
         >
-          Prompt Skill Library
+          Prompt 鍊金坊
         </div>
       </Link>
 
