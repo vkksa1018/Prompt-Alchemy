@@ -1,20 +1,17 @@
-import { Outlet } from "react-router-dom";
+// 後台權限守門員：包在需要登入才能看的路由外層。
+// 從 localStorage 讀登入狀態，沒登入就導去 /admin/login。
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { getAdminAuth } from "../api/adminApi";
 
 export default function ProtectedRoute() {
-  // By default, we let users bypass the login check for development/demonstration.
-  // In a real application, you'd check auth state here.
-  const isAuthenticated = true;
+  const location = useLocation();
+  const admin = getAdminAuth(); // localStorage 裡的管理者資料，null 代表未登入
 
-  if (!isAuthenticated) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-gray-50 dark:bg-gray-950">
-        <div className="max-w-md w-full text-center space-y-4 p-8 bg-white dark:bg-gray-900 rounded-lg shadow border dark:border-gray-800">
-          <h2 className="text-2xl font-bold text-red-600 dark:text-red-400">Access Denied</h2>
-          <p className="text-gray-600 dark:text-gray-400">You must be logged in as an administrator to view this page.</p>
-        </div>
-      </div>
-    );
+  if (!admin) {
+    // 未登入 → 導向登入頁。state.from 記住原本想去的位置（之後可用來登入後導回）。
+    return <Navigate to="/admin/login" replace state={{ from: location }} />;
   }
 
+  // 已登入 → 放行，Outlet 會渲染子路由（AdminLayout 及其頁面）。
   return <Outlet />;
 }
