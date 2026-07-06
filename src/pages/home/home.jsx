@@ -19,11 +19,16 @@ export default function Home() {
       {/* Hero Zone */}
       <div
         data-pencil-name="Hero Zone"
-        className="box-border w-full max-w-275 h-auto md:h-85 shrink-0 opacity-[0.9] flex flex-row gap-0 justify-between items-center py-8 md:py-0 border-b border-[#39FF14]/10"
+        className="relative box-border w-full max-w-275 h-auto md:h-85 shrink-0 flex flex-row gap-0 justify-between items-center py-8 md:py-0 border-b border-[#39FF14]/10 overflow-hidden"
       >
         <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-[url('/bg_01.gif')] bg-cover bg-center opacity-50"
+        />
+        <div aria-hidden="true" className="absolute inset-0 bg-[#0A0E1A]/45" />
+        <div
           data-pencil-name="Hero Copy"
-          className="box-border w-full max-w-231.25 shrink-0 h-fit flex flex-col gap-5.5 justify-start items-start"
+          className="relative z-10 box-border w-full max-w-231.25 shrink-0 h-fit flex flex-col gap-5.5 justify-start items-start ps-8"
         >
           <div
             data-pencil-name="Hero Title"
@@ -62,39 +67,13 @@ export default function Home() {
               data-pencil-name="Secondary CTA"
               className="box-border w-fit shrink-0 h-fit flex flex-row gap-0 py-3.5 px-6 justify-start items-start bg-transparent border border-[#00FFFF] hover:bg-[#00FFFF]/10 active:scale-95 transition-all rounded-lg no-underline cursor-pointer"
             >
-              把常用指令分類、搜尋、收藏，
-              <br />
-              下一次不再翻聊天室紀錄。
-            </div>
-            <div
-              data-pencil-name="Hero Actions"
-              className="box-border w-fit h-fit shrink-0 flex flex-row gap-[14px] justify-start items-start"
-            >
-              <Link
-                to="/skills"
-                data-pencil-name="Primary CTA"
-                className="box-border w-fit shrink-0 h-fit flex flex-row gap-0 py-[14px] px-[24px] justify-start items-start bg-[#39FF14] hover:bg-[#32dd10] active:scale-95 transition-all rounded-[8px] no-underline cursor-pointer"
+              <div
+                data-pencil-name="Secondary CTA Label"
+                className="text-[16px]/[normal] box-border text-[#00FFFF] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap"
               >
-                <div
-                  data-pencil-name="Primary CTA Label"
-                  className="text-[16px]/[normal] box-border text-[#0A0E1A] font-['JetBrains_Mono',system-ui,sans-serif] font-bold text-left whitespace-nowrap"
-                >
-                  開始探索
-                </div>
-              </Link>
-              <a
-                href="#featured-skills"
-                data-pencil-name="Secondary CTA"
-                className="box-border w-fit shrink-0 h-fit flex flex-row gap-0 py-[14px] px-[24px] justify-start items-start bg-transparent border border-[#00FFFF] hover:bg-[#00FFFF]/10 active:scale-95 transition-all rounded-[8px] no-underline cursor-pointer"
-              >
-                <div
-                  data-pencil-name="Secondary CTA Label"
-                  className="text-[16px]/[normal] box-border text-[#00FFFF] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap"
-                >
-                  查看範例
-                </div>
-              </a>
-            </div>
+                查看範例
+              </div>
+            </a>
           </div>
         </div>
       </div>
