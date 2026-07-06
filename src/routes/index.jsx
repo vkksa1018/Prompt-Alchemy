@@ -6,6 +6,9 @@ import Skills from "../pages/prompt/skills";
 import SkillDetail from "../pages/prompt/skillDetail";
 import Favorite from "../pages/favorite/favorite";
 import Login from "../pages/member/login";
+import Register from "../pages/member/register";
+import Profile from "../pages/favorite/profile";
+import Password from "../pages/favorite/password";
 import NotFound from "../pages/notFound";
 import FavoriteLayout from "../layouts/favoriteLayout";
 import adminRoutes from "./adminRoutes";
@@ -38,11 +41,23 @@ const router = createHashRouter([
                 path: "favorites",
                 element: <Favorite />,
               },
+              {
+                path: "favorites/profile",
+                element: <Profile />,
+              },
+              {
+                path: "favorites/password",
+                element: <Password />,
+              },
             ],
           },
           {
             path: "login",
             element: <Login />,
+          },
+          {
+            path: "register",
+            element: <Register />,
           },
           {
             path: "*",

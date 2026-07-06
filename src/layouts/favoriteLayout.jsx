@@ -1,24 +1,37 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, NavLink, useNavigate, Navigate } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
 
 export default function FavoriteLayout() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+
   return (
     <div className="min-h-screen bg-[#0A0E1A] text-[#E0F0E8] font-['JetBrains_Mono',system-ui,sans-serif] py-8 px-6 flex flex-col items-center">
       <div
         data-pencil-name="Page Content"
-        className="box-border w-full max-w-[1100px] flex flex-col md:flex-row gap-[22px] justify-start items-start"
+        className="box-border w-full max-w-275 flex flex-col md:flex-row gap-5.5 justify-start items-start"
       >
         {/* Favorites Menu Sidebar */}
         <div
           data-pencil-name="Favorites Menu"
-          className="box-border w-full md:w-[240px] shrink-0 flex flex-col gap-[18px] p-[18px] justify-start items-start bg-[#111827] border border-[#1A3A2A] rounded-[14px]"
+          className="box-border w-full md:w-60 shrink-0 flex flex-col gap-4.5 p-4.5 justify-start items-start bg-[#111827] border border-[#1A3A2A] rounded-[14px]"
         >
           <div
             data-pencil-name="Favorites Brand"
-            className="box-border w-fit h-fit shrink-0 flex flex-row gap-[10px] justify-start items-center"
+            className="box-border w-fit h-fit shrink-0 flex flex-row gap-2.5 justify-start items-center"
           >
             <div
               data-pencil-name="Favorites Mark"
-              className="box-border w-[28px] shrink-0 h-[28px] bg-[#39FF14] rounded-full"
+              className="box-border w-7 shrink-0 h-7 bg-[#39FF14] rounded-full"
             ></div>
             <div
               data-pencil-name="Favorites Brand Text"
@@ -27,49 +40,61 @@ export default function FavoriteLayout() {
               Prompt Skill Library
             </div>
           </div>
-          <div
-            data-pencil-name="Menu 我的收藏"
-            className="box-border w-full h-fit shrink-0 flex flex-row gap-0 py-[10px] px-[12px] justify-start items-start bg-[#39FF14] rounded-[8px]"
+
+          {/* Navigation Links */}
+          <NavLink
+            to="/favorites"
+            end
+            className={({ isActive }) =>
+              `box-border w-full h-fit shrink-0 flex flex-row gap-0 py-2.5 px-3 justify-start items-start rounded-lg no-underline transition-all ${
+                isActive
+                  ? "bg-[#39FF14] text-[#0A0E1A] font-bold"
+                  : "bg-transparent text-[#7DCEA0] hover:bg-[#39FF14]/10 hover:text-[#39FF14]"
+              }`
+            }
           >
-            <div
-              data-pencil-name="Menu Label 我的收藏"
-              className="text-[14px]/[normal] box-border text-[#0A0E1A] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap"
-            >
+            <span className="text-[14px]/[normal] font-['JetBrains_Mono',system-ui,sans-serif] text-inherit text-left whitespace-nowrap">
               我的收藏
-            </div>
-          </div>
-          <div
-            data-pencil-name="Menu 個人資料"
-            className="box-border w-full h-fit shrink-0 flex flex-row gap-0 py-[10px] px-[12px] justify-start items-start bg-transparent hover:bg-[#39FF14]/10 rounded-[8px] cursor-pointer"
+            </span>
+          </NavLink>
+
+          <NavLink
+            to="/favorites/profile"
+            className={({ isActive }) =>
+              `box-border w-full h-fit shrink-0 flex flex-row gap-0 py-2.5 px-3 justify-start items-start rounded-lg no-underline transition-all ${
+                isActive
+                  ? "bg-[#39FF14] text-[#0A0E1A] font-bold"
+                  : "bg-transparent text-[#7DCEA0] hover:bg-[#39FF14]/10 hover:text-[#39FF14]"
+              }`
+            }
           >
-            <div
-              data-pencil-name="Menu Label 個人資料"
-              className="text-[14px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] transition-colors font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap"
-            >
+            <span className="text-[14px]/[normal] font-['JetBrains_Mono',system-ui,sans-serif] text-inherit text-left whitespace-nowrap">
               個人資料
-            </div>
-          </div>
-          <div
-            data-pencil-name="Menu 修改密碼"
-            className="box-border w-full h-fit shrink-0 flex flex-row gap-0 py-[10px] px-[12px] justify-start items-start bg-transparent hover:bg-[#39FF14]/10 rounded-[8px] cursor-pointer"
+            </span>
+          </NavLink>
+
+          <NavLink
+            to="/favorites/password"
+            className={({ isActive }) =>
+              `box-border w-full h-fit shrink-0 flex flex-row gap-0 py-2.5 px-3 justify-start items-start rounded-lg no-underline transition-all ${
+                isActive
+                  ? "bg-[#39FF14] text-[#0A0E1A] font-bold"
+                  : "bg-transparent text-[#7DCEA0] hover:bg-[#39FF14]/10 hover:text-[#39FF14]"
+              }`
+            }
           >
-            <div
-              data-pencil-name="Menu Label 修改密碼"
-              className="text-[14px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] transition-colors font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap"
-            >
+            <span className="text-[14px]/[normal] font-['JetBrains_Mono',system-ui,sans-serif] text-inherit text-left whitespace-nowrap">
               修改密碼
-            </div>
-          </div>
+            </span>
+          </NavLink>
+
           <div
-            data-pencil-name="Menu 登出"
-            className="box-border w-full h-fit shrink-0 flex flex-row gap-0 py-[10px] px-[12px] justify-start items-start bg-transparent hover:bg-[#39FF14]/10 rounded-[8px] cursor-pointer"
+            onClick={handleLogout}
+            className="box-border w-full h-fit shrink-0 flex flex-row gap-0 py-2.5 px-3 justify-start items-start bg-transparent hover:bg-[#FF00FF]/10 text-[#7DCEA0] hover:text-[#FF00FF] rounded-lg cursor-pointer transition-all"
           >
-            <div
-              data-pencil-name="Menu Label 登出"
-              className="text-[14px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] transition-colors font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap"
-            >
+            <span className="text-[14px]/[normal] font-['JetBrains_Mono',system-ui,sans-serif] text-inherit text-left whitespace-nowrap">
               登出
-            </div>
+            </span>
           </div>
         </div>
 
