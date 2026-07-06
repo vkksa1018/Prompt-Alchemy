@@ -1,93 +1,30 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import PromptCard from "../../components/PromptCard/promptCard";
+import { skillItemsTable, getParameterName } from "../../api/mockData";
 
-export const initialPrompts = [
-  {
-    id: 1,
-    title: "後端 API 審查",
-    description: "檢查 Express / Next.js API 的錯誤處理、安全性與回傳結構。",
-    likes: 32,
-    uses: 125,
-    category: "後端開發",
-    tags: ["#API", "#Security"],
-    content:
-      "請審查以下後端 API 程式碼的錯誤處理、安全性與 RESTful 回傳結構：\n\n[在此輸入程式碼]",
-    date: "2026-07-01",
-    isNew: true,
-    isHot: true,
-  },
-  {
-    id: 2,
-    title: "前端 Debug 助手",
-    description: "協助找出 React / Next.js 專案的錯誤原因與除錯線索。",
-    likes: 21,
-    uses: 98,
-    category: "前端開發",
-    tags: ["#React", "#Debug"],
-    content:
-      "請分析以下 React/Next.js 錯誤訊息，並給出可能的修復方案及除錯步驟：\n\n[在此輸入錯誤訊息]",
-    date: "2026-06-28",
-    isNew: false,
-    isHot: true,
-  },
-  {
-    id: 3,
-    title: "SQL 查詢優化",
-    description: "分析 SQL 查詢效能瓶頸與最佳化建議。",
-    likes: 18,
-    uses: 77,
-    category: "後端開發",
-    tags: ["#SQL"],
-    content:
-      "請分析以下 SQL 查詢的效能瓶頸，並提供最佳化建議及索引設計：\n\n[在此輸入 SQL 語句]",
-    date: "2026-06-25",
-    isNew: false,
-    isHot: false,
-  },
-  {
-    id: 4,
-    title: "資安漏洞檢查清單",
-    description: "檢查常見的 Web 與雲端環境風險掃描方式。",
-    likes: 15,
-    uses: 63,
-    category: "資安相關",
-    tags: ["#Security"],
-    content:
-      "請提供一份針對以下環境的 Web 應用程式安全檢測清單與常見漏洞防範建議：\n\n[在此說明技術棧環境]",
-    date: "2026-06-20",
-    isNew: false,
-    isHot: false,
-  },
-  {
-    id: 5,
-    title: "英文翻譯與潤飾",
-    description: "將中文技術文件翻譯為專業流暢的英文，並提供多種口吻潤飾。",
-    likes: 42,
-    uses: 180,
-    category: "翻譯助手",
-    tags: ["#Translation"],
-    content:
-      "請將以下中文技術內容翻譯成專業、自然的英文，並提供 Academic 與 Professional 兩種口吻：\n\n[在此輸入內容]",
-    date: "2026-07-02",
-    isNew: true,
-    isHot: true,
-  },
-  {
-    id: 6,
-    title: "Regex 自動生成器",
-    description: "輸入期望匹配與排除的規則，自動產生高效率的正則表達式。",
-    likes: 29,
-    uses: 110,
-    category: "小工具",
-    tags: ["#Debug"],
-    content:
-      "請根據以下條件生成一個高效的正則表達式，並附上測試案例說明：\n- 匹配：[條件]\n- 排除：[條件]\n\n輸入字串範例：",
-    date: "2026-06-15",
-    isNew: false,
-    isHot: false,
-  },
-];
+export const initialPrompts = skillItemsTable.map((item) => {
+  const categoryName = getParameterName(item.categoryId);
+  const tagNames = item.tags.map((tagId) => getParameterName(tagId));
+  const createdDate = item.createdAt.split("T")[0];
+
+  // Calculate dynamic tags
+  const isNew = new Date(item.createdAt) >= new Date("2026-06-25T00:00:00Z");
+  const isHot = item.favoriteCount >= 20;
+
+  return {
+    ...item,
+    category: categoryName,
+    tags: tagNames,
+    date: createdDate,
+    isNew,
+    isHot,
+    likes: item.favoriteCount,
+    uses: item.copyCount,
+    description: item.intro,
+    content: item.promptContent,
+  };
+});
 
 export default function Skills() {
   const location = useLocation();

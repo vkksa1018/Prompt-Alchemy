@@ -2,90 +2,35 @@ import { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { copyToClipboard } from "../../utils/copyToClipboard";
 import useAuth from "../../hooks/useAuth";
+import { skillItemsTable, getParameterName } from "../../api/mockData";
 
-const promptsDb = {
-  1: {
-    title: "後端 API 審查",
-    category: "後端開發",
-    tags: ["後端", "#API", "#Security", "#Express"],
-    description:
-      "當你接收一支 API，需要 AI 幫你檢查安全性、錯誤處理與資料結構時使用。",
-    promptContent:
-      "請你扮演資深後端工程師，檢查以下 API 程式碼。\n幫我找出可能的錯誤、安全性風險、效能問題，\n並提出改善建議。\n\n輸出請包含：\n【程式碼問題】\n【改善建議程式碼】\n【為什麼這樣改】",
-    exampleContent:
-      "請檢查這段 Express route...\n\napp.get('/api/user', async (req, res) => {\n  const id = req.query.id;\n  const user = await db.query(...);\n  res.json(user);\n});",
-    phoneDesc: "幫你檢查 API 規格、錯誤回應與安全性。",
-    phoneCode: "app.get('/api', async () => {\n  return json(data)\n})",
-  },
-  2: {
-    title: "前端 Debug 助手",
-    category: "前端開發",
-    tags: ["前端", "#React", "#Debug", "#Vite"],
-    description: "協助找出 React / Next.js 專案的錯誤原因與除錯線索。",
-    promptContent:
-      "請分析以下 React/Next.js 錯誤訊息，並給出可能的修復方案及除錯步驟：\n\n[在此輸入錯誤訊息]",
-    exampleContent:
-      "TypeError: Cannot read properties of undefined (reading 'map')\n  at ProductList (ProductList.jsx:12)",
-    phoneDesc: "協助您進行前端元件的故障排除。",
-    phoneCode: "const [data, setData] = useState()",
-  },
-  3: {
-    title: "SQL 查詢優化",
-    category: "後端開發",
-    tags: ["後端", "#SQL", "#Database", "#MySQL"],
-    description: "分析 SQL 查詢效能瓶頸與最佳化建議。",
-    promptContent:
-      "請分析以下 SQL 查詢的效能瓶頸，並提供最佳化建議及索引設計：\n\n[在此輸入 SQL 語句]",
-    exampleContent:
-      "SELECT * FROM orders WHERE user_id = 5 AND status = 'pending' ORDER BY created_at DESC;",
-    phoneDesc: "檢查 SQL 與進行效能最佳化。",
-    phoneCode: "SELECT * FROM users WHERE id = 1",
-  },
-  4: {
-    title: "資安漏洞檢查清單",
-    category: "資安相關",
-    tags: ["資安", "#Security", "#Web"],
-    description: "檢查常見的 Web 與雲端環境風險掃描方式。",
-    promptContent:
-      "請提供一份針對以下環境的 Web 應用程式安全檢測清單與常見漏洞防範建議：\n\n[在此說明技術棧環境]",
-    exampleContent: "Web API Node.js environment...",
-    phoneDesc: "檢查 Web 常見安全性風險。",
-    phoneCode: "npm audit",
-  },
-  5: {
-    title: "英文翻譯與潤飾",
-    category: "翻譯助手",
-    tags: ["寫作", "#English", "#Translation"],
-    description: "將中文技術文件翻譯為專業流暢的英文，並提供多種口吻潤飾。",
-    promptContent:
-      "請將以下中文技術內容翻譯成專業、自然的英文，並提供 Academic 與 Professional 兩種口吻：\n\n[在此輸入內容]",
-    exampleContent: "如何使用 React 進行狀態管理...",
-    phoneDesc: "英文技術文件專家翻譯與修飾。",
-    phoneCode: "Translate: How to use React...",
-  },
-  6: {
-    title: "Regex 自動生成器",
-    category: "小工具",
-    tags: ["工具", "#Regex", "#Helper"],
-    description: "輸入期望匹配與排除的規則，自動產生高效率的正則表達式。",
-    promptContent:
-      "請根據以下條件生成一個高效的正則表達式，並附上測試案例說明：\n- 匹配：[條件]\n- 排除：[條件]\n\n輸入字串範例：",
-    exampleContent: "匹配 email 格式，並排除 .com 結尾...",
-    phoneDesc: "自動生成正則表達式小工具。",
-    phoneCode: "/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$/",
-  },
-};
+// Construct promptsDb dynamically from the relational database table
+const promptsDb = {};
+skillItemsTable.forEach((item) => {
+  const categoryName = getParameterName(item.categoryId);
+  const tagNames = item.tags.map((tagId) => getParameterName(tagId));
+  promptsDb[item.id] = {
+    title: item.title,
+    category: categoryName,
+    tags: tagNames,
+    description: item.intro,
+    promptContent: item.promptContent,
+    exampleContent: item.exampleInput, // Maps to exampleInput in the schema
+    phoneDesc: item.intro,
+    phoneCode: item.promptContent.slice(0, 40),
+  };
+});
 
 export default function SkillDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, favorites, toggleFavorite } = useAuth();
-  const promptData = promptsDb[id] || promptsDb[1];
+  const promptData = promptsDb[id] || promptsDb[Object.keys(promptsDb)[0]];
 
   const [copiedPrompt, setCopiedPrompt] = useState(false);
   const [copiedExample, setCopiedExample] = useState(false);
 
-  const isFavorited = favorites.includes(Number(id));
+  const isFavorited = favorites.includes(id);
 
   const handleCopyPrompt = async () => {
     const success = await copyToClipboard(promptData.promptContent);
@@ -108,7 +53,7 @@ export default function SkillDetail() {
       navigate("/login");
       return;
     }
-    toggleFavorite(Number(id));
+    toggleFavorite(id);
   };
 
   const getTagStyles = (tag) => {

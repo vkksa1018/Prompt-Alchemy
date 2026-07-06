@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect } from "react";
+import { favoritesTable, usersTable } from "../api/mockData";
 
 export const AuthContext = createContext(null);
 
@@ -14,6 +15,13 @@ export function AuthProvider({ children }) {
       const storedFavs = localStorage.getItem(`favorites_${parsedUser.email}`);
       if (storedFavs) {
         setFavorites(JSON.parse(storedFavs));
+      } else {
+        // Retrieve initial favorites from the relational mock database
+        const userDbId = parsedUser.id || (usersTable.find(u => u.email === parsedUser.email)?.id);
+        const dbFavs = favoritesTable
+          .filter((f) => f.userId === userDbId)
+          .map((f) => f.SkillItemId);
+        setFavorites(dbFavs);
       }
     }
   }, []);
@@ -25,7 +33,11 @@ export function AuthProvider({ children }) {
     if (storedFavs) {
       setFavorites(JSON.parse(storedFavs));
     } else {
-      setFavorites([]);
+      const userDbId = userData.id || (usersTable.find(u => u.email === userData.email)?.id);
+      const dbFavs = favoritesTable
+        .filter((f) => f.userId === userDbId)
+        .map((f) => f.SkillItemId);
+      setFavorites(dbFavs);
     }
   };
 
@@ -65,7 +77,7 @@ export function AuthProvider({ children }) {
 
   const resetFavorites = () => {
     if (!user) return;
-    const defaults = [1, 2];
+    const defaults = ["prompt-uuid-0001-0000-000000000001", "prompt-uuid-0001-0000-000000000002"];
     setFavorites(defaults);
     localStorage.setItem(`favorites_${user.email}`, JSON.stringify(defaults));
   };

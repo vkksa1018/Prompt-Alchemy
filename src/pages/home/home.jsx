@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import PromptCard from "../../components/PromptCard/promptCard";
+import { skillItemsTable } from "../../api/mockData";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -8,42 +9,10 @@ export default function Home() {
     navigate("/skills", { state: { category: categoryName } });
   };
 
-  // Mock data for featured prompts
-  const featuredPrompts = [
-    {
-      id: 1,
-      title: "後端 API 審查",
-      description: "檢查 Express / Next.js API 的錯誤處理、安全性與回傳結構。",
-      likes: 32,
-      uses: 125,
-      category: "後端開發",
-      tags: ["後端", "#API", "#Security"],
-      content:
-        "請審查以下後端 API 程式碼的錯誤處理、安全性（如 SQL injection, XSS）與 RESTful 回傳結構：\n\n[在此輸入程式碼]",
-    },
-    {
-      id: 2,
-      title: "前端 Debug 助手",
-      description: "協助找出 React / Next.js 專案的錯誤原因與除錯線索。",
-      likes: 21,
-      uses: 98,
-      category: "前端開發",
-      tags: ["前端", "#React", "#Debug"],
-      content:
-        "請分析以下 React/Next.js 錯誤訊息，並給出可能的修復方案及除錯步驟：\n\n[在此輸入錯誤訊息]",
-    },
-    {
-      id: 3,
-      title: "SQL 查詢優化",
-      description: "分析 SQL 查詢效能瓶頸與最佳化建議。",
-      likes: 18,
-      uses: 77,
-      category: "後端開發",
-      tags: ["後端", "#SQL", "#Database"],
-      content:
-        "請分析以下 SQL 查詢的效能瓶頸，並提供最佳化建議及索引設計：\n\n[在此輸入 SQL 語句]",
-    },
-  ];
+  // Dynamically retrieve featured prompts from the relational mock database
+  const featuredPrompts = skillItemsTable
+    .filter((prompt) => prompt.isActive && prompt.status === "published")
+    .slice(0, 3);
 
   return (
     <div className="min-h-screen bg-[#0A0E1A] text-[#E0F0E8] font-['JetBrains_Mono',system-ui,sans-serif] px-6 py-8 flex flex-col items-center">

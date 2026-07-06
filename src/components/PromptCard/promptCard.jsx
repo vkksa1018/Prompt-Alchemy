@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { copyToClipboard } from "../../utils/copyToClipboard";
 import useAuth from "../../hooks/useAuth";
+import { getParameterName } from "../../api/mockData";
 
 export default function PromptCard({ prompt }) {
   const navigate = useNavigate();
@@ -9,12 +10,12 @@ export default function PromptCard({ prompt }) {
   const [copied, setCopied] = useState(false);
 
   const liked = favorites.includes(prompt.id);
-  const likesCount = (prompt?.likes ?? 32) + (liked ? 1 : 0);
+  const likesCount = (prompt?.favoriteCount ?? 0) + (liked ? 1 : 0);
 
   const handleCopy = async (e) => {
     e.stopPropagation();
     const textToCopy =
-      prompt?.content || prompt?.description || "Default Prompt Content";
+      prompt?.promptContent || prompt?.intro || "Default Prompt Content";
     const success = await copyToClipboard(textToCopy);
     if (success) {
       setCopied(true);
@@ -35,7 +36,13 @@ export default function PromptCard({ prompt }) {
     navigate(`/skills/${prompt.id || 1}`);
   };
 
-  const tags = prompt?.tags || ["後端", "#API", "#Security"];
+  const categoryName = prompt?.category || getParameterName(prompt?.categoryId) || "其他";
+  const tags = (prompt?.tags || []).map((t) => {
+    if (typeof t === "string" && t.includes("uuid")) {
+      return getParameterName(t);
+    }
+    return t;
+  });
 
   const getTagStyles = (tag) => {
     const cleanTag = tag.trim().toLowerCase().replace("#", "");
@@ -222,7 +229,7 @@ export default function PromptCard({ prompt }) {
       資安相關: "bg-[#1A0A1A]",
       翻譯助手: "bg-[#1A1A0A]",
       小工具: "bg-[#1A0A15]",
-    }[prompt.category] || "bg-[#0F1F18]";
+    }[categoryName] || "bg-[#0F1F18]";
 
   return (
     <div
@@ -242,7 +249,7 @@ export default function PromptCard({ prompt }) {
             data-pencil-name="Icon Wrap"
             className={`box-border w-10 shrink-0 h-10 flex flex-row gap-0 justify-center items-center ${iconWrapBg} rounded-[10px]`}
           >
-            {getCategoryIcon(prompt.category)}
+            {getCategoryIcon(categoryName)}
           </div>
         </div>
         <button
@@ -268,7 +275,7 @@ export default function PromptCard({ prompt }) {
           data-pencil-name="Card Description"
           className="text-[12px]/[18px] box-border w-full text-[#7DCEA0] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left line-clamp-2 h-9 overflow-hidden"
         >
-          {prompt?.description ||
+          {prompt?.intro ||
             "檢查 Express / Next.js API 的錯誤處理、安全性與回傳結構。"}
         </div>
       </div>
@@ -315,7 +322,7 @@ export default function PromptCard({ prompt }) {
           data-pencil-name="Uses"
           className="text-[12px]/[normal] box-border text-[#7DCEA0] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap"
         >
-          {prompt?.uses || 125}
+          {prompt?.copyCount || 0}
         </div>
       </div>
     </div>
