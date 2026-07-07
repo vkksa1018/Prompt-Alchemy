@@ -1,18 +1,21 @@
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import PromptCard from "../../components/PromptCard/promptCard";
-import { skillItemsTable } from "../../api/mockData";
+import { getPublishedPrompts } from "../../api/promptApi";
 
 export default function Home() {
   const navigate = useNavigate();
+  const [featuredPrompts, setFeaturedPrompts] = useState([]);
+
+  useEffect(() => {
+    getPublishedPrompts().then((list) => {
+      setFeaturedPrompts(list.slice(0, 3));
+    });
+  }, []);
 
   const handleCategoryClick = (categoryName) => {
     navigate("/skills", { state: { category: categoryName } });
   };
-
-  // Dynamically retrieve featured prompts from the relational mock database
-  const featuredPrompts = skillItemsTable
-    .filter((prompt) => prompt.isActive && prompt.status === "published")
-    .slice(0, 3);
 
   return (
     <div className="w-full bg-[#0A0E1A] text-[#E0F0E8] font-['JetBrains_Mono',system-ui,sans-serif] px-6 py-8 flex flex-col items-center">

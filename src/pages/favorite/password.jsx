@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
+import { updateUserPassword } from "../../api/authApi";
 
 export default function Password() {
   const navigate = useNavigate();
@@ -17,24 +18,7 @@ export default function Password() {
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
-  if (!user) {
-    return (
-      <div className="box-border w-full flex flex-col gap-5 p-10 justify-center items-center bg-[#111827] border border-[#1A3A2A] rounded-[14px] text-center font-['JetBrains_Mono',system-ui,sans-serif]">
-        <div className="text-[48px]">🔒</div>
-        <div className="text-[20px] font-bold text-[#FFFFFF]">請先登入帳號</div>
-        <div className="text-[14px] text-[#7DCEA0] max-w-[320px]">
-          你需要先登入，才能修改密碼。
-        </div>
-        <button
-          type="button"
-          onClick={() => navigate("/login")}
-          className="box-border w-fit h-fit py-3 px-6 bg-[#39FF14] text-[#0A0E1A] font-bold rounded-lg border-none cursor-pointer hover:bg-[#39FF14]/90 transition-colors"
-        >
-          前往登入
-        </button>
-      </div>
-    );
-  }
+  if (!user) return null;
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -56,14 +40,19 @@ export default function Password() {
       return;
     }
 
-    // Mock password change success
-    setSuccessMsg("密碼已修改成功！下一次登入時請使用新密碼。");
-
-    // Clear fields
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmNewPassword("");
+    updateUserPassword(user.email, currentPassword, newPassword)
+      .then(() => {
+        setSuccessMsg("密碼已修改成功！下一次登入時請使用新密碼。");
+        // Clear fields
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmNewPassword("");
+      })
+      .catch((err) => {
+        setError(err.message || "密碼修改失敗，請稍後再試。");
+      });
   };
+
 
   return (
     <div className="box-border w-full flex flex-col gap-6 p-[24px_28px] bg-[#111827] border border-[#1A3A2A] rounded-[14px] font-['JetBrains_Mono',system-ui,sans-serif]">

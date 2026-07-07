@@ -34,24 +34,7 @@ export default function Profile() {
     }
   }, [user]);
 
-  if (!user) {
-    return (
-      <div className="box-border w-full flex flex-col gap-5 p-10 justify-center items-center bg-[#111827] border border-[#1A3A2A] rounded-[14px] text-center font-['JetBrains_Mono',system-ui,sans-serif]">
-        <div className="text-[48px]">🔒</div>
-        <div className="text-[20px] font-bold text-[#FFFFFF]">請先登入帳號</div>
-        <div className="text-[14px] text-[#7DCEA0] max-w-[320px]">
-          你需要先登入，才能檢視與修改個人資料頁面。
-        </div>
-        <button
-          type="button"
-          onClick={() => navigate("/login")}
-          className="box-border w-fit h-fit py-3 px-6 bg-[#39FF14] text-[#0A0E1A] font-bold rounded-lg border-none cursor-pointer hover:bg-[#39FF14]/90 transition-colors"
-        >
-          前往登入
-        </button>
-      </div>
-    );
-  }
+  if (!user) return null;
 
   const handleSave = (e) => {
     e.preventDefault();

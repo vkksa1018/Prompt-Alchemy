@@ -1,46 +1,54 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { copyToClipboard } from "../../utils/copyToClipboard";
 import useAuth from "../../hooks/useAuth";
-import { skillItemsTable, getParameterName } from "../../api/mockData";
-
-// Construct promptsDb dynamically from the relational database table
-const promptsDb = {};
-skillItemsTable.forEach((item) => {
-  const categoryName = getParameterName(item.categoryId);
-  const tagNames = item.tags.map((tagId) => getParameterName(tagId));
-  promptsDb[item.id] = {
-    title: item.title,
-    category: categoryName,
-    tags: tagNames,
-    description: item.intro,
-    promptContent: item.promptContent,
-    exampleContent: item.exampleInput, // Maps to exampleInput in the schema
-    phoneDesc: item.intro,
-    phoneCode: item.promptContent.slice(0, 40),
-  };
-});
+import { getPromptById, getPublishedPrompts, incrementCopyCount } from "../../api/promptApi";
 
 export default function SkillDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, favorites, toggleFavorite } = useAuth();
-  const promptData = promptsDb[id] || promptsDb[Object.keys(promptsDb)[0]];
 
+  const [promptData, setPromptData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [copiedPrompt, setCopiedPrompt] = useState(false);
   const [copiedExample, setCopiedExample] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    getPromptById(id).then((data) => {
+      if (data) {
+        setPromptData(data);
+        setLoading(false);
+      } else {
+        // Fallback to first published prompt if ID not found
+        getPublishedPrompts().then((list) => {
+          if (list.length > 0) {
+            setPromptData(list[0]);
+          }
+          setLoading(false);
+        });
+      }
+    });
+  }, [id]);
 
   const isFavorited = favorites.includes(id);
 
   const handleCopyPrompt = async () => {
+    if (!promptData) return;
     const success = await copyToClipboard(promptData.promptContent);
     if (success) {
       setCopiedPrompt(true);
       setTimeout(() => setCopiedPrompt(false), 2000);
+      // Increment copy counter in dynamic local storage database
+      incrementCopyCount(promptData.id).catch((err) => {
+        console.error("Failed to increment copy count", err);
+      });
     }
   };
 
   const handleCopyExample = async () => {
+    if (!promptData) return;
     const success = await copyToClipboard(promptData.exampleContent);
     if (success) {
       setCopiedExample(true);
@@ -55,6 +63,7 @@ export default function SkillDetail() {
     }
     toggleFavorite(id);
   };
+
 
   const getTagStyles = (tag) => {
     const cleanTag = tag.trim().toLowerCase().replace("#", "");
@@ -137,6 +146,14 @@ export default function SkillDetail() {
         return styles[Math.abs(hash) % styles.length];
     }
   };
+
+  if (loading || !promptData) {
+    return (
+      <div className="w-full min-h-screen bg-[#0A0E1A] text-[#E0F0E8] font-['JetBrains_Mono',system-ui,sans-serif] py-8 px-6 flex items-center justify-center">
+        <div className="text-[18px] text-[#7DCEA0]">載入中...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full min-h-screen bg-[#0A0E1A] text-[#E0F0E8] font-['JetBrains_Mono',system-ui,sans-serif] py-8 px-6 flex flex-col items-center">

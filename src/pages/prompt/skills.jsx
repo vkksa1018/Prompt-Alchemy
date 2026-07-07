@@ -1,30 +1,61 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import PromptCard from "../../components/PromptCard/promptCard";
-import { skillItemsTable, getParameterName } from "../../api/mockData";
+import { getPublishedPrompts, getCategories, getTags } from "../../api/promptApi";
 
-export const initialPrompts = skillItemsTable.map((item) => {
-  const categoryName = getParameterName(item.categoryId);
-  const tagNames = item.tags.map((tagId) => getParameterName(tagId));
-  const createdDate = item.createdAt.split("T")[0];
-
-  // Calculate dynamic tags
-  const isNew = new Date(item.createdAt) >= new Date("2026-06-25T00:00:00Z");
-  const isHot = item.favoriteCount >= 20;
-
-  return {
-    ...item,
-    category: categoryName,
-    tags: tagNames,
-    date: createdDate,
-    isNew,
-    isHot,
-    likes: item.favoriteCount,
-    uses: item.copyCount,
-    description: item.intro,
-    content: item.promptContent,
-  };
-});
+const getTagStyles = (label) => {
+  const cleanLabel = label.toLowerCase().replace("#", "");
+  switch (cleanLabel) {
+    case "api":
+      return {
+        bg: "bg-[#0A1520]",
+        border: "border-[#00FFFF]",
+        text: "text-[#00FFFF]",
+      };
+    case "react":
+    case "vite":
+      return {
+        bg: "bg-[#1A0A1A]",
+        border: "border-[#FF00FF]",
+        text: "text-[#FF00FF]",
+      };
+    case "sql":
+    case "database":
+    case "mysql":
+      return {
+        bg: "bg-[#1A1A0A]",
+        border: "border-[#FFD700]",
+        text: "text-[#FFD700]",
+      };
+    case "security":
+    case "web":
+      return {
+        bg: "bg-[#0A1F1A]",
+        border: "border-[#39FF14]",
+        text: "text-[#39FF14]",
+      };
+    case "debug":
+      return {
+        bg: "bg-[#1A0A0A]",
+        border: "border-[#FF8C00]",
+        text: "text-[#FF8C00]",
+      };
+    case "node.js":
+    case "node":
+    case "express":
+      return {
+        bg: "bg-[#1A0A15]",
+        border: "border-[#FF3366]",
+        text: "text-[#FF3366]",
+      };
+    default:
+      return {
+        bg: "bg-[#0F1E24]",
+        border: "border-[#3b82f6]",
+        text: "text-[#3b82f6]",
+      };
+  }
+};
 
 export default function Skills() {
   const location = useLocation();
@@ -33,6 +64,32 @@ export default function Skills() {
   const [selectedTag, setSelectedTag] = useState(null);
   const [sortBy, setSortBy] = useState("date"); // "date" | "popularity"
 
+  const [prompts, setPrompts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [tags, setTags] = useState([]);
+
+  useEffect(() => {
+    // Load categories
+    getCategories().then((cats) => {
+      setCategories([
+        { name: "全部", icon: null },
+        { name: "最新技能", icon: "✦", iconColor: "text-[#00FFFF]" },
+        { name: "熱門分類", icon: "🔥", iconColor: "text-[#FF8C00]" },
+        ...cats.map((c) => ({ name: c.name, icon: null })),
+      ]);
+    });
+
+    // Load tags
+    getTags().then((tgList) => {
+      setTags(tgList);
+    });
+
+    // Load prompts
+    getPublishedPrompts().then((list) => {
+      setPrompts(list);
+    });
+  }, []);
+
   useEffect(() => {
     if (location.state && location.state.category) {
       setSelectedCategory(location.state.category);
@@ -40,7 +97,7 @@ export default function Skills() {
   }, [location.state]);
 
   // Filter & Sort logic
-  const filteredPrompts = initialPrompts
+  const filteredPrompts = prompts
     .filter((prompt) => {
       // Category filter
       if (selectedCategory === "最新技能") return prompt.isNew;
@@ -68,57 +125,6 @@ export default function Skills() {
       }
       return new Date(b.date) - new Date(a.date);
     });
-
-  const categories = [
-    { name: "全部", icon: null },
-    { name: "最新技能", icon: "✦", iconColor: "text-[#00FFFF]" },
-    { name: "熱門分類", icon: "🔥", iconColor: "text-[#FF8C00]" },
-    { name: "前端開發", icon: null },
-    { name: "後端開發", icon: null },
-    { name: "資安相關", icon: null },
-    { name: "除錯技巧", icon: null },
-    { name: "翻譯助手", icon: null },
-    { name: "小工具", icon: null },
-  ];
-
-  const sidebarTags = [
-    {
-      label: "#API",
-      bg: "bg-[#0A1520]",
-      border: "border-[#00FFFF]",
-      text: "text-[#00FFFF]",
-    },
-    {
-      label: "#React",
-      bg: "bg-[#1A0A15]",
-      border: "border-[#FF00FF]",
-      text: "text-[#FF00FF]",
-    },
-    {
-      label: "#SQL",
-      bg: "bg-[#1A1A0A]",
-      border: "border-[#FFD700]",
-      text: "text-[#FFD700]",
-    },
-    {
-      label: "#Security",
-      bg: "bg-[#0A1F1A]",
-      border: "border-[#39FF14]",
-      text: "text-[#39FF14]",
-    },
-    {
-      label: "#Debug",
-      bg: "bg-[#1A0A0A]",
-      border: "border-[#FF8C00]",
-      text: "text-[#FF8C00]",
-    },
-    {
-      label: "#Node.js",
-      bg: "bg-[#1A0A15]",
-      border: "border-[#FF3366]",
-      text: "text-[#FF3366]",
-    },
-  ];
 
   const handleCategorySelect = (categoryName) => {
     setSelectedCategory(categoryName);
@@ -184,23 +190,24 @@ export default function Skills() {
             data-pencil-name="Tag Column"
             className="box-border w-full h-fit flex flex-wrap gap-2 justify-start items-start"
           >
-            {sidebarTags.map((tag) => {
-              const isSelected = selectedTag === tag.label;
+            {tags.map((tag) => {
+              const style = getTagStyles(tag.name);
+              const isSelected = selectedTag === tag.name;
               return (
                 <button
-                  key={tag.label}
+                  key={tag.id}
                   type="button"
-                  onClick={() => handleTagToggle(tag.label)}
+                  onClick={() => handleTagToggle(tag.name)}
                   className={`box-border w-fit h-fit flex flex-row gap-0 py-1.5 px-2.5 justify-start items-start rounded-[999px] border cursor-pointer transition-all ${
                     isSelected
-                      ? `bg-transparent ${tag.border} ring-2 ring-offset-2 ring-offset-[#111827] ring-[#00FFFF]`
-                      : `${tag.bg} ${tag.border} hover:opacity-80`
+                      ? `bg-transparent ${style.border} ring-2 ring-offset-2 ring-offset-[#111827] ring-[#00FFFF]`
+                      : `${style.bg} ${style.border} hover:opacity-80`
                   }`}
                 >
                   <span
-                    className={`text-[12px]/[normal] ${tag.text} whitespace-nowrap`}
+                    className={`text-[12px]/[normal] ${style.text} whitespace-nowrap`}
                   >
-                    {tag.label}
+                    {tag.name}
                   </span>
                 </button>
               );
@@ -292,3 +299,4 @@ export default function Skills() {
     </div>
   );
 }
+
