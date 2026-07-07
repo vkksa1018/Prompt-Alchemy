@@ -15,7 +15,7 @@ export default function FavoriteLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0E1A] text-[#E0F0E8] font-['JetBrains_Mono',system-ui,sans-serif] py-8 px-6 flex flex-col items-center">
+    <div className="min-h-screen bg-[#0A0E1A] text-[#E0F0E8] py-8 px-6 flex flex-col items-center">
       <div
         data-pencil-name="Page Content"
         className="box-border w-full max-w-275 flex flex-col md:flex-row gap-5.5 justify-start items-start"
@@ -35,7 +35,7 @@ export default function FavoriteLayout() {
             ></div>
             <div
               data-pencil-name="Favorites Brand Text"
-              className="text-[16px]/[normal] box-border text-[#39FF14] font-['JetBrains_Mono',system-ui,sans-serif] font-bold text-left whitespace-nowrap"
+              className="text-[16px]/[normal] box-border text-[#39FF14] font-bold text-left whitespace-nowrap"
             >
               Prompt Skill Library
             </div>
@@ -53,7 +53,7 @@ export default function FavoriteLayout() {
               }`
             }
           >
-            <span className="text-[14px]/[normal] font-['JetBrains_Mono',system-ui,sans-serif] text-inherit text-left whitespace-nowrap">
+            <span className="text-[14px]/[normal] text-inherit text-left whitespace-nowrap">
               我的收藏
             </span>
           </NavLink>
@@ -68,7 +68,7 @@ export default function FavoriteLayout() {
               }`
             }
           >
-            <span className="text-[14px]/[normal] font-['JetBrains_Mono',system-ui,sans-serif] text-inherit text-left whitespace-nowrap">
+            <span className="text-[14px]/[normal] text-inherit text-left whitespace-nowrap">
               個人資料
             </span>
           </NavLink>
@@ -83,7 +83,7 @@ export default function FavoriteLayout() {
               }`
             }
           >
-            <span className="text-[14px]/[normal] font-['JetBrains_Mono',system-ui,sans-serif] text-inherit text-left whitespace-nowrap">
+            <span className="text-[14px]/[normal] text-inherit text-left whitespace-nowrap">
               修改密碼
             </span>
           </NavLink>
@@ -92,7 +92,7 @@ export default function FavoriteLayout() {
             onClick={handleLogout}
             className="box-border w-full h-fit shrink-0 flex flex-row gap-0 py-2.5 px-3 justify-start items-start bg-transparent hover:bg-[#FF00FF]/10 text-[#7DCEA0] hover:text-[#FF00FF] rounded-lg cursor-pointer transition-all"
           >
-            <span className="text-[14px]/[normal] font-['JetBrains_Mono',system-ui,sans-serif] text-inherit text-left whitespace-nowrap">
+            <span className="text-[14px]/[normal] text-inherit text-left whitespace-nowrap">
               登出
             </span>
           </div>

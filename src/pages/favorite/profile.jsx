@@ -36,7 +36,7 @@ export default function Profile() {
 
   if (!user) {
     return (
-      <div className="box-border w-full flex flex-col gap-5 p-10 justify-center items-center bg-[#111827] border border-[#1A3A2A] rounded-[14px] text-center font-['JetBrains_Mono',system-ui,sans-serif]">
+      <div className="box-border w-full flex flex-col gap-5 p-10 justify-center items-center bg-[#111827] border border-[#1A3A2A] rounded-[14px] text-center ">
         <div className="text-[48px]">🔒</div>
         <div className="text-[20px] font-bold text-[#FFFFFF]">請先登入帳號</div>
         <div className="text-[14px] text-[#7DCEA0] max-w-[320px]">
@@ -66,7 +66,7 @@ export default function Profile() {
   };
 
   return (
-    <div className="box-border w-full flex flex-col gap-6 p-[24px_28px] bg-[#111827] border border-[#1A3A2A] rounded-[14px] font-['JetBrains_Mono',system-ui,sans-serif]">
+    <div className="box-border w-full flex flex-col gap-6 p-[24px_28px] bg-[#111827] border border-[#1A3A2A] rounded-[14px] ">
       <div className="box-border w-full h-fit flex flex-col gap-1.5 border-b border-[#1A3A2A] pb-4">
         <div className="text-[28px]/[normal] text-[#FFFFFF] font-bold">
           個人資料

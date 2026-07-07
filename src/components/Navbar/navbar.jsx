@@ -24,14 +24,14 @@ export default function Navbar() {
           ></div>
           <div
             data-pencil-name="Brand Dot"
-            className="text-[14px]/[normal] box-border absolute left-2 top-1.5 text-[#0A0E1A] font-['JetBrains_Mono',system-ui,sans-serif] font-bold text-left whitespace-nowrap z-10"
+            className="text-[14px]/[normal] box-border absolute left-2 top-1.5 text-[#0A0E1A] font-bold text-left whitespace-nowrap z-10"
           >
             ✦
           </div>
         </div>
         <div
           data-pencil-name="Brand Text"
-          className="text-[20px]/[normal] box-border text-[#39FF14] font-['JetBrains_Mono',system-ui,sans-serif] font-bold text-left whitespace-nowrap"
+          className="text-[20px]/[normal] box-border text-[#39FF14] font-bold text-left whitespace-nowrap"
         >
           Prompt 鍊金坊
         </div>
@@ -44,14 +44,14 @@ export default function Navbar() {
         <Link
           to="/"
           data-pencil-name="Nav 首頁"
-          className="text-[14px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] transition-colors font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap no-underline"
+          className="text-[16px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] transition-colors font-bold text-left whitespace-nowrap no-underline"
         >
           首頁
         </Link>
         <Link
           to="/skills"
           data-pencil-name="Nav 技能列表"
-          className="text-[14px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] transition-colors font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap no-underline"
+          className="text-[16px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] transition-colors font-bold text-left whitespace-nowrap no-underline"
         >
           技能列表
         </Link>
@@ -59,7 +59,7 @@ export default function Navbar() {
           <Link
             to="/favorites"
             data-pencil-name="Nav 我的收藏"
-            className="text-[14px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] transition-colors font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap no-underline"
+            className="text-[16px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] transition-colors font-bold text-left whitespace-nowrap no-underline"
           >
             我的收藏
           </Link>
@@ -84,7 +84,7 @@ export default function Navbar() {
               ></div>
               <div
                 data-pencil-name="Avatar Text"
-                className="text-[14px]/[normal] box-border absolute left-1.75 top-1.5 text-[#7DCEA0] group-hover:text-[#39FF14] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap z-10 transition-colors"
+                className="text-[14px]/[normal] box-border absolute left-1.75 top-1.5 text-[#7DCEA0] group-hover:text-[#39FF14] font-normal text-left whitespace-nowrap z-10 transition-colors"
               >
                 {user.avatar || "👤"}
               </div>
@@ -99,7 +99,7 @@ export default function Navbar() {
             >
               <div
                 data-pencil-name="Login Label"
-                className="text-[14px]/[normal] box-border text-[#39FF14] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap"
+                className="text-[14px]/[normal] box-border text-[#39FF14] font-normal text-left whitespace-nowrap"
               >
                 登入
               </div>
@@ -111,7 +111,7 @@ export default function Navbar() {
             >
               <div
                 data-pencil-name="Signup Label"
-                className="text-[14px]/[normal] box-border text-[#0A0E1A] font-['JetBrains_Mono',system-ui,sans-serif] font-bold text-left whitespace-nowrap"
+                className="text-[14px]/[normal] box-border text-[#0A0E1A] font-bold text-left whitespace-nowrap"
               >
                 註冊
               </div>

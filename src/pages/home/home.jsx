@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import PromptCard from "../../components/PromptCard/promptCard";
 import { skillItemsTable } from "../../api/mockData";
+import HeroDevice from "../../components/HeroDevice/heroDevice";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -15,11 +16,11 @@ export default function Home() {
     .slice(0, 3);
 
   return (
-    <div className="w-full bg-[#0A0E1A] text-[#E0F0E8] font-['JetBrains_Mono',system-ui,sans-serif] px-6 py-8 flex flex-col items-center">
+    <div className="w-full bg-[#0A0E1A] text-[#E0F0E8] px-6 py-8 flex flex-col items-center">
       {/* Hero Zone */}
       <div
         data-pencil-name="Hero Zone"
-        className="relative box-border w-full max-w-275 h-auto md:h-85 shrink-0 flex flex-row gap-0 justify-between items-center py-8 md:py-0 border-b border-[#39FF14]/10 overflow-hidden"
+        className="relative box-border w-full max-w-275 h-auto shrink-0 flex flex-col md:flex-row gap-4 justify-between items-center py-8 border-b border-[#39FF14]/10 overflow-hidden"
       >
         <div
           aria-hidden="true"
@@ -28,11 +29,11 @@ export default function Home() {
         <div aria-hidden="true" className="absolute inset-0 bg-[#0A0E1A]/45" />
         <div
           data-pencil-name="Hero Copy"
-          className="relative z-10 box-border w-full max-w-231.25 shrink-0 h-fit flex flex-col gap-5.5 justify-start items-start ps-8"
+          className="relative z-10 box-border w-full md:max-w-[60%] shrink-0 h-fit flex flex-col gap-5.5 justify-start items-start px-4 sm:px-8"
         >
           <div
             data-pencil-name="Hero Title"
-            className="text-[36px]/[42px] sm:text-[52px]/[57px] box-border w-full text-[#FFFFFF] font-['JetBrains_Mono',system-ui,sans-serif] font-bold text-left"
+            className="text-[36px]/[42px] sm:text-[52px]/[57px] box-border w-full text-[#FFFFFF] font-bold text-left"
           >
             整理你的
             <br />
@@ -40,7 +41,7 @@ export default function Home() {
           </div>
           <div
             data-pencil-name="Hero Body"
-            className="text-[16px]/[24px] sm:text-[18px]/[27px] box-border w-full text-[#7DCEA0] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left"
+            className="text-[16px]/[24px] sm:text-[18px]/[27px] box-border w-full text-[#7DCEA0] font-normal text-left"
           >
             把常用指令分類、搜尋、收藏，
             <br />
@@ -57,7 +58,7 @@ export default function Home() {
             >
               <div
                 data-pencil-name="Primary CTA Label"
-                className="text-[16px]/[normal] box-border text-[#0A0E1A] font-['JetBrains_Mono',system-ui,sans-serif] font-bold text-left whitespace-nowrap"
+                className="text-[16px]/[normal] box-border text-[#0A0E1A] font-bold text-left whitespace-nowrap"
               >
                 開始探索
               </div>
@@ -69,11 +70,26 @@ export default function Home() {
             >
               <div
                 data-pencil-name="Secondary CTA Label"
-                className="text-[16px]/[normal] box-border text-[#00FFFF] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap"
+                className="text-[16px]/[normal] box-border text-[#00FFFF] font-normal text-left whitespace-nowrap"
               >
                 查看範例
               </div>
             </a>
+          </div>
+        </div>
+        <div className="relative z-10 w-full md:w-auto flex justify-center md:justify-end px-4 sm:px-8 md:ps-0">
+          <HeroDevice />
+
+          <div className="hidden lg:flex flex-col gap-4 absolute right-0 top-8 translate-x-[115%]">
+            <span className="px-4 py-1 rounded-full border border-[#00FFFF]/65 bg-[#0A1022]/90 text-[#8CF9FF] text-sm font-semibold">
+              #backend
+            </span>
+            <span className="px-4 py-1 rounded-full border border-[#FF00FF]/65 bg-[#0A1022]/90 text-[#F4A6FF] text-sm font-semibold">
+              #debug
+            </span>
+            <span className="w-11 h-11 rounded-full border border-[#FFD700]/80 bg-[#FFD700]/90 text-[#0A0E1A] text-xl grid place-items-center shadow-[0_0_20px_rgba(255,215,0,0.55)]">
+              ★
+            </span>
           </div>
         </div>
       </div>
@@ -288,17 +304,14 @@ export default function Home() {
         className="w-full max-w-275 mt-16 flex flex-col gap-6"
       >
         <div className="flex justify-between items-center border-b border-[#39FF14]/15 pb-3">
-          <h2
-            className="text-[22px]/[normal] font-bold m-0"
-            style={{ color: "#FFD700" }}
-          >
+          <div className="text-[24px]/[normal] box-border text-[#FFD700] font-bold text-left m-0">
             最新技能
-          </h2>
+          </div>
           <Link
             to="/skills"
             className="text-[14px] text-[#7DCEA0] hover:text-[#39FF14] transition-colors no-underline"
           >
-            瀏覽全部 &gt;
+            &lt; 瀏覽全部 &gt;
           </Link>
         </div>
 

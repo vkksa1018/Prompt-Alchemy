@@ -139,7 +139,7 @@ export default function SkillDetail() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#0A0E1A] text-[#E0F0E8] font-['JetBrains_Mono',system-ui,sans-serif] py-8 px-6 flex flex-col items-center">
+    <div className="w-full min-h-screen bg-[#0A0E1A] text-[#E0F0E8] py-8 px-6 flex flex-col items-center">
       <div
         data-pencil-name="Page Content"
         className="box-border w-full max-w-275 flex flex-col lg:flex-row gap-6 justify-start items-start"
@@ -262,7 +262,7 @@ export default function SkillDetail() {
               >
                 <pre
                   data-pencil-name="Prompt Text"
-                  className="text-[15px] sm:text-[17px]/[28px] box-border w-full text-[#E0F0E8] font-normal text-left whitespace-pre-wrap wrap-break-word font-['JetBrains_Mono',system-ui,sans-serif]"
+                  className="text-[15px] sm:text-[17px]/[28px] box-border w-full text-[#E0F0E8] font-normal text-left whitespace-pre-wrap wrap-break-word "
                 >
                   {promptData.promptContent}
                 </pre>
@@ -304,7 +304,7 @@ export default function SkillDetail() {
               >
                 <pre
                   data-pencil-name="Example Code"
-                  className="text-[13px] sm:text-[14px]/[22px] box-border w-full text-[#E0F0E8] font-normal text-left whitespace-pre-wrap wrap-break-word font-['JetBrains_Mono',system-ui,sans-serif]"
+                  className="text-[13px] sm:text-[14px]/[22px] box-border w-full text-[#E0F0E8] font-normal text-left whitespace-pre-wrap wrap-break-word "
                 >
                   {promptData.exampleContent}
                 </pre>

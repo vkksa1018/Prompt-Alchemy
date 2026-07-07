@@ -57,7 +57,7 @@ export default function Register() {
         >
           <div
             data-pencil-name="Modal Title"
-            className="text-[28px]/[normal] box-border text-[#FFFFFF] font-['JetBrains_Mono',system-ui,sans-serif] font-bold text-left whitespace-nowrap"
+            className="text-[28px]/[normal] box-border text-[#FFFFFF] font-bold text-left whitespace-nowrap"
           >
             建立新帳號
           </div>
@@ -65,20 +65,20 @@ export default function Register() {
             type="button"
             onClick={handleClose}
             data-pencil-name="Modal Close"
-            className="text-[18px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] transition-colors font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap bg-transparent border-none cursor-pointer focus:outline-none"
+            className="text-[18px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] transition-colors font-normal text-left whitespace-nowrap bg-transparent border-none cursor-pointer focus:outline-none"
           >
             ✕
           </button>
         </div>
         <div
           data-pencil-name="Modal Subtitle"
-          className="text-[14px]/[21px] box-border w-full text-[#7DCEA0] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left"
+          className="text-[14px]/[21px] box-border w-full text-[#7DCEA0] font-normal text-left"
         >
           立即註冊以解鎖收藏、管理與自訂 Prompt 技能。
         </div>
 
         {error && (
-          <div className="box-border w-full p-[10px_14px] bg-[#FF00FF]/10 border border-[#FF00FF]/40 rounded-[10px] text-[13px] text-[#FF00FF] font-['JetBrains_Mono',system-ui,sans-serif]">
+          <div className="box-border w-full p-[10px_14px] bg-[#FF00FF]/10 border border-[#FF00FF]/40 rounded-[10px] text-[13px] text-[#FF00FF] ">
             ⚠️ {error}
           </div>
         )}
@@ -90,7 +90,7 @@ export default function Register() {
         >
           <div
             data-pencil-name="Field Label Email"
-            className="text-[13px]/[normal] box-border text-[#E0F0E8] font-['JetBrains_Mono',system-ui,sans-serif] font-semibold text-left whitespace-nowrap"
+            className="text-[13px]/[normal] box-border text-[#E0F0E8] font-semibold text-left whitespace-nowrap"
           >
             電子郵件 Email
           </div>
@@ -100,7 +100,7 @@ export default function Register() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
             required
-            className="box-border w-full h-fit shrink-0 p-3.5 bg-[#0F1F18] border border-[#1A3A2A] rounded-xl text-[14px] text-[#E0F0E8] placeholder-[#3D6B50] focus:outline-none focus:border-[#39FF14] font-['JetBrains_Mono',system-ui,sans-serif] transition-all"
+            className="box-border w-full h-fit shrink-0 p-3.5 bg-[#0F1F18] border border-[#1A3A2A] rounded-xl text-[14px] text-[#E0F0E8] placeholder-[#3D6B50] focus:outline-none focus:border-[#39FF14] transition-all"
           />
         </div>
 
@@ -111,7 +111,7 @@ export default function Register() {
         >
           <div
             data-pencil-name="Field Label Username"
-            className="text-[13px]/[normal] box-border text-[#E0F0E8] font-['JetBrains_Mono',system-ui,sans-serif] font-semibold text-left whitespace-nowrap"
+            className="text-[13px]/[normal] box-border text-[#E0F0E8] font-semibold text-left whitespace-nowrap"
           >
             使用者名稱 Username
           </div>
@@ -121,7 +121,7 @@ export default function Register() {
             onChange={(e) => setUsername(e.target.value)}
             placeholder="例如: cyber_alchemist"
             required
-            className="box-border w-full h-fit shrink-0 p-3.5 bg-[#0F1F18] border border-[#1A3A2A] rounded-xl text-[14px] text-[#E0F0E8] placeholder-[#3D6B50] focus:outline-none focus:border-[#39FF14] font-['JetBrains_Mono',system-ui,sans-serif] transition-all"
+            className="box-border w-full h-fit shrink-0 p-3.5 bg-[#0F1F18] border border-[#1A3A2A] rounded-xl text-[14px] text-[#E0F0E8] placeholder-[#3D6B50] focus:outline-none focus:border-[#39FF14] transition-all"
           />
         </div>
 
@@ -132,7 +132,7 @@ export default function Register() {
         >
           <div
             data-pencil-name="Field Label Password"
-            className="text-[13px]/[normal] box-border text-[#E0F0E8] font-['JetBrains_Mono',system-ui,sans-serif] font-semibold text-left whitespace-nowrap"
+            className="text-[13px]/[normal] box-border text-[#E0F0E8] font-semibold text-left whitespace-nowrap"
           >
             密碼 Password
           </div>
@@ -143,13 +143,13 @@ export default function Register() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="最少 6 位字元"
               required
-              className="box-border w-full h-fit shrink-0 p-3.5 pr-11 bg-[#0F1F18] border border-[#1A3A2A] rounded-xl text-[14px] text-[#E0F0E8] placeholder-[#3D6B50] focus:outline-none focus:border-[#39FF14] font-['JetBrains_Mono',system-ui,sans-serif] transition-all"
+              className="box-border w-full h-fit shrink-0 p-3.5 pr-11 bg-[#0F1F18] border border-[#1A3A2A] rounded-xl text-[14px] text-[#E0F0E8] placeholder-[#3D6B50] focus:outline-none focus:border-[#39FF14] transition-all"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               data-pencil-name="Password Toggle"
-              className="absolute right-3.5 top-3.75 text-[16px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] font-['JetBrains_Mono',system-ui,sans-serif] font-normal bg-transparent border-none cursor-pointer focus:outline-none transition-colors"
+              className="absolute right-3.5 top-3.75 text-[16px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] font-normal bg-transparent border-none cursor-pointer focus:outline-none transition-colors"
             >
               👁
             </button>
@@ -163,7 +163,7 @@ export default function Register() {
         >
           <div
             data-pencil-name="Field Label Confirm Password"
-            className="text-[13px]/[normal] box-border text-[#E0F0E8] font-['JetBrains_Mono',system-ui,sans-serif] font-semibold text-left whitespace-nowrap"
+            className="text-[13px]/[normal] box-border text-[#E0F0E8] font-semibold text-left whitespace-nowrap"
           >
             確認密碼 Confirm Password
           </div>
@@ -173,7 +173,7 @@ export default function Register() {
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="請再次輸入密碼"
             required
-            className="box-border w-full h-fit shrink-0 p-3.5 bg-[#0F1F18] border border-[#1A3A2A] rounded-xl text-[14px] text-[#E0F0E8] placeholder-[#3D6B50] focus:outline-none focus:border-[#39FF14] font-['JetBrains_Mono',system-ui,sans-serif] transition-all"
+            className="box-border w-full h-fit shrink-0 p-3.5 bg-[#0F1F18] border border-[#1A3A2A] rounded-xl text-[14px] text-[#E0F0E8] placeholder-[#3D6B50] focus:outline-none focus:border-[#39FF14] transition-all"
           />
         </div>
 
@@ -185,7 +185,7 @@ export default function Register() {
         >
           <div
             data-pencil-name="Register Button Label"
-            className="text-[15px]/[normal] box-border text-[#0A0E1A] font-['JetBrains_Mono',system-ui,sans-serif] font-bold text-left whitespace-nowrap"
+            className="text-[15px]/[normal] box-border text-[#0A0E1A] font-bold text-left whitespace-nowrap"
           >
             註冊
           </div>
@@ -201,7 +201,7 @@ export default function Register() {
           ></div>
           <div
             data-pencil-name="Divider Text"
-            className="text-[12px]/[normal] box-border text-[#3D6B50] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap"
+            className="text-[12px]/[normal] box-border text-[#3D6B50] font-normal text-left whitespace-nowrap"
           >
             或
           </div>
@@ -229,13 +229,13 @@ export default function Register() {
         >
           <div
             data-pencil-name="Google Icon"
-            className="text-[16px]/[normal] box-border text-[#FFFFFF] font-['JetBrains_Mono',system-ui,sans-serif] font-bold text-left whitespace-nowrap"
+            className="text-[16px]/[normal] box-border text-[#FFFFFF] font-bold text-left whitespace-nowrap"
           >
             G
           </div>
           <div
             data-pencil-name="Google Register Label"
-            className="text-[14px]/[normal] box-border text-[#E0F0E8] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap"
+            className="text-[14px]/[normal] box-border text-[#E0F0E8] font-normal text-left whitespace-nowrap"
           >
             使用 Google 帳號註冊
           </div>
@@ -247,14 +247,14 @@ export default function Register() {
         >
           <div
             data-pencil-name="Login Hint"
-            className="text-[13px]/[normal] box-border text-[#7DCEA0] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap"
+            className="text-[13px]/[normal] box-border text-[#7DCEA0] font-normal text-left whitespace-nowrap"
           >
             已有帳號？
           </div>
           <Link
             to="/login"
             data-pencil-name="Login Link"
-            className="text-[13px]/[normal] box-border text-[#39FF14] hover:text-[#39FF14]/80 transition-all cursor-pointer font-['JetBrains_Mono',system-ui,sans-serif] font-semibold text-left whitespace-nowrap no-underline"
+            className="text-[13px]/[normal] box-border text-[#39FF14] hover:text-[#39FF14]/80 transition-all cursor-pointer font-semibold text-left whitespace-nowrap no-underline"
           >
             立即登入
           </Link>
