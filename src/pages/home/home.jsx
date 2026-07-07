@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import PromptCard from "../../components/PromptCard/promptCard";
 import { skillItemsTable } from "../../api/mockData";
@@ -9,6 +8,10 @@ export default function Home() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const isBloombergTheme = user?.theme === "bloomberg";
+  const featuredPrompts = skillItemsTable
+    .filter((item) => item.isActive && item.status === "published")
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 3);
 
   const handleCategoryClick = (categoryName) => {
     navigate("/skills", { state: { category: categoryName } });
