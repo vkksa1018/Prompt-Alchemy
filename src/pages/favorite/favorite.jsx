@@ -27,7 +27,7 @@ export default function Favorite() {
   return (
     <div
       data-pencil-name="Favorites Main"
-      className="box-border w-full h-full flex flex-col gap-4.5 p-[8px_6px] justify-start items-start font-['JetBrains_Mono',system-ui,sans-serif]"
+      className="box-border w-full h-full flex flex-col gap-4.5 p-[8px_6px] justify-start items-start "
     >
       <div
         data-pencil-name="Favorites Header"
@@ -87,13 +87,13 @@ export default function Favorite() {
         >
           <div
             data-pencil-name="Empty Icon"
-            className="text-[56px]/[normal] box-border text-[#FF00FF] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap"
+            className="text-[56px]/[normal] box-border text-[#FF00FF] font-normal text-left whitespace-nowrap"
           >
             ♡♡
           </div>
           <div
             data-pencil-name="Empty Text"
-            className="text-[16px]/[26px] box-border w-90 text-[#7DCEA0] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-center"
+            className="text-[16px]/[26px] box-border w-90 text-[#7DCEA0] font-normal text-center"
           >
             你還沒有收藏任何 Prompt / Skill
             <br />
@@ -107,7 +107,7 @@ export default function Favorite() {
           >
             <div
               data-pencil-name="Browse CTA Label"
-              className="text-[14px]/[normal] box-border text-[#0A0E1A] font-['JetBrains_Mono',system-ui,sans-serif] font-semibold text-left whitespace-nowrap"
+              className="text-[14px]/[normal] box-border text-[#0A0E1A] font-semibold text-left whitespace-nowrap"
             >
               前往技能列表
             </div>

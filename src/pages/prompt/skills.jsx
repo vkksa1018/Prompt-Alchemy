@@ -135,7 +135,7 @@ export default function Skills() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#0A0E1A] text-[#E0F0E8] font-['JetBrains_Mono',system-ui,sans-serif] py-8 px-6 flex flex-col items-center">
+    <div className="w-full min-h-screen bg-[#0A0E1A] text-[#E0F0E8] py-8 px-6 flex flex-col items-center">
       <div
         data-pencil-name="List Content"
         className="box-border w-full max-w-300 flex flex-col lg:flex-row gap-6 justify-start items-start"
@@ -234,7 +234,7 @@ export default function Skills() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="搜尋 Prompt / Skill..."
-                className="w-full bg-transparent border-0 text-[#E0F0E8] placeholder-[#3D6B50] focus:outline-none text-[13px] font-['JetBrains_Mono',system-ui,sans-serif]"
+                className="w-full bg-transparent border-0 text-[#E0F0E8] placeholder-[#3D6B50] focus:outline-none text-[13px] "
               />
             </div>
 

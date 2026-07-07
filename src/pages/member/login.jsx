@@ -45,7 +45,7 @@ export default function Login() {
         >
           <div
             data-pencil-name="Modal Title"
-            className="text-[28px]/[normal] box-border text-[#FFFFFF] font-['JetBrains_Mono',system-ui,sans-serif] font-bold text-left whitespace-nowrap"
+            className="text-[28px]/[normal] box-border text-[#FFFFFF] font-bold text-left whitespace-nowrap"
           >
             歡迎回來
           </div>
@@ -53,14 +53,14 @@ export default function Login() {
             type="button"
             onClick={handleClose}
             data-pencil-name="Modal Close"
-            className="text-[18px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] transition-colors font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap bg-transparent border-none cursor-pointer focus:outline-none"
+            className="text-[18px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] transition-colors font-normal text-left whitespace-nowrap bg-transparent border-none cursor-pointer focus:outline-none"
           >
             ✕
           </button>
         </div>
         <div
           data-pencil-name="Modal Subtitle"
-          className="text-[14px]/[21px] box-border w-full text-[#7DCEA0] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left"
+          className="text-[14px]/[21px] box-border w-full text-[#7DCEA0] font-normal text-left"
         >
           登入你的帳號，管理收藏的 Prompt 與 Skill。
         </div>
@@ -79,7 +79,7 @@ export default function Login() {
         >
           <div
             data-pencil-name="Field Label Email"
-            className="text-[13px]/[normal] box-border text-[#E0F0E8] font-['JetBrains_Mono',system-ui,sans-serif] font-semibold text-left whitespace-nowrap"
+            className="text-[13px]/[normal] box-border text-[#E0F0E8] font-semibold text-left whitespace-nowrap"
           >
             Email
           </div>
@@ -89,7 +89,7 @@ export default function Login() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
             required
-            className="box-border w-full h-fit shrink-0 p-3.5 bg-[#0F1F18] border border-[#1A3A2A] rounded-xl text-[14px] text-[#E0F0E8] placeholder-[#3D6B50] focus:outline-none focus:border-[#39FF14] font-['JetBrains_Mono',system-ui,sans-serif] transition-all"
+            className="box-border w-full h-fit shrink-0 p-3.5 bg-[#0F1F18] border border-[#1A3A2A] rounded-xl text-[14px] text-[#E0F0E8] placeholder-[#3D6B50] focus:outline-none focus:border-[#39FF14] transition-all"
           />
         </div>
 
@@ -100,7 +100,7 @@ export default function Login() {
         >
           <div
             data-pencil-name="Field Label Password"
-            className="text-[13px]/[normal] box-border text-[#E0F0E8] font-['JetBrains_Mono',system-ui,sans-serif] font-semibold text-left whitespace-nowrap"
+            className="text-[13px]/[normal] box-border text-[#E0F0E8] font-semibold text-left whitespace-nowrap"
           >
             密碼
           </div>
@@ -111,13 +111,13 @@ export default function Login() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••••"
               required
-              className="box-border w-full h-fit shrink-0 p-3.5 pr-11 bg-[#0F1F18] border border-[#1A3A2A] rounded-xl text-[14px] text-[#E0F0E8] placeholder-[#3D6B50] focus:outline-none focus:border-[#39FF14] font-['JetBrains_Mono',system-ui,sans-serif] transition-all"
+              className="box-border w-full h-fit shrink-0 p-3.5 pr-11 bg-[#0F1F18] border border-[#1A3A2A] rounded-xl text-[14px] text-[#E0F0E8] placeholder-[#3D6B50] focus:outline-none focus:border-[#39FF14] transition-all"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               data-pencil-name="Password Toggle"
-              className="absolute right-3.5 top-3.75 text-[16px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] font-['JetBrains_Mono',system-ui,sans-serif] font-normal bg-transparent border-none cursor-pointer focus:outline-none transition-colors"
+              className="absolute right-3.5 top-3.75 text-[16px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] font-normal bg-transparent border-none cursor-pointer focus:outline-none transition-colors"
             >
               👁
             </button>
@@ -145,14 +145,14 @@ export default function Login() {
             ></div>
             <div
               data-pencil-name="Remember Label"
-              className="text-[13px]/[normal] box-border text-[#7DCEA0] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap"
+              className="text-[13px]/[normal] box-border text-[#7DCEA0] font-normal text-left whitespace-nowrap"
             >
               記住我
             </div>
           </button>
           <div
             data-pencil-name="Forgot Password"
-            className="text-[13px]/[normal] box-border text-[#00FFFF] hover:text-[#39FF14] transition-colors cursor-pointer font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap"
+            className="text-[13px]/[normal] box-border text-[#00FFFF] hover:text-[#39FF14] transition-colors cursor-pointer font-normal text-left whitespace-nowrap"
           >
             忘記密碼？
           </div>
@@ -166,7 +166,7 @@ export default function Login() {
         >
           <div
             data-pencil-name="Login Button Label"
-            className="text-[15px]/[normal] box-border text-[#0A0E1A] font-['JetBrains_Mono',system-ui,sans-serif] font-bold text-left whitespace-nowrap"
+            className="text-[15px]/[normal] box-border text-[#0A0E1A] font-bold text-left whitespace-nowrap"
           >
             登入
           </div>
@@ -182,7 +182,7 @@ export default function Login() {
           ></div>
           <div
             data-pencil-name="Divider Text"
-            className="text-[12px]/[normal] box-border text-[#3D6B50] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap"
+            className="text-[12px]/[normal] box-border text-[#3D6B50] font-normal text-left whitespace-nowrap"
           >
             或
           </div>
@@ -201,13 +201,13 @@ export default function Login() {
         >
           <div
             data-pencil-name="Google Icon"
-            className="text-[16px]/[normal] box-border text-[#FFFFFF] font-['JetBrains_Mono',system-ui,sans-serif] font-bold text-left whitespace-nowrap"
+            className="text-[16px]/[normal] box-border text-[#FFFFFF] font-bold text-left whitespace-nowrap"
           >
             G
           </div>
           <div
             data-pencil-name="Google Login Label"
-            className="text-[14px]/[normal] box-border text-[#E0F0E8] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap"
+            className="text-[14px]/[normal] box-border text-[#E0F0E8] font-normal text-left whitespace-nowrap"
           >
             使用 Google 帳號登入
           </div>
@@ -219,14 +219,14 @@ export default function Login() {
         >
           <div
             data-pencil-name="Signup Hint"
-            className="text-[13px]/[normal] box-border text-[#7DCEA0] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap"
+            className="text-[13px]/[normal] box-border text-[#7DCEA0] font-normal text-left whitespace-nowrap"
           >
             還沒有帳號？
           </div>
           <Link
             to="/register"
             data-pencil-name="Signup Link"
-            className="text-[13px]/[normal] box-border text-[#39FF14] hover:text-[#39FF14]/80 transition-all cursor-pointer font-['JetBrains_Mono',system-ui,sans-serif] font-semibold text-left whitespace-nowrap no-underline"
+            className="text-[13px]/[normal] box-border text-[#39FF14] hover:text-[#39FF14]/80 transition-all cursor-pointer font-semibold text-left whitespace-nowrap no-underline"
           >
             立即註冊
           </Link>

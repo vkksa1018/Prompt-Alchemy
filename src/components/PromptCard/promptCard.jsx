@@ -256,7 +256,7 @@ export default function PromptCard({ prompt }) {
           type="button"
           onClick={handleLike}
           data-pencil-name="Heart"
-          className="text-[12px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] active:scale-95 transition-all bg-transparent border-0 cursor-pointer font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap"
+          className="text-[12px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] active:scale-95 transition-all bg-transparent border-0 cursor-pointer font-normal text-left whitespace-nowrap"
         >
           {liked ? "♥" : "♡"} {likesCount}
         </button>
@@ -267,13 +267,13 @@ export default function PromptCard({ prompt }) {
       >
         <div
           data-pencil-name="Card Title"
-          className="text-[20px]/[normal] box-border text-[#E0F0E8] font-['JetBrains_Mono',system-ui,sans-serif] font-bold text-left whitespace-nowrap overflow-hidden text-ellipsis w-full"
+          className="text-[20px]/[normal] box-border text-[#E0F0E8] font-bold text-left whitespace-nowrap overflow-hidden text-ellipsis w-full"
         >
           {prompt?.title || "後端 API 審查"}
         </div>
         <div
           data-pencil-name="Card Description"
-          className="text-[12px]/[18px] box-border w-full text-[#7DCEA0] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left line-clamp-2 h-9 overflow-hidden"
+          className="text-[12px]/[18px] box-border w-full text-[#7DCEA0] font-normal text-left line-clamp-2 h-9 overflow-hidden"
         >
           {prompt?.intro ||
             "檢查 Express / Next.js API 的錯誤處理、安全性與回傳結構。"}
@@ -293,7 +293,7 @@ export default function PromptCard({ prompt }) {
             >
               <div
                 data-pencil-name={`Tag Label ${tag}`}
-                className={`text-[11px]/[normal] box-border ${style.text} font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap`}
+                className={`text-[11px]/[normal] box-border ${style.text} font-normal text-left whitespace-nowrap`}
               >
                 {tag}
               </div>
@@ -313,14 +313,14 @@ export default function PromptCard({ prompt }) {
         >
           <div
             data-pencil-name="Copy Label"
-            className="text-[11px]/[normal] box-border text-[#00FFFF] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap"
+            className="text-[11px]/[normal] box-border text-[#00FFFF] font-normal text-left whitespace-nowrap"
           >
             {copied ? "已複製" : "複製"}
           </div>
         </button>
         <div
           data-pencil-name="Uses"
-          className="text-[12px]/[normal] box-border text-[#7DCEA0] font-['JetBrains_Mono',system-ui,sans-serif] font-normal text-left whitespace-nowrap"
+          className="text-[12px]/[normal] box-border text-[#7DCEA0] font-normal text-left whitespace-nowrap"
         >
           {prompt?.copyCount || 0}
         </div>

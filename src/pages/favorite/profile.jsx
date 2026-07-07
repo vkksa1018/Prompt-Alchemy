@@ -9,6 +9,7 @@ export default function Profile() {
   const [username, setUsername] = useState("");
   const [avatar, setAvatar] = useState("👤");
   const [role, setRole] = useState("前端工程師");
+  const [theme, setTheme] = useState("default");
   const [bio, setBio] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
@@ -23,6 +24,10 @@ export default function Profile() {
     "資料科學家",
     "其他",
   ];
+  const themeOptions = [
+    { value: "default", label: "預設風格" },
+    { value: "bloomberg", label: "Bloomberg Theme" },
+  ];
 
   // Load user data on mount/change
   useEffect(() => {
@@ -30,11 +35,29 @@ export default function Profile() {
       setUsername(user.username || "");
       setAvatar(user.avatar || "👤");
       setRole(user.role || "前端工程師");
+      setTheme(user.theme || "default");
       setBio(user.bio || "");
     }
   }, [user]);
 
-  if (!user) return null;
+  if (!user) {
+    return (
+      <div className="box-border w-full flex flex-col gap-5 p-10 justify-center items-center bg-[#111827] border border-[#1A3A2A] rounded-[14px] text-center ">
+        <div className="text-[48px]">🔒</div>
+        <div className="text-[20px] font-bold text-[#FFFFFF]">請先登入帳號</div>
+        <div className="text-[14px] text-[#7DCEA0] max-w-[320px]">
+          你需要先登入，才能檢視與修改個人資料頁面。
+        </div>
+        <button
+          type="button"
+          onClick={() => navigate("/login")}
+          className="box-border w-fit h-fit py-3 px-6 bg-[#39FF14] text-[#0A0E1A] font-bold rounded-lg border-none cursor-pointer hover:bg-[#39FF14]/90 transition-colors"
+        >
+          前往登入
+        </button>
+      </div>
+    );
+  }
 
   const handleSave = (e) => {
     e.preventDefault();
@@ -42,6 +65,7 @@ export default function Profile() {
       username,
       avatar,
       role,
+      theme,
       bio,
     });
     setSuccessMsg("個人資料已成功更新！");
@@ -49,7 +73,7 @@ export default function Profile() {
   };
 
   return (
-    <div className="box-border w-full flex flex-col gap-6 p-[24px_28px] bg-[#111827] border border-[#1A3A2A] rounded-[14px] font-['JetBrains_Mono',system-ui,sans-serif]">
+    <div className="box-border w-full flex flex-col gap-6 p-[24px_28px] bg-[#111827] border border-[#1A3A2A] rounded-[14px] ">
       <div className="box-border w-full h-fit flex flex-col gap-1.5 border-b border-[#1A3A2A] pb-4">
         <div className="text-[28px]/[normal] text-[#FFFFFF] font-bold">
           個人資料
@@ -155,6 +179,32 @@ export default function Profile() {
                 className="bg-[#111827] text-[#E0F0E8]"
               >
                 {opt}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Home Theme Select */}
+        <div className="box-border w-full flex flex-col gap-2">
+          <label
+            htmlFor="theme-select"
+            className="text-[13px] font-semibold text-[#E0F0E8]"
+          >
+            首頁風格 Theme
+          </label>
+          <select
+            id="theme-select"
+            value={theme}
+            onChange={(e) => setTheme(e.target.value)}
+            className="box-border w-full p-3.5 bg-[#0F1F18] border border-[#1A3A2A] rounded-xl text-[14px] text-[#E0F0E8] focus:outline-none focus:border-[#39FF14] transition-all cursor-pointer"
+          >
+            {themeOptions.map((opt) => (
+              <option
+                key={opt.value}
+                value={opt.value}
+                className="bg-[#111827] text-[#E0F0E8]"
+              >
+                {opt.label}
               </option>
             ))}
           </select>
