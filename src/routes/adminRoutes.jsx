@@ -9,7 +9,8 @@ import ProtectedRoute from "./protectedRoute";
 import AdminLayout from "../layouts/adminLayout";
 import AdminLogin from "../pages/admin/AdminLogin";
 import AdminDashboard from "../pages/admin/AdminDashboard";
-import AdminCategories from "../pages/admin/AdminCategories";
+import AdminParameters from "../pages/admin/AdminParameters";
+import AdminUsers from "../pages/admin/AdminUsers";
 import AdminSkillsView from "../pages/admin/AdminSkillsView";
 import AdminSkillFormManager from "../pages/admin/AdminSkillFormManager";
 import AdminNotFound from "../pages/admin/NotFound";
@@ -33,8 +34,12 @@ const adminRoutes = {
               element: <AdminDashboard />,
             },
             {
-              path: "categories",
-              element: <AdminCategories />,
+              path: "parameters",
+              element: <AdminParameters />,
+            },
+            {
+              path: "users",
+              element: <AdminUsers />,
             },
             {
               path: "skills",

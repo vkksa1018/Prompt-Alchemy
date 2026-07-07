@@ -12,29 +12,28 @@ import {
   usersTable,
 } from "./mockData";
 
-const CATEGORIES_KEY = "admin_categories";
+const PARAMETERS_KEY = "admin_parameters";
 const SKILLS_KEY = "admin_skills";
+const USERS_KEY = "admin_users";
 const ADMIN_AUTH_KEY = "admin_auth";
 
 // ---- 種子初始化 -------------------------------------------------------------
 
-function seedCategories() {
-  const existing = storage.get(CATEGORIES_KEY);
+function seedParameters() {
+  const existing = storage.get(PARAMETERS_KEY);
   if (existing) return existing;
 
-  const seed = parametersTable
-    .filter((p) => p.type === "category")
-    .map((p, index) => ({
-      id: p.id,
-      name: p.name,
-      description: p.memo || "",
-      isActive: p.isActive,
-      sortOrder: p.sortOrder,
-      // 原始資料沒有建立時間，種子階段補上一個合理的時間
-      createdAt: p.createdAt || `2026-06-0${index + 1}T08:00:00Z`,
-    }));
+  const seed = parametersTable.map((p, index) => ({
+    id: p.id,
+    type: p.type,
+    name: p.name,
+    description: p.memo || p.description || "",
+    isActive: p.isActive,
+    sortOrder: p.sortOrder,
+    createdAt: p.createdAt || `2026-06-0${(index % 9) + 1}T08:00:00Z`,
+  }));
 
-  storage.set(CATEGORIES_KEY, seed);
+  storage.set(PARAMETERS_KEY, seed);
   return seed;
 }
 
@@ -47,12 +46,24 @@ function seedSkills() {
   return seed;
 }
 
-function readCategories() {
-  return seedCategories();
+function seedUsers() {
+  const existing = storage.get(USERS_KEY);
+  if (existing) return existing;
+
+  const seed = usersTable.map((u) => ({
+    ...u,
+    createdAt: `2026-06-01T08:00:00Z`,
+  }));
+  storage.set(USERS_KEY, seed);
+  return seed;
 }
 
-function writeCategories(list) {
-  storage.set(CATEGORIES_KEY, list);
+function readParameters() {
+  return seedParameters();
+}
+
+function writeParameters(list) {
+  storage.set(PARAMETERS_KEY, list);
   return list;
 }
 
@@ -62,6 +73,15 @@ function readSkills() {
 
 function writeSkills(list) {
   storage.set(SKILLS_KEY, list);
+  return list;
+}
+
+function readUsers() {
+  return seedUsers();
+}
+
+function writeUsers(list) {
+  storage.set(USERS_KEY, list);
   return list;
 }
 
@@ -84,56 +104,84 @@ function resolve(value) {
   );
 }
 
-// ---- 參數 / 選項 lookup（models / tags / contentTypes 維持靜態）------------
+// ---- 統一參數管理 (Parameters CRUD) -------------------------------------------
 
-export function getContentTypeOptions() {
-  return parametersTable
-    .filter((p) => p.type === "contentType" && p.isActive)
-    .map((p) => ({
-      id: p.id,
-      value: p.name,
-      // name 為 "prompt" / "skills"，統一顯示為 Prompt / Skill
-      label: p.name === "prompt" ? "Prompt" : "Skill",
-    }));
+export function getParametersByType(type) {
+  const list = readParameters()
+    .filter((p) => p.type === type)
+    .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+  return resolve(list);
 }
 
-export function getModelOptions() {
-  return parametersTable
-    .filter((p) => p.type === "model" && p.isActive)
-    .map((p) => ({ id: p.id, label: p.name, memo: p.memo }));
+// 為了相容舊版呼叫，提供別名
+export function getCategories() {
+  return getParametersByType("category");
 }
 
-export function getTagOptions() {
-  return parametersTable
-    .filter((p) => p.type === "tag" && p.isActive)
-    .map((p) => ({ id: p.id, label: p.name, memo: p.memo }));
+export function createParameter(type, data) {
+  const list = readParameters();
+  const param = {
+    id: generateId(type),
+    type: type,
+    name: data.name,
+    description: data.description || "",
+    isActive: data.isActive ?? true,
+    sortOrder: list.length + 1,
+    createdAt: nowIso(),
+  };
+  writeParameters([...list, param]);
+  return resolve(param);
 }
 
-// 顯示用名稱解析（同步）
+export function updateParameter(id, data) {
+  const list = readParameters();
+  let updated = null;
+  const next = list.map((p) => {
+    if (p.id !== id) return p;
+    updated = {
+      ...p,
+      name: data.name ?? p.name,
+      description: data.description ?? p.description,
+      isActive: data.isActive ?? p.isActive,
+    };
+    return updated;
+  });
+  writeParameters(next);
+  return updated ? resolve(updated) : Promise.reject(new Error("找不到參數"));
+}
+
+export function disableParameter(id) {
+  return updateParameter(id, { isActive: false });
+}
+
+// ---- 顯示用名稱解析（同步，供 Table 渲染用）-----------------------------------
+
 export function getContentTypeLabel(id) {
-  const opt = getContentTypeOptions().find((o) => o.id === id);
-  return opt ? opt.label : "";
+  const opt = readParameters().find((p) => p.id === id);
+  // name 為 "prompt" / "skills"，統一顯示為 Prompt / Skill
+  if (!opt) return "";
+  return opt.name === "prompt" ? "Prompt" : opt.name === "skills" ? "Skill" : opt.name;
 }
 
 export function getCategoryName(id) {
-  const cat = readCategories().find((c) => c.id === id);
+  const cat = readParameters().find((c) => c.id === id);
   return cat ? cat.name : "";
 }
 
 export function getModelLabels(ids = []) {
-  const options = getModelOptions();
+  const options = readParameters().filter((p) => p.type === "model");
   return ids
     .map((id) => options.find((o) => o.id === id))
     .filter(Boolean)
-    .map((o) => o.label);
+    .map((o) => o.name);
 }
 
 export function getTagLabels(ids = []) {
-  const options = getTagOptions();
+  const options = readParameters().filter((p) => p.type === "tag");
   return ids
     .map((id) => options.find((o) => o.id === id))
     .filter(Boolean)
-    .map((o) => o.label);
+    .map((o) => o.name);
 }
 
 // 狀態顯示
@@ -151,16 +199,15 @@ export function getStatusLabel(status) {
 // ---- Auth -------------------------------------------------------------------
 
 export function loginAdmin({ email, password }) {
-  // Mock login：比對 usersTable 中的 admin 帳號，密碼不驗證（第一版）。
-  const user = usersTable.find(
-    (u) => u.email === email && u.role_id?.startsWith("role-admin"),
+  const list = readUsers();
+  const user = list.find(
+    (u) => u.email === email && u.role_id?.startsWith("role-admin") && u.isActive
   );
 
   if (!user) {
     return Promise.reject(new Error("帳號不存在或非管理者帳號"));
   }
 
-  // 保留 password 參數位置，未來可在此串接真實驗證
   void password;
 
   const authUser = {
@@ -182,50 +229,54 @@ export function getAdminAuth() {
   return storage.get(ADMIN_AUTH_KEY);
 }
 
-// ---- Categories -------------------------------------------------------------
+// ---- Users ------------------------------------------------------------------
 
-export function getCategories() {
-  const list = [...readCategories()].sort(
-    (a, b) => (a.sortOrder || 0) - (b.sortOrder || 0),
+export function getUsers(roleId = null) {
+  let list = readUsers();
+  if (roleId) {
+    list = list.filter((u) => u.role_id === roleId);
+  }
+  list = list.sort(
+    (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
   );
   return resolve(list);
 }
 
-export function createCategory(data) {
-  const list = readCategories();
-  const category = {
-    id: generateId("cat"),
-    name: data.name,
-    description: data.description || "",
+export function createUser(data) {
+  const list = readUsers();
+  const user = {
+    id: generateId("user"),
+    name: data.name || "",
+    email: data.email || "",
+    role_id: data.role_id || "",
+    passwordHash: "bcrypt-hash-placeholder-new",
     isActive: data.isActive ?? true,
-    sortOrder: list.length + 1,
     createdAt: nowIso(),
   };
-  writeCategories([...list, category]);
-  return resolve(category);
+  writeUsers([user, ...list]);
+  return resolve(user);
 }
 
-export function updateCategory(id, data) {
-  const list = readCategories();
+export function updateUser(id, data) {
+  const list = readUsers();
   let updated = null;
-  const next = list.map((c) => {
-    if (c.id !== id) return c;
+  const next = list.map((u) => {
+    if (u.id !== id) return u;
     updated = {
-      ...c,
-      name: data.name ?? c.name,
-      description: data.description ?? c.description,
-      isActive: data.isActive ?? c.isActive,
+      ...u,
+      name: data.name ?? u.name,
+      email: data.email ?? u.email,
+      role_id: data.role_id ?? u.role_id,
+      isActive: data.isActive ?? u.isActive,
     };
     return updated;
   });
-  writeCategories(next);
-  return updated
-    ? resolve(updated)
-    : Promise.reject(new Error("找不到分類"));
+  writeUsers(next);
+  return updated ? resolve(updated) : Promise.reject(new Error("找不到會員"));
 }
 
-export function disableCategory(id) {
-  return updateCategory(id, { isActive: false });
+export function disableUser(id) {
+  return updateUser(id, { isActive: false });
 }
 
 // ---- Skills -----------------------------------------------------------------

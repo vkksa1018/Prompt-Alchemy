@@ -1,7 +1,6 @@
 // Prompt / Skill 列表上方的篩選列：關鍵字、類型、分類、狀態。
 // 本身不存狀態，篩選條件由父層（skills.jsx）持有；這裡改動就呼叫 onChange 回傳新的條件物件。
 import {
-  getContentTypeOptions,
   getStatusLabel,
   STATUS_OPTIONS,
 } from "../../api/adminApi";
@@ -9,8 +8,7 @@ import {
 const selectClass =
   "rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100";
 
-export default function SkillFilterBar({ filters, categories, onChange }) {
-  const contentTypes = getContentTypeOptions();
+export default function SkillFilterBar({ filters, categories, contentTypes, onChange }) {
 
   // 更新單一篩選欄位，其餘條件原封不動一起回傳給父層。
   const update = (field, value) => {
@@ -35,7 +33,7 @@ export default function SkillFilterBar({ filters, categories, onChange }) {
         <option value="">全部類型</option>
         {contentTypes.map((ct) => (
           <option key={ct.id} value={ct.id}>
-            {ct.label}
+            {ct.name === "prompt" ? "Prompt" : ct.name === "skills" ? "Skill" : ct.name}
           </option>
         ))}
       </select>

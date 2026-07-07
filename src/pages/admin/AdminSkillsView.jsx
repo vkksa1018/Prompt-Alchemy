@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import AdminPageHeader from "../../components/admin/adminPageHeader";
 import SkillFilterBar from "../../components/admin/skillFilterBar";
 import SkillTable from "../../components/admin/skillTable";
-import { getSkills, getCategories, archiveSkill } from "../../api/adminApi";
+import { getSkills, getParametersByType, archiveSkill } from "../../api/adminApi";
 import { alertHelper } from "../../utils/sweetAlert";
 
 // 篩選的初始值（空字串代表「全部」）。
@@ -20,14 +20,21 @@ export default function AdminSkillsPage() {
   const navigate = useNavigate();
   const [skills, setSkills] = useState([]);
   const [categories, setCategories] = useState([]); // 分類篩選下拉用
+  const [contentTypes, setContentTypes] = useState([]); // 類型篩選下拉用
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const [loading, setLoading] = useState(true);
 
-  // 載入分類清單（只需一次，給篩選列的分類選項用）。
+  // 載入分類與類型清單（只需一次，給篩選列的選項用）。
   useEffect(() => {
     let active = true;
-    getCategories().then((data) => {
-      if (active) setCategories(data);
+    Promise.all([
+      getParametersByType("category"),
+      getParametersByType("contentType")
+    ]).then(([cats, ctypes]) => {
+      if (active) {
+        setCategories(cats);
+        setContentTypes(ctypes);
+      }
     });
     return () => {
       active = false;
@@ -83,6 +90,7 @@ export default function AdminSkillsPage() {
         <SkillFilterBar
           filters={filters}
           categories={categories}
+          contentTypes={contentTypes}
           onChange={setFilters}
         />
         <SkillTable

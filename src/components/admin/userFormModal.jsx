@@ -1,0 +1,147 @@
+import { useForm, useWatch } from "react-hook-form";
+
+export default function UserFormModal({ user, roles, onClose, onSubmit }) {
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    defaultValues: {
+      name: user?.name || "",
+      email: user?.email || "",
+      role_id: user?.role_id || "",
+      isActive: user?.isActive ?? true,
+    },
+  });
+
+  const isEdit = Boolean(user);
+  const isActive = useWatch({ control, name: "isActive" });
+
+  const inputClass =
+    "w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100";
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="w-full max-w-md space-y-5 rounded-2xl border border-gray-200 bg-white p-6 shadow-xl dark:border-gray-800 dark:bg-gray-900"
+      >
+        <div className="flex items-center justify-between">
+          <div className="text-lg font-bold text-gray-900 dark:text-gray-100">
+            {isEdit ? "編輯會員" : "新增會員"}
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-gray-400 transition hover:text-gray-600 dark:hover:text-gray-200"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              名稱 <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              {...register("name", {
+                required: "名稱為必填",
+                setValueAs: (v) => (typeof v === "string" ? v.trim() : v),
+              })}
+              className={inputClass}
+            />
+            {errors.name && (
+              <p className="text-xs text-red-500">{errors.name.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Email <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="email"
+              {...register("email", {
+                required: "Email為必填",
+                pattern: {
+                  value: /^\S+@\S+$/i,
+                  message: "請輸入有效的 Email 格式",
+                },
+                setValueAs: (v) => (typeof v === "string" ? v.trim() : v),
+              })}
+              className={inputClass}
+            />
+            {errors.email && (
+              <p className="text-xs text-red-500">{errors.email.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              角色指派 <span className="text-red-500">*</span>
+            </label>
+            <select
+              {...register("role_id", { required: "請選擇角色" })}
+              className={inputClass}
+            >
+              <option value="">請選擇</option>
+              {roles.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.name}
+                </option>
+              ))}
+            </select>
+            {errors.role_id && (
+              <p className="text-xs text-red-500">{errors.role_id.message}</p>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            狀態
+          </label>
+          <button
+            type="button"
+            onClick={() => setValue("isActive", !isActive)}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
+              isActive ? "bg-indigo-600" : "bg-gray-300 dark:bg-gray-600"
+            }`}
+            role="switch"
+            aria-checked={isActive}
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
+                isActive ? "translate-x-6" : "translate-x-1"
+              }`}
+            />
+          </button>
+        </div>
+        <p className="text-xs text-gray-400 dark:text-gray-500">
+          {isActive ? "啟用中：該帳號可正常登入使用" : "已停用：該帳號無法登入"}
+        </p>
+
+        <div className="flex justify-end gap-2 pt-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
+          >
+            取消
+          </button>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:opacity-60"
+          >
+            {isSubmitting ? "儲存中…" : "儲存"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}

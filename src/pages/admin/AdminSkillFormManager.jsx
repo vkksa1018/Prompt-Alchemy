@@ -7,7 +7,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import AdminPageHeader from "../../components/admin/adminPageHeader";
 import SkillForm from "../../components/admin/skillForm";
 import {
-  getCategories,
+  getParametersByType,
   getSkillById,
   createSkill,
   updateSkill,
@@ -22,6 +22,9 @@ export default function SkillFormPage() {
   const isEdit = Boolean(id);
 
   const [categories, setCategories] = useState([]); // 分類下拉選單用
+  const [contentTypes, setContentTypes] = useState([]); // 資料類型
+  const [models, setModels] = useState([]); // 適用模型
+  const [tags, setTags] = useState([]); // 標籤
   const [initialValues, setInitialValues] = useState(null); // 帶給表單的預設值
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false); // 編輯模式找不到該筆資料時顯示
@@ -31,9 +34,18 @@ export default function SkillFormPage() {
     // active 旗標：避免元件已卸載後才 setState（非同步回來太慢的情況）。
     let active = true;
     const load = async () => {
-      const cats = await getCategories();
+      const [cats, ctypes, mods, tgs] = await Promise.all([
+        getParametersByType("category"),
+        getParametersByType("contentType"),
+        getParametersByType("model"),
+        getParametersByType("tag"),
+      ]);
       if (!active) return;
+      
       setCategories(cats);
+      setContentTypes(ctypes);
+      setModels(mods);
+      setTags(tgs);
 
       if (isEdit) {
         const skill = await getSkillById(id);
@@ -95,6 +107,9 @@ export default function SkillFormPage() {
           <SkillForm
             initialValues={initialValues}
             categories={categories}
+            contentTypes={contentTypes}
+            models={models}
+            tags={tags}
             onSubmit={handleSubmit}
             onCancel={() => navigate("/admin/skills")}
           />

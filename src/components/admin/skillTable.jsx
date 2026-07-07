@@ -20,13 +20,13 @@ export default function SkillTable({ skills, loading, onArchive }) {
         <table className="w-full text-left text-sm">
           <thead className="border-b border-gray-200 bg-gray-50 text-gray-500 dark:border-gray-800 dark:bg-gray-800/50 dark:text-gray-400">
             <tr>
-              <th className="px-6 py-3 font-medium">標題</th>
-              <th className="px-6 py-3 font-medium">類型</th>
-              <th className="px-6 py-3 font-medium">分類</th>
-              <th className="px-6 py-3 font-medium">適用模型</th>
-              <th className="px-6 py-3 font-medium">狀態</th>
-              <th className="px-6 py-3 font-medium">更新時間</th>
-              <th className="px-6 py-3 text-right font-medium">操作</th>
+              <th className="whitespace-nowrap px-6 py-3 font-medium">標題</th>
+              <th className="whitespace-nowrap px-6 py-3 font-medium">類型</th>
+              <th className="whitespace-nowrap px-6 py-3 font-medium">分類</th>
+              <th className="whitespace-nowrap px-6 py-3 font-medium">適用模型</th>
+              <th className="whitespace-nowrap px-6 py-3 font-medium">狀態</th>
+              <th className="whitespace-nowrap px-6 py-3 font-medium">更新時間</th>
+              <th className="whitespace-nowrap px-6 py-3 text-right font-medium">操作</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -47,7 +47,7 @@ export default function SkillTable({ skills, loading, onArchive }) {
                 const models = getModelLabels(skill.modelType);
                 return (
                   <tr key={skill.id} className="text-gray-700 dark:text-gray-200">
-                    <td className="max-w-xs px-6 py-4">
+                    <td className="min-w-[200px] max-w-xs px-6 py-4">
                       <div className="font-medium text-gray-900 dark:text-gray-100">
                         {skill.title}
                       </div>
@@ -55,15 +55,15 @@ export default function SkillTable({ skills, loading, onArchive }) {
                         {skill.intro}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="whitespace-nowrap px-6 py-4">
                       <span className="inline-flex items-center rounded-md bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
                         {getContentTypeLabel(skill.contentTypeId)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
+                    <td className="whitespace-nowrap px-6 py-4 text-gray-500 dark:text-gray-400">
                       {getCategoryName(skill.categoryId) || "—"}
                     </td>
-                    <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
+                    <td className="min-w-[150px] px-6 py-4 text-gray-500 dark:text-gray-400">
                       {models.length > 0 ? (
                         <div className="flex flex-wrap gap-1">
                           {models.map((m) => (
@@ -79,13 +79,13 @@ export default function SkillTable({ skills, loading, onArchive }) {
                         "—"
                       )}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="whitespace-nowrap px-6 py-4">
                       <StatusBadge status={skill.status} />
                     </td>
-                    <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
+                    <td className="whitespace-nowrap px-6 py-4 text-gray-500 dark:text-gray-400">
                       {formatDate(skill.updatedAt)}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="whitespace-nowrap px-6 py-4">
                       <div className="flex justify-end gap-2">
                         <button
                           type="button"

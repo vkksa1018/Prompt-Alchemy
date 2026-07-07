@@ -1,10 +1,13 @@
-// 分類的新增 / 編輯彈窗，新增與編輯共用這個元件。
-// 有傳 category → 編輯模式（帶入原值）；沒傳 → 新增模式。
-// 父層（categories.jsx）是用 {modalOpen && <CategoryFormModal .../>} 的方式掛載，
-// 每次打開都重新掛載，所以這裡直接用 defaultValues 初始化即可，不需另外用 effect 重設。
 import { useForm, useWatch } from "react-hook-form";
 
-export default function CategoryFormModal({ category, onClose, onSubmit }) {
+const LABELS = {
+  category: "分類",
+  contentType: "資料類型",
+  model: "適用模型",
+  tag: "標籤"
+};
+
+export default function ParameterFormModal({ parameter, type, onClose, onSubmit }) {
   const {
     register,
     handleSubmit,
@@ -13,15 +16,15 @@ export default function CategoryFormModal({ category, onClose, onSubmit }) {
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      name: category?.name || "",
-      description: category?.description || "",
-      isActive: category?.isActive ?? true,
+      name: parameter?.name || "",
+      description: parameter?.description || "",
+      isActive: parameter?.isActive ?? true,
     },
   });
 
-  const isEdit = Boolean(category);
-  // isActive 是自製的 switch（非原生 checkbox），用 useWatch 讀值、setValue 寫值。
+  const isEdit = Boolean(parameter);
   const isActive = useWatch({ control, name: "isActive" });
+  const typeLabel = LABELS[type] || "參數";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
@@ -31,7 +34,7 @@ export default function CategoryFormModal({ category, onClose, onSubmit }) {
       >
         <div className="flex items-center justify-between">
           <div className="text-lg font-bold text-gray-900 dark:text-gray-100">
-            {isEdit ? "編輯分類" : "新增分類"}
+            {isEdit ? `編輯${typeLabel}` : `新增${typeLabel}`}
           </div>
           <button
             type="button"
@@ -44,12 +47,12 @@ export default function CategoryFormModal({ category, onClose, onSubmit }) {
 
         <div className="space-y-1.5">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            分類名稱 <span className="text-red-500">*</span>
+            {typeLabel}名稱 <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
             {...register("name", {
-              required: "分類名稱為必填",
+              required: `${typeLabel}名稱為必填`,
               setValueAs: (v) => (typeof v === "string" ? v.trim() : v),
             })}
             className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
@@ -61,7 +64,7 @@ export default function CategoryFormModal({ category, onClose, onSubmit }) {
 
         <div className="space-y-1.5">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            分類說明
+            {typeLabel}說明
           </label>
           <textarea
             rows={3}

@@ -6,12 +6,7 @@
 //    再用 useWatch 讀回目前選取值來畫出「被選中」的樣式。
 //  - 驗證只在送出時觸發；通過後才呼叫 props.onSubmit(data)。
 import { useForm, useWatch } from "react-hook-form";
-import {
-  getContentTypeOptions,
-  getModelOptions,
-  getTagOptions,
-  STATUS_OPTIONS,
-} from "../../api/adminApi";
+import { STATUS_OPTIONS } from "../../api/adminApi";
 
 // 共用的 input 樣式，抽出來避免每個欄位重複一長串 className。
 const inputClass =
@@ -64,6 +59,9 @@ function Label({ children, required }) {
 export default function SkillForm({
   initialValues,
   categories,
+  contentTypes,
+  models,
+  tags,
   onSubmit,
   onCancel,
 }) {
@@ -78,10 +76,7 @@ export default function SkillForm({
     defaultValues: { ...DEFAULTS, ...initialValues },
   });
 
-  // 下拉 / chips 的選項來源（型別、模型、標籤都來自 adminApi 的參數表）。
-  const contentTypes = getContentTypeOptions();
-  const models = getModelOptions();
-  const tags = getTagOptions();
+  // 選項來源現在全由父層（AdminSkillFormManager）非同步載入後透過 Props 傳入。
 
   // 適用模型、標籤是「多選 chips」，不是原生 input，
   // 所以用 useWatch 讀目前選取的陣列，好在畫面上標示哪些被選中。
@@ -153,7 +148,7 @@ export default function SkillForm({
               <option value="">請選擇</option>
               {contentTypes.map((ct) => (
                 <option key={ct.id} value={ct.id}>
-                  {ct.label}
+                  {ct.name === "prompt" ? "Prompt" : ct.name === "skills" ? "Skill" : ct.name}
                 </option>
               ))}
             </select>
@@ -202,7 +197,7 @@ export default function SkillForm({
                       : "border-gray-300 text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
                   }`}
                 >
-                  {model.label}
+                  {model.name}
                 </button>
               );
             })}
@@ -225,7 +220,7 @@ export default function SkillForm({
                       : "border-gray-300 text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
                   }`}
                 >
-                  {tag.label}
+                  {tag.name}
                 </button>
               );
             })}

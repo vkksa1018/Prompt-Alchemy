@@ -7,7 +7,8 @@ import { alertHelper } from "../../utils/sweetAlert";
 // end: true 讓「後台首頁」只有在剛好停在 /admin 時才顯示成選中（避免子頁面也被點亮）。
 const NAV_ITEMS = [
   { to: "/admin", label: "後台首頁", icon: "🏠", end: true },
-  { to: "/admin/categories", label: "分類管理", icon: "🗂️" },
+  { to: "/admin/parameters", label: "參數管理", icon: "🗂️" },
+  { to: "/admin/users", label: "會員管理", icon: "👥" },
   { to: "/admin/skills", label: "Prompt / Skill 管理", icon: "📝" },
 ];
 
