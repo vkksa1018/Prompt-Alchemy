@@ -1,5 +1,7 @@
 import { createContext, useState, useEffect } from "react";
-import { favoritesTable, usersTable } from "../api/mockData";
+import { getUserFavorites, saveUserFavorites } from "../api/favoriteApi";
+import { updateUserProfile } from "../api/authApi";
+import { updateFavoriteCount } from "../api/promptApi";
 
 export const AuthContext = createContext(null);
 
@@ -12,33 +14,18 @@ export function AuthProvider({ children }) {
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
       setUser(parsedUser);
-      const storedFavs = localStorage.getItem(`favorites_${parsedUser.email}`);
-      if (storedFavs) {
-        setFavorites(JSON.parse(storedFavs));
-      } else {
-        // Retrieve initial favorites from the relational mock database
-        const userDbId = parsedUser.id || (usersTable.find(u => u.email === parsedUser.email)?.id);
-        const dbFavs = favoritesTable
-          .filter((f) => f.userId === userDbId)
-          .map((f) => f.SkillItemId);
-        setFavorites(dbFavs);
-      }
+      getUserFavorites(parsedUser.email, parsedUser.id).then((favs) => {
+        setFavorites(favs);
+      });
     }
   }, []);
 
   const loginUser = (userData) => {
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
-    const storedFavs = localStorage.getItem(`favorites_${userData.email}`);
-    if (storedFavs) {
-      setFavorites(JSON.parse(storedFavs));
-    } else {
-      const userDbId = userData.id || (usersTable.find(u => u.email === userData.email)?.id);
-      const dbFavs = favoritesTable
-        .filter((f) => f.userId === userDbId)
-        .map((f) => f.SkillItemId);
-      setFavorites(dbFavs);
-    }
+    getUserFavorites(userData.email, userData.id).then((favs) => {
+      setFavorites(favs);
+    });
   };
 
   const logoutUser = () => {
@@ -49,22 +36,36 @@ export function AuthProvider({ children }) {
 
   const updateUser = (newUserData) => {
     setUser((prevUser) => {
+      if (!prevUser) return null;
       const updated = { ...prevUser, ...newUserData };
       localStorage.setItem("user", JSON.stringify(updated));
+      // Sync update to dynamic user database (admin_users)
+      updateUserProfile(updated.email, newUserData).catch((err) => {
+        console.error("Failed to sync profile update to db", err);
+      });
       return updated;
     });
   };
 
   const toggleFavorite = (promptId) => {
     if (!user) return;
+    let isAdding = false;
     setFavorites((prev) => {
       let updated;
       if (prev.includes(promptId)) {
         updated = prev.filter((id) => id !== promptId);
+        isAdding = false;
       } else {
         updated = [...prev, promptId];
+        isAdding = true;
       }
-      localStorage.setItem(`favorites_${user.email}`, JSON.stringify(updated));
+      saveUserFavorites(user.email, updated);
+
+      // Sync back favorite count increment/decrement to dynamic skills db
+      updateFavoriteCount(promptId, isAdding ? 1 : -1).catch((err) => {
+        console.error("Failed to sync favorite count to db", err);
+      });
+
       return updated;
     });
   };
@@ -72,14 +73,22 @@ export function AuthProvider({ children }) {
   const clearFavorites = () => {
     if (!user) return;
     setFavorites([]);
-    localStorage.setItem(`favorites_${user.email}`, JSON.stringify([]));
+    saveUserFavorites(user.email, []);
+    // Optional: decrement favorite counts in database for all previously favorited items
+    favorites.forEach((favId) => {
+      updateFavoriteCount(favId, -1).catch(console.error);
+    });
   };
 
   const resetFavorites = () => {
     if (!user) return;
     const defaults = ["prompt-uuid-0001-0000-000000000001", "prompt-uuid-0001-0000-000000000002"];
     setFavorites(defaults);
-    localStorage.setItem(`favorites_${user.email}`, JSON.stringify(defaults));
+    saveUserFavorites(user.email, defaults);
+    // Optional: sync counts
+    defaults.forEach((favId) => {
+      updateFavoriteCount(favId, 1).catch(console.error);
+    });
   };
 
   return (
@@ -99,3 +108,4 @@ export function AuthProvider({ children }) {
     </AuthContext.Provider>
   );
 }
+

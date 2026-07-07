@@ -1,15 +1,20 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PromptCard from "../../components/PromptCard/promptCard";
-import { initialPrompts } from "../prompt/skills";
+import { getPublishedPrompts } from "../../api/promptApi";
 import useAuth from "../../hooks/useAuth";
 
 export default function Favorite() {
   const navigate = useNavigate();
   const { favorites, clearFavorites, resetFavorites } = useAuth();
+  const [favoritePrompts, setFavoritePrompts] = useState([]);
 
-  const favoritePrompts = initialPrompts.filter((prompt) =>
-    favorites.includes(prompt.id)
-  );
+  useEffect(() => {
+    getPublishedPrompts().then((list) => {
+      const filtered = list.filter((prompt) => favorites.includes(prompt.id));
+      setFavoritePrompts(filtered);
+    });
+  }, [favorites]);
 
   const handleClearAll = () => {
     clearFavorites();
@@ -112,3 +117,4 @@ export default function Favorite() {
     </div>
   );
 }
+

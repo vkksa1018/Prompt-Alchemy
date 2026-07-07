@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
+import { registerUser } from "../../api/authApi";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -31,18 +32,25 @@ export default function Register() {
       return;
     }
 
-    // Mock register: log them in immediately
-    login({
-      email: email,
-      username: username || email.split("@")[0],
+    registerUser({
+      email,
+      username,
+      password,
       avatar: "👤",
-      bio: "這個使用者很懶，還沒有寫下任何個人簡介。",
       role: "前端工程師",
-    });
-
-    // Redirect to profile page to let them fill out details
-    navigate("/favorites/profile");
+      bio: "這個使用者很懶，還沒有寫下任何個人簡介。",
+    })
+      .then((userData) => {
+        // Mock register: log them in immediately
+        login(userData);
+        // Redirect to profile page to let them fill out details
+        navigate("/favorites/profile");
+      })
+      .catch((err) => {
+        setError(err.message || "註冊失敗，請稍後再試。");
+      });
   };
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0A0E1A]/85 backdrop-blur-md p-4">

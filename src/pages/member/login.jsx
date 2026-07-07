@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
+import { loginUser } from "../../api/authApi";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
+  const [error, setError] = useState("");
 
   const handleClose = () => {
     navigate("/");
@@ -17,11 +19,17 @@ export default function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    login({
-      email: email || "developer@promptalchemy.com",
-      username: (email || "developer@promptalchemy.com").split("@")[0],
-    });
-    navigate("/");
+    setError("");
+
+    const targetEmail = email || "developer@promptalchemy.com";
+    loginUser({ email: targetEmail, password })
+      .then((userData) => {
+        login(userData);
+        navigate("/");
+      })
+      .catch((err) => {
+        setError(err.message || "登入失敗，請檢查帳密是否正確。");
+      });
   };
 
   return (
@@ -56,6 +64,13 @@ export default function Login() {
         >
           登入你的帳號，管理收藏的 Prompt 與 Skill。
         </div>
+
+        {error && (
+          <div className="box-border w-full p-[10px_14px] bg-[#FF00FF]/10 border border-[#FF00FF]/40 rounded-[10px] text-[13px] text-[#FF00FF] font-['JetBrains_Mono',system-ui,sans-serif]">
+            ⚠️ {error}
+          </div>
+        )}
+
 
         {/* Email Field */}
         <div

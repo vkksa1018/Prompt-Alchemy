@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
+import { updateUserPassword } from "../../api/authApi";
 
 export default function Password() {
   const navigate = useNavigate();
@@ -56,14 +57,19 @@ export default function Password() {
       return;
     }
 
-    // Mock password change success
-    setSuccessMsg("密碼已修改成功！下一次登入時請使用新密碼。");
-
-    // Clear fields
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmNewPassword("");
+    updateUserPassword(user.email, currentPassword, newPassword)
+      .then(() => {
+        setSuccessMsg("密碼已修改成功！下一次登入時請使用新密碼。");
+        // Clear fields
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmNewPassword("");
+      })
+      .catch((err) => {
+        setError(err.message || "密碼修改失敗，請稍後再試。");
+      });
   };
+
 
   return (
     <div className="box-border w-full flex flex-col gap-6 p-[24px_28px] bg-[#111827] border border-[#1A3A2A] rounded-[14px] ">
