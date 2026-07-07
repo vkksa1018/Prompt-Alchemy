@@ -9,6 +9,7 @@ export default function Profile() {
   const [username, setUsername] = useState("");
   const [avatar, setAvatar] = useState("👤");
   const [role, setRole] = useState("前端工程師");
+  const [theme, setTheme] = useState("default");
   const [bio, setBio] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
@@ -23,6 +24,10 @@ export default function Profile() {
     "資料科學家",
     "其他",
   ];
+  const themeOptions = [
+    { value: "default", label: "預設風格" },
+    { value: "bloomberg", label: "Bloomberg Theme" },
+  ];
 
   // Load user data on mount/change
   useEffect(() => {
@@ -30,6 +35,7 @@ export default function Profile() {
       setUsername(user.username || "");
       setAvatar(user.avatar || "👤");
       setRole(user.role || "前端工程師");
+      setTheme(user.theme || "default");
       setBio(user.bio || "");
     }
   }, [user]);
@@ -59,6 +65,7 @@ export default function Profile() {
       username,
       avatar,
       role,
+      theme,
       bio,
     });
     setSuccessMsg("個人資料已成功更新！");
@@ -172,6 +179,32 @@ export default function Profile() {
                 className="bg-[#111827] text-[#E0F0E8]"
               >
                 {opt}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Home Theme Select */}
+        <div className="box-border w-full flex flex-col gap-2">
+          <label
+            htmlFor="theme-select"
+            className="text-[13px] font-semibold text-[#E0F0E8]"
+          >
+            首頁風格 Theme
+          </label>
+          <select
+            id="theme-select"
+            value={theme}
+            onChange={(e) => setTheme(e.target.value)}
+            className="box-border w-full p-3.5 bg-[#0F1F18] border border-[#1A3A2A] rounded-xl text-[14px] text-[#E0F0E8] focus:outline-none focus:border-[#39FF14] transition-all cursor-pointer"
+          >
+            {themeOptions.map((opt) => (
+              <option
+                key={opt.value}
+                value={opt.value}
+                className="bg-[#111827] text-[#E0F0E8]"
+              >
+                {opt.label}
               </option>
             ))}
           </select>

@@ -16,9 +16,10 @@ const toneClassMap = {
   gap: "text-transparent",
 };
 
-export default function HeroDevice() {
+export default function HeroDevice({ theme = "default" }) {
   const [lineIndex, setLineIndex] = useState(0);
   const [charIndex, setCharIndex] = useState(0);
+  const isBloombergTheme = theme === "bloomberg";
 
   useEffect(() => {
     if (lineIndex >= SCRIPT_LINES.length) {
@@ -52,12 +53,22 @@ export default function HeroDevice() {
   }, [lineIndex, charIndex]);
 
   return (
-    <div className="hero-device-float relative w-75 sm:w-85">
+    <div
+      className={`hero-device-float relative w-75 sm:w-85 ${
+        isBloombergTheme ? "hero-device--bloomberg" : "hero-device--default"
+      }`}
+    >
       <div
         className="hero-device-glow absolute -inset-4.5 rounded-[28px]"
         aria-hidden="true"
       />
-      <div className="relative z-10 rounded-[26px] border border-[#39FF14]/60 bg-[#0A1022] px-5 py-4 shadow-[0_0_30px_rgba(57,255,20,0.25)]">
+      <div
+        className={`relative z-10 rounded-[26px] px-5 py-4 ${
+          isBloombergTheme
+            ? "border border-[#FF8A1F]/70 bg-[#0A0A0A] shadow-[0_0_30px_rgba(255,138,31,0.25)]"
+            : "border border-[#39FF14]/60 bg-[#0A1022] shadow-[0_0_30px_rgba(57,255,20,0.25)]"
+        }`}
+      >
         <div className="mb-3 flex items-center gap-2">
           <span className="h-2.5 w-2.5 rounded-full bg-[#7DFFA7]" />
           <span className="h-2.5 w-2.5 rounded-full bg-[#FFD400]" />
