@@ -5,7 +5,18 @@ const USERS_KEY = "admin_users";
 
 function seedUsers() {
   const existing = storage.get(USERS_KEY);
-  if (existing) return existing;
+  if (existing) {
+    const hasUser = existing.some((u) => u.email === "user@promptalchemy.com");
+    if (!hasUser) {
+      const defUser = usersTable.find((u) => u.email === "user@promptalchemy.com");
+      if (defUser) {
+        const updated = [defUser, ...existing];
+        storage.set(USERS_KEY, updated);
+        return updated;
+      }
+    }
+    return existing;
+  }
   storage.set(USERS_KEY, usersTable);
   return usersTable;
 }

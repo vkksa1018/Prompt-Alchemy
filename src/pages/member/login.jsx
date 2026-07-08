@@ -21,7 +21,7 @@ export default function Login() {
     e.preventDefault();
     setError("");
 
-    const targetEmail = email || "developer@promptalchemy.com";
+    const targetEmail = email || "user@promptalchemy.com";
     loginUser({ email: targetEmail, password })
       .then((userData) => {
         login(userData);
@@ -151,6 +151,7 @@ export default function Login() {
             </div>
           </button>
           <div
+            onClick={() => alert("此為展示專案，請使用預設帳密 (user@promptalchemy.com) 登入，或直接註冊新帳號。")}
             data-pencil-name="Forgot Password"
             className="text-[13px]/[normal] box-border text-[#00FFFF] hover:text-[#39FF14] transition-colors cursor-pointer font-normal text-left whitespace-nowrap"
           >
@@ -192,10 +193,20 @@ export default function Login() {
           ></div>
         </div>
 
-        {/* Google sign-in mockup */}
+        {/* Google sign-up mockup */}
         <button
           type="button"
-          onClick={handleSubmit}
+          onClick={() => {
+            login({
+              id: "user-member-uuid-0000-000000000002",
+              email: "user@promptalchemy.com",
+              username: "Jane User",
+              avatar: "👤",
+              bio: "預設測試帳號，專門用於系統測試與功能展示。",
+              role: "前端工程師",
+            });
+            navigate("/");
+          }}
           data-pencil-name="Google Login Button"
           className="box-border w-full h-fit shrink-0 flex flex-row gap-2.5 p-3.5 justify-center items-center bg-transparent hover:bg-[#1A3A2A]/20 transition-all border border-[#1A3A2A] rounded-xl cursor-pointer"
         >

@@ -112,8 +112,10 @@ export default function Skills() {
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         return (
-          prompt.title.toLowerCase().includes(query) ||
-          prompt.description.toLowerCase().includes(query)
+          (prompt.title || "").toLowerCase().includes(query) ||
+          (prompt.description || "").toLowerCase().includes(query) ||
+          (prompt.category || "").toLowerCase().includes(query) ||
+          (prompt.tags || []).some((tag) => (tag || "").toLowerCase().includes(query))
         );
       }
 
@@ -227,7 +229,7 @@ export default function Skills() {
           >
             <div
               data-pencil-name="Search Field"
-              className="box-border w-full sm:w-105 shrink-0 h-fit flex flex-row gap-2.5 py-2.5 px-3.5 justify-start items-center bg-[#0F1F18] border border-[#1A3A2A] rounded-[10px]"
+              className="box-border w-full sm:w-105 shrink-0 h-fit flex flex-row gap-2.5 py-2.5 px-3.5 justify-start items-center bg-[#0F1F18] border border-[#1A3A2A] rounded-[10px] focus-within:border-[#39FF14] transition-all"
             >
               <input
                 type="text"

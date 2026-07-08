@@ -230,6 +230,9 @@ export const usersTable = [
     passwordHash: "bcrypt-hash-placeholder-member",
     role_id: "role-member-uuid-0000-000000000002", // FK
     isActive: true,
+    avatar: "👤",
+    role: "前端工程師",
+    bio: "預設測試帳號，專門用於系統測試與功能展示。",
   },
 ];
 

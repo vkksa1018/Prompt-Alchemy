@@ -22,19 +22,46 @@ export default function Register() {
     e.preventDefault();
     setError("");
 
-    if (password !== confirmPassword) {
-      setError("密碼與確認密碼不一致！");
+    // 1. Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("請輸入有效的電子郵件地址！");
       return;
     }
 
+    // 2. Username validation
+    const trimmedUsername = username.trim();
+    if (trimmedUsername.length < 3) {
+      setError("使用者名稱長度必須至少為 3 個字元！");
+      return;
+    }
+    const usernameRegex = /^[a-zA-Z0-9_]+$/;
+    if (!usernameRegex.test(trimmedUsername)) {
+      setError("使用者名稱只能包含英文字母、數字與底線！");
+      return;
+    }
+
+    // 3. Password length check
     if (password.length < 6) {
       setError("密碼長度必須至少為 6 個字元！");
       return;
     }
 
+    // 4. Password strength check (contains both letters and numbers)
+    if (!/(?=.*[A-Za-z])(?=.*\d)/.test(password)) {
+      setError("密碼必須同時包含英文字母與數字，以提高安全性！");
+      return;
+    }
+
+    // 5. Confirm password check
+    if (password !== confirmPassword) {
+      setError("密碼與確認密碼不一致！");
+      return;
+    }
+
     registerUser({
       email,
-      username,
+      username: trimmedUsername,
       password,
       avatar: "👤",
       role: "前端工程師",
@@ -224,13 +251,14 @@ export default function Register() {
           type="button"
           onClick={() => {
             login({
-              email: "google_user@promptalchemy.com",
-              username: "google_coder",
-              avatar: "🤖",
-              bio: "使用 Google 快速建立的開發者。",
-              role: "AI 訓練師",
+              id: "user-member-uuid-0000-000000000002",
+              email: "user@promptalchemy.com",
+              username: "Jane User",
+              avatar: "👤",
+              bio: "預設測試帳號，專門用於系統測試與功能展示。",
+              role: "前端工程師",
             });
-            navigate("/favorites/profile");
+            navigate("/");
           }}
           data-pencil-name="Google Register Button"
           className="box-border w-full h-fit shrink-0 flex flex-row gap-2.5 p-3.5 justify-center items-center bg-transparent hover:bg-[#1A3A2A]/20 transition-all border border-[#1A3A2A] rounded-xl cursor-pointer"

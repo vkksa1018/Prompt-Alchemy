@@ -1,17 +1,28 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import PromptCard from "../../components/PromptCard/promptCard";
-import { skillItemsTable } from "../../api/mockData";
+import { getPublishedPrompts } from "../../api/promptApi";
 import HeroDevice from "../../components/HeroDevice/heroDevice";
 import useAuth from "../../hooks/useAuth";
 
 export default function Home() {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const isBloombergTheme = user?.theme === "bloomberg";
-  const featuredPrompts = skillItemsTable
-    .filter((item) => item.isActive && item.status === "published")
+
+  const [prompts, setPrompts] = useState([]);
+
+  useEffect(() => {
+    getPublishedPrompts().then((list) => {
+      setPrompts(list);
+    });
+  }, []);
+
+  const featuredPrompts = [...prompts]
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     .slice(0, 3);
+
+  const countByCategory = (categoryName) => {
+    return prompts.filter((p) => p.category === categoryName).length;
+  };
 
   const handleCategoryClick = (categoryName) => {
     navigate("/skills", { state: { category: categoryName } });
@@ -56,17 +67,11 @@ export default function Home() {
             <Link
               to="/skills"
               data-pencil-name="Primary CTA"
-              className={`box-border w-fit shrink-0 h-fit flex flex-row gap-0 py-3.5 px-6 justify-start items-start active:scale-95 transition-all rounded-lg no-underline cursor-pointer ${
-                isBloombergTheme
-                  ? "bg-[#FF8A1F] hover:bg-[#E77818]"
-                  : "bg-[#39FF14] hover:bg-[#32dd10]"
-              }`}
+              className="box-border w-fit shrink-0 h-fit flex flex-row gap-0 py-3.5 px-6 justify-start items-start active:scale-95 transition-all rounded-lg no-underline cursor-pointer bg-[#39FF14] hover:bg-[#32dd10]"
             >
               <div
                 data-pencil-name="Primary CTA Label"
-                className={`text-[16px]/[normal] box-border font-bold text-left whitespace-nowrap ${
-                  isBloombergTheme ? "text-[#0A0A0A]" : "text-[#0A0E1A]"
-                }`}
+                className="text-[16px]/[normal] box-border font-bold text-left text-[#0A0E1A] whitespace-nowrap"
               >
                 開始探索
               </div>
@@ -86,7 +91,7 @@ export default function Home() {
           </div>
         </div>
         <div className="relative z-10 w-full md:w-auto flex justify-center md:justify-end px-4 sm:px-8 md:ps-0">
-          <HeroDevice theme={isBloombergTheme ? "bloomberg" : "default"} />
+          <HeroDevice />
 
           <div className="hidden lg:flex flex-col gap-4 absolute right-0 top-8 translate-x-[115%]">
             <span className="px-4 py-1 rounded-full border border-[#00FFFF]/65 bg-[#0A1022]/90 text-[#8CF9FF] text-sm font-semibold">
@@ -145,7 +150,7 @@ export default function Home() {
               data-pencil-name="Category Count"
               className="text-[11px]/[normal] box-border text-[#3D6B50] font-normal text-left whitespace-nowrap"
             >
-              126 個技能
+              {countByCategory("前端開發")} 個技能
             </div>
           </div>
           {/* 後端開發 */}
@@ -176,7 +181,7 @@ export default function Home() {
               data-pencil-name="Category Count"
               className="text-[11px]/[normal] box-border text-[#3D6B50] font-normal text-left whitespace-nowrap"
             >
-              166 個技能
+              {countByCategory("後端開發")} 個技能
             </div>
           </div>
           {/* 資安相關 */}
@@ -207,7 +212,7 @@ export default function Home() {
               data-pencil-name="Category Count"
               className="text-[11px]/[normal] box-border text-[#3D6B50] font-normal text-left whitespace-nowrap"
             >
-              86 個技能
+              {countByCategory("資安相關")} 個技能
             </div>
           </div>
           {/* 除錯技巧 */}
@@ -238,7 +243,7 @@ export default function Home() {
               data-pencil-name="Category Count"
               className="text-[11px]/[normal] box-border text-[#3D6B50] font-normal text-left whitespace-nowrap"
             >
-              92 個技能
+              {countByCategory("除錯技巧")} 個技能
             </div>
           </div>
           {/* 翻譯助手 */}
@@ -269,7 +274,7 @@ export default function Home() {
               data-pencil-name="Category Count"
               className="text-[11px]/[normal] box-border text-[#3D6B50] font-normal text-left whitespace-nowrap"
             >
-              64 個技能
+              {countByCategory("翻譯助手")} 個技能
             </div>
           </div>
           {/* 小工具 */}
@@ -300,7 +305,7 @@ export default function Home() {
               data-pencil-name="Category Count"
               className="text-[11px]/[normal] box-border text-[#3D6B50] font-normal text-left whitespace-nowrap"
             >
-              73 個技能
+              {countByCategory("小工具")} 個技能
             </div>
           </div>
         </div>

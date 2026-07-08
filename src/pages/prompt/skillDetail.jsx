@@ -259,7 +259,7 @@ export default function SkillDetail() {
                 >
                   Prompt / Skill 內容
                 </div>
-                <button
+                 <button
                   type="button"
                   onClick={handleCopyPrompt}
                   data-pencil-name="Copy Action"

@@ -18,37 +18,28 @@ export default function Password() {
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
-  if (!user) {
-    return (
-      <div className="box-border w-full flex flex-col gap-5 p-10 justify-center items-center bg-[#111827] border border-[#1A3A2A] rounded-[14px] text-center ">
-        <div className="text-[48px]">🔒</div>
-        <div className="text-[20px] font-bold text-[#FFFFFF]">請先登入帳號</div>
-        <div className="text-[14px] text-[#7DCEA0] max-w-[320px]">
-          你需要先登入，才能修改密碼。
-        </div>
-        <button
-          type="button"
-          onClick={() => navigate("/login")}
-          className="box-border w-fit h-fit py-3 px-6 bg-[#39FF14] text-[#0A0E1A] font-bold rounded-lg border-none cursor-pointer hover:bg-[#39FF14]/90 transition-colors"
-        >
-          前往登入
-        </button>
-      </div>
-    );
-  }
-
   const handleSubmit = (e) => {
     e.preventDefault();
     setError("");
     setSuccessMsg("");
 
-    if (newPassword !== confirmNewPassword) {
-      setError("新密碼與確認新密碼不一致！");
+    if (!currentPassword || !newPassword || !confirmNewPassword) {
+      setError("所有欄位均為必填！");
       return;
     }
 
     if (newPassword.length < 6) {
-      setError("新密碼長度必須至少為 6 個字元！");
+      setError("新密碼長度最少需 6 位字元！");
+      return;
+    }
+
+    if (!/(?=.*[A-Za-z])(?=.*\d)/.test(newPassword)) {
+      setError("新密碼必須同時包含英文字母與數字，以提高安全性！");
+      return;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      setError("新密碼與確認新密碼不一致！");
       return;
     }
 
@@ -70,9 +61,27 @@ export default function Password() {
       });
   };
 
+  if (!user) {
+    return (
+      <div className="box-border w-full flex flex-col gap-5 p-10 justify-center items-center bg-[#111827] border border-[#1A3A2A] rounded-[14px] text-center">
+        <div className="text-[48px]">🔒</div>
+        <div className="text-[20px] font-bold text-[#FFFFFF]">請先登入帳號</div>
+        <div className="text-[14px] text-[#7DCEA0] max-w-[320px]">
+          你需要先登入，才能修改密碼。
+        </div>
+        <button
+          type="button"
+          onClick={() => navigate("/login")}
+          className="box-border w-fit h-fit py-3 px-6 bg-[#39FF14] text-[#0A0E1A] font-bold rounded-lg border-none cursor-pointer hover:bg-[#39FF14]/90 transition-colors"
+        >
+          前往登入
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className="box-border w-full flex flex-col gap-6 p-[24px_28px] bg-[#111827] border border-[#1A3A2A] rounded-[14px] ">
+    <div className="box-border w-full flex flex-col gap-6 p-[24px_28px] bg-[#111827] border border-[#1A3A2A] rounded-[14px]">
       <div className="box-border w-full h-fit flex flex-col gap-1.5 border-b border-[#1A3A2A] pb-4">
         <div className="text-[28px]/[normal] text-[#FFFFFF] font-bold">
           修改密碼

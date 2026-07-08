@@ -10,8 +10,10 @@ export default function FavoriteLayout() {
   }
 
   const handleLogout = () => {
-    logout();
-    navigate("/");
+    if (window.confirm("確定要登出嗎？")) {
+      logout();
+      navigate("/");
+    }
   };
 
   return (
