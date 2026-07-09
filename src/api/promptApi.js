@@ -47,7 +47,7 @@ export function getPublishedPrompts() {
     .filter((s) => s.isActive && s.status === "published")
     .map((item) => {
       const categoryName = getParamName(item.categoryId);
-      const tagNames = item.tags.map((tagId) => getParamName(tagId));
+      const tagNames = (item.tags || []).map((tagId) => getParamName(tagId));
       const createdDate = item.createdAt.split("T")[0];
 
       // Calculate dynamic tags
@@ -86,7 +86,7 @@ export function getPromptById(id) {
   if (!item) return Promise.resolve(null);
 
   const categoryName = getParamName(item.categoryId);
-  const tagNames = item.tags.map((tagId) => getParamName(tagId));
+  const tagNames = (item.tags || []).map((tagId) => getParamName(tagId));
 
   const promptData = {
     ...item,

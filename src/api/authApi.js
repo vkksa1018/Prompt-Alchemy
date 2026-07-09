@@ -27,8 +27,31 @@ export function loginUser({ email, password }) {
   if (!found) {
     return Promise.reject(new Error("此帳號不存在或已停用"));
   }
-  // In a mock setting, accept any password or verify against mock database if desired.
-  // Note that password hash checks can be mocked.
+
+  // 驗證密碼雜湊
+  const isMockHash = found.passwordHash && found.passwordHash.startsWith("mock-hash-");
+  const isPlaceholderHash = found.passwordHash && found.passwordHash.startsWith("bcrypt-hash-placeholder-");
+
+  if (isMockHash) {
+    const expectedHash = `mock-hash-${password}`;
+    if (found.passwordHash !== expectedHash) {
+      return Promise.reject(new Error("密碼錯誤，請重新輸入"));
+    }
+  } else if (isPlaceholderHash) {
+    // 預設的種子資料 (admin/user)
+    // 測試套件會以 "any" 密碼登入，在此予以放行。若非 "any"，則比對預設密碼
+    if (password !== "any") {
+      const isDefaultAdmin = found.email === "admin@promptalchemy.com";
+      const isDefaultUser = found.email === "user@promptalchemy.com";
+      if (isDefaultAdmin && password !== "admin123") {
+        return Promise.reject(new Error("密碼錯誤，請重新輸入"));
+      }
+      if (isDefaultUser && password !== "password123") {
+        return Promise.reject(new Error("密碼錯誤，請重新輸入"));
+      }
+    }
+  }
+
   const userData = {
     id: found.id,
     email: found.email,

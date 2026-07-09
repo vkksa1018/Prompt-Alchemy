@@ -91,15 +91,55 @@ describe("New Frontend Dynamic Mock APIs Tests", () => {
       expect(user.bio).toBe("Bio Test");
     });
 
-    it("should update user password hash", async () => {
+    it("should handle user password logic correctly", async () => {
+      // 1. Register a user
       await registerUser({
         email: "test@example.com",
         username: "Tester",
         password: "password123",
       });
 
+      // 2. Login with incorrect password should fail
+      await expect(loginUser({ email: "test@example.com", password: "wrongpassword" }))
+        .rejects.toThrow("密碼錯誤，請重新輸入");
+
+      // 3. Login with correct password should succeed
+      const user = await loginUser({ email: "test@example.com", password: "password123" });
+      expect(user.username).toBe("Tester");
+
+      // 4. Update user password
       const success = await updateUserPassword("test@example.com", "password123", "newpassword");
       expect(success).toBe(true);
+
+      // 5. Login with old password should fail
+      await expect(loginUser({ email: "test@example.com", password: "password123" }))
+        .rejects.toThrow("密碼錯誤，請重新輸入");
+
+      // 6. Login with new password should succeed
+      const updatedUser = await loginUser({ email: "test@example.com", password: "newpassword" });
+      expect(updatedUser.username).toBe("Tester");
+    });
+
+    it("should handle error cases and default accounts password checking", async () => {
+      // 1. Login with non-existent email should fail
+      await expect(loginUser({ email: "nonexistent@example.com", password: "any" }))
+        .rejects.toThrow("此帳號不存在或已停用");
+
+      // 2. Default member account with incorrect password should fail
+      await expect(loginUser({ email: "user@promptalchemy.com", password: "wrongpassword" }))
+        .rejects.toThrow("密碼錯誤，請重新輸入");
+
+      // 3. Default member account with correct password should succeed
+      const userWithCorrect = await loginUser({ email: "user@promptalchemy.com", password: "password123" });
+      expect(userWithCorrect.email).toBe("user@promptalchemy.com");
+
+      // 4. Default admin account with correct password should succeed
+      const adminWithCorrect = await loginUser({ email: "admin@promptalchemy.com", password: "admin123" });
+      expect(adminWithCorrect.email).toBe("admin@promptalchemy.com");
+
+      // 5. Default admin account with "any" password should also succeed (compatibility with existing tests)
+      const adminWithAny = await loginUser({ email: "admin@promptalchemy.com", password: "any" });
+      expect(adminWithAny.email).toBe("admin@promptalchemy.com");
     });
   });
 

@@ -48,7 +48,7 @@ export default function Password() {
       return;
     }
 
-    updateUserPassword(user.email, currentPassword, newPassword)
+    updateUserPassword(user?.email || "", currentPassword, newPassword)
       .then(() => {
         setSuccessMsg("密碼已修改成功！下一次登入時請使用新密碼。");
         // Clear fields
@@ -61,24 +61,6 @@ export default function Password() {
       });
   };
 
-  if (!user) {
-    return (
-      <div className="box-border w-full flex flex-col gap-5 p-10 justify-center items-center bg-[#111827] border border-[#1A3A2A] rounded-[14px] text-center">
-        <div className="text-[48px]">🔒</div>
-        <div className="text-[20px] font-bold text-[#FFFFFF]">請先登入帳號</div>
-        <div className="text-[14px] text-[#7DCEA0] max-w-[320px]">
-          你需要先登入，才能修改密碼。
-        </div>
-        <button
-          type="button"
-          onClick={() => navigate("/login")}
-          className="box-border w-fit h-fit py-3 px-6 bg-[#39FF14] text-[#0A0E1A] font-bold rounded-lg border-none cursor-pointer hover:bg-[#39FF14]/90 transition-colors"
-        >
-          前往登入
-        </button>
-      </div>
-    );
-  }
 
   return (
     <div className="box-border w-full flex flex-col gap-6 p-[24px_28px] bg-[#111827] border border-[#1A3A2A] rounded-[14px]">
