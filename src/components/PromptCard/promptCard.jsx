@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { copyToClipboard } from "../../utils/copyToClipboard";
 import useAuth from "../../hooks/useAuth";
 import { getParameterName } from "../../api/mockData";
+import { Heart } from "lucide-react";
 
 export default function PromptCard({ prompt }) {
   const navigate = useNavigate();
@@ -36,7 +37,8 @@ export default function PromptCard({ prompt }) {
     navigate(`/skills/${prompt.id || 1}`);
   };
 
-  const categoryName = prompt?.category || getParameterName(prompt?.categoryId) || "其他";
+  const categoryName =
+    prompt?.category || getParameterName(prompt?.categoryId) || "其他";
   const tags = (prompt?.tags || []).map((t) => {
     if (typeof t === "string" && t.includes("uuid")) {
       return getParameterName(t);
@@ -235,9 +237,9 @@ export default function PromptCard({ prompt }) {
     <div
       onClick={handleCardClick}
       data-pencil-name={prompt?.title || "後端 API 審查"}
-      className="box-border flex-1 h-fit flex flex-col gap-3.5 p-[16px_16px_14px_16px] justify-start items-start bg-[#111827] border border-[#1A4A2A] rounded-xl hover:border-[#39FF14]/40 hover:scale-[1.01] hover:shadow-lg transition-all duration-300 cursor-pointer"
+      className="box-border flex-1 h-fit flex flex-col gap-3.5 p-[28px_16px_24px_16px] justify-start items-start bg-[#111827] border-2 border-[#1A4A2A] rounded-xl hover:border-[#39FF14]/40 hover:scale-[1.01] hover:shadow-lg transition-all duration-300 cursor-pointer"
     >
-      <div
+      {/* <div
         data-pencil-name="Card Top"
         className="box-border w-full h-fit shrink-0 flex flex-row gap-0 justify-between items-center"
       >
@@ -256,21 +258,34 @@ export default function PromptCard({ prompt }) {
           type="button"
           onClick={handleLike}
           data-pencil-name="Heart"
-          className="text-[12px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] active:scale-95 transition-all bg-transparent border-0 cursor-pointer font-normal text-left whitespace-nowrap"
+          className="text-[14px]/[normal] box-border text-[#fc4c87] hover:text-[#ff1476] active:scale-95 transition-all bg-transparent border-0 cursor-pointer font-normal text-left whitespace-nowrap flex align-middle items-center gap-1"
         >
-          {liked ? "♥" : "♡"} {likesCount}
+          {liked ? <Heart size={14} fill="#fc4c87" /> : <Heart size={14} />}
+          {likesCount}
         </button>
-      </div>
+      </div> */}
       <div
         data-pencil-name="Title Block"
         className="box-border w-full h-fit shrink-0 flex flex-col gap-1.5 justify-start items-start"
       >
-        <div
-          data-pencil-name="Card Title"
-          className="text-[20px]/[normal] box-border text-[#E0F0E8] font-bold text-left whitespace-nowrap overflow-hidden text-ellipsis w-full"
-        >
-          {prompt?.title || "後端 API 審查"}
+        <div className="flex w-full justify-between items-center">
+          <div
+            data-pencil-name="Card Title"
+            className="text-[20px]/[normal] box-border text-[#E0F0E8] font-bold text-left whitespace-nowrap overflow-hidden text-ellipsis w-full"
+          >
+            {prompt?.title || "後端 API 審查"}
+          </div>
+          <button
+            type="button"
+            onClick={handleLike}
+            data-pencil-name="Heart"
+            className="text-[14px]/[normal] box-border text-[#fc4c87] hover:text-[#ff1476] active:scale-95 transition-all bg-transparent border-0 cursor-pointer font-normal text-left whitespace-nowrap flex align-middle items-center gap-1"
+          >
+            {liked ? <Heart size={14} fill="#fc4c87" /> : <Heart size={14} />}
+            {likesCount}
+          </button>
         </div>
+
         <div
           data-pencil-name="Card Description"
           className="text-[12px]/[18px] box-border w-full text-[#7DCEA0] font-normal text-left line-clamp-2 h-9 overflow-hidden"
@@ -322,7 +337,7 @@ export default function PromptCard({ prompt }) {
           data-pencil-name="Uses"
           className="text-[12px]/[normal] box-border text-[#7DCEA0] font-normal text-left whitespace-nowrap"
         >
-          {prompt?.copyCount || 0}
+          Copied {prompt?.copyCount || 0} 次
         </div>
       </div>
     </div>
