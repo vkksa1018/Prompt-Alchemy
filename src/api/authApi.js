@@ -6,6 +6,14 @@ const USERS_KEY = "admin_users";
 function seedUsers() {
   const existing = storage.get(USERS_KEY);
   if (existing) {
+    // If it's old schema data (contains role_id, is_active, or avatar), force overwrite to reset
+    if (
+      existing.length > 0 &&
+      ("role_id" in existing[0] || "is_active" in existing[0] || "avatar" in existing[0])
+    ) {
+      storage.set(USERS_KEY, usersTable);
+      return usersTable;
+    }
     const hasUser = existing.some((u) => u.email === "user@promptalchemy.com");
     if (!hasUser) {
       const defUser = usersTable.find((u) => u.email === "user@promptalchemy.com");
@@ -23,18 +31,18 @@ function seedUsers() {
 
 export function loginUser({ email, password }) {
   const users = seedUsers();
-  const found = users.find((u) => u.email === email && u.isActive);
+  const found = users.find((u) => u.email === email);
   if (!found) {
     return Promise.reject(new Error("此帳號不存在或已停用"));
   }
 
   // 驗證密碼雜湊
-  const isMockHash = found.passwordHash && found.passwordHash.startsWith("mock-hash-");
-  const isPlaceholderHash = found.passwordHash && found.passwordHash.startsWith("bcrypt-hash-placeholder-");
+  const isMockHash = found.password_hash && found.password_hash.startsWith("mock-hash-");
+  const isPlaceholderHash = found.password_hash && found.password_hash.startsWith("bcrypt-hash-placeholder-");
 
   if (isMockHash) {
     const expectedHash = `mock-hash-${password}`;
-    if (found.passwordHash !== expectedHash) {
+    if (found.password_hash !== expectedHash) {
       return Promise.reject(new Error("密碼錯誤，請重新輸入"));
     }
   } else if (isPlaceholderHash) {
@@ -55,15 +63,13 @@ export function loginUser({ email, password }) {
   const userData = {
     id: found.id,
     email: found.email,
-    username: found.name,
-    avatar: found.avatar || "👤",
-    bio: found.bio || "這個使用者很懶，還沒有寫下任何個人簡介。",
-    role: found.role || "前端工程師",
+    name: found.name,
+    role: found.role || "member",
   };
   return Promise.resolve(userData);
 }
 
-export function registerUser({ email, username, password, avatar, role, bio }) {
+export function registerUser({ email, name, password, role }) {
   const users = seedUsers();
   const exists = users.some((u) => u.email === email);
   if (exists) {
@@ -72,15 +78,11 @@ export function registerUser({ email, username, password, avatar, role, bio }) {
 
   const newUser = {
     id: `user-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
-    name: username,
+    name: name,
     email: email,
-    passwordHash: `mock-hash-${password}`,
-    role_id: "role-member-uuid-0000-000000000002", // general member
-    avatar: avatar || "👤",
-    role: role || "前端工程師",
-    bio: bio || "這個使用者很懶，還沒有寫下任何個人簡介。",
-    isActive: true,
-    createdAt: new Date().toISOString(),
+    password_hash: `mock-hash-${password}`,
+    role: role || "member",
+    created_at: new Date().toISOString(),
   };
 
   storage.set(USERS_KEY, [newUser, ...users]);
@@ -88,9 +90,7 @@ export function registerUser({ email, username, password, avatar, role, bio }) {
   const userData = {
     id: newUser.id,
     email: newUser.email,
-    username: newUser.name,
-    avatar: newUser.avatar,
-    bio: newUser.bio,
+    name: newUser.name,
     role: newUser.role,
   };
   return Promise.resolve(userData);
@@ -103,10 +103,8 @@ export function updateUserProfile(email, data) {
     if (u.email === email) {
       updated = {
         ...u,
-        name: data.username ?? u.name,
-        avatar: data.avatar ?? u.avatar,
+        name: data.name ?? u.name,
         role: data.role ?? u.role,
-        bio: data.bio ?? u.bio,
       };
       return updated;
     }
@@ -117,9 +115,7 @@ export function updateUserProfile(email, data) {
     return Promise.resolve({
       id: updated.id,
       email: updated.email,
-      username: updated.name,
-      avatar: updated.avatar,
-      bio: updated.bio,
+      name: updated.name,
       role: updated.role,
     });
   }
@@ -136,7 +132,7 @@ export function updateUserPassword(email, currentPassword, newPassword) {
     if (u.email === email) {
       return {
         ...u,
-        passwordHash: `mock-hash-${newPassword}`,
+        password_hash: `mock-hash-${newPassword}`,
       };
     }
     return u;

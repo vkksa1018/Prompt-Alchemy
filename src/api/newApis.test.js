@@ -57,45 +57,42 @@ describe("New Frontend Dynamic Mock APIs Tests", () => {
     it("should authenticate mock administrator or member", async () => {
       const user = await loginUser({ email: "admin@promptalchemy.com", password: "any" });
       expect(user.email).toBe("admin@promptalchemy.com");
-      expect(user.username).toBe("James Admin");
+      expect(user.name).toBe("James Admin");
     });
 
     it("should register new user and login", async () => {
       const reg = await registerUser({
         email: "test@example.com",
-        username: "Tester",
+        name: "Tester",
         password: "password123",
       });
       expect(reg.email).toBe("test@example.com");
 
       const user = await loginUser({ email: "test@example.com", password: "password123" });
-      expect(user.username).toBe("Tester");
+      expect(user.name).toBe("Tester");
     });
 
     it("should update user profile", async () => {
       await registerUser({
         email: "test@example.com",
-        username: "Tester",
+        name: "Tester",
         password: "password123",
       });
 
       const updated = await updateUserProfile("test@example.com", {
-        username: "Tester New",
-        bio: "Bio Test",
+        name: "Tester New",
       });
-      expect(updated.username).toBe("Tester New");
-      expect(updated.bio).toBe("Bio Test");
+      expect(updated.name).toBe("Tester New");
 
       const user = await loginUser({ email: "test@example.com", password: "password123" });
-      expect(user.username).toBe("Tester New");
-      expect(user.bio).toBe("Bio Test");
+      expect(user.name).toBe("Tester New");
     });
 
     it("should handle user password logic correctly", async () => {
       // 1. Register a user
       await registerUser({
         email: "test@example.com",
-        username: "Tester",
+        name: "Tester",
         password: "password123",
       });
 
@@ -105,7 +102,7 @@ describe("New Frontend Dynamic Mock APIs Tests", () => {
 
       // 3. Login with correct password should succeed
       const user = await loginUser({ email: "test@example.com", password: "password123" });
-      expect(user.username).toBe("Tester");
+      expect(user.name).toBe("Tester");
 
       // 4. Update user password
       const success = await updateUserPassword("test@example.com", "password123", "newpassword");
@@ -117,7 +114,7 @@ describe("New Frontend Dynamic Mock APIs Tests", () => {
 
       // 6. Login with new password should succeed
       const updatedUser = await loginUser({ email: "test@example.com", password: "newpassword" });
-      expect(updatedUser.username).toBe("Tester");
+      expect(updatedUser.name).toBe("Tester");
     });
 
     it("should handle error cases and default accounts password checking", async () => {

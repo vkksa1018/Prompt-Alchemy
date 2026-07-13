@@ -6,26 +6,30 @@ const PARAMETERS_KEY = "admin_parameters";
 
 function seedSkills() {
   const existing = storage.get(SKILLS_KEY);
-  if (existing) return existing;
+  if (existing && existing.length > 0 && "is_active" in existing[0]) {
+    return existing;
+  }
   storage.set(SKILLS_KEY, skillItemsTable);
   return skillItemsTable;
 }
 
 function seedParameters() {
   const existing = storage.get(PARAMETERS_KEY);
-  if (existing) return existing;
+  if (existing && existing.length > 0 && "is_active" in existing[0]) {
+    return existing;
+  }
   storage.set(PARAMETERS_KEY, parametersTable);
   return parametersTable;
 }
 
 export function getCategories() {
   const params = seedParameters();
-  return Promise.resolve(params.filter((p) => p.type === "category" && p.isActive));
+  return Promise.resolve(params.filter((p) => p.type === "category" && p.is_active));
 }
 
 export function getTags() {
   const params = seedParameters();
-  return Promise.resolve(params.filter((p) => p.type === "tag" && p.isActive));
+  return Promise.resolve(params.filter((p) => p.type === "tag" && p.is_active));
 }
 
 export function getParameterName(id) {
@@ -44,27 +48,45 @@ export function getPublishedPrompts() {
   };
 
   const list = skills
-    .filter((s) => s.isActive && s.status === "published")
+    .filter((s) => s.is_active && s.status === true)
     .map((item) => {
-      const categoryName = getParamName(item.categoryId);
+      const categoryName = getParamName(item.category_id);
       const tagNames = (item.tags || []).map((tagId) => getParamName(tagId));
-      const createdDate = item.createdAt.split("T")[0];
+      const createdDate = item.created_at.split("T")[0];
 
       // Calculate dynamic tags
-      const isNew = new Date(item.createdAt) >= new Date("2026-06-25T00:00:00Z");
-      const isHot = item.favoriteCount >= 20;
+      const isNew = new Date(item.created_at) >= new Date("2026-06-25T00:00:00Z");
+      const isHot = item.favorite_count >= 20;
 
       return {
-        ...item,
-        category: categoryName,
+        id: item.id,
+        title: item.title,
+        slug: item.slug,
+        intro: item.intro,
+        contentTypeId: item.content_type_id,
+        modelType: item.model_type,
+        promptContent: item.prompt_content,
+        useCase: item.use_case,
+        exampleInput: item.example_input,
+        exampleOutput: item.example_output,
+        categoryId: item.category_id,
         tags: tagNames,
+        sourceUrl: item.source_url,
+        copyCount: item.copy_count,
+        favoriteCount: item.favorite_count,
+        status: item.status,
+        createdAt: item.created_at,
+        updatedAt: item.updated_at,
+        isActive: item.is_active,
+
+        category: categoryName,
         date: createdDate,
         isNew,
         isHot,
-        likes: item.favoriteCount,
-        uses: item.copyCount,
+        likes: item.favorite_count,
+        uses: item.copy_count,
         description: item.intro,
-        content: item.promptContent,
+        content: item.prompt_content,
       };
     });
 
@@ -81,22 +103,39 @@ export function getPromptById(id) {
   };
 
   const item = skills.find(
-    (s) => s.id === id && s.isActive && s.status === "published"
+    (s) => s.id === id && s.is_active && s.status === true
   );
   if (!item) return Promise.resolve(null);
 
-  const categoryName = getParamName(item.categoryId);
+  const categoryName = getParamName(item.category_id);
   const tagNames = (item.tags || []).map((tagId) => getParamName(tagId));
 
   const promptData = {
-    ...item,
-    category: categoryName,
+    id: item.id,
+    title: item.title,
+    slug: item.slug,
+    intro: item.intro,
+    contentTypeId: item.content_type_id,
+    modelType: item.model_type,
+    promptContent: item.prompt_content,
+    useCase: item.use_case,
+    exampleInput: item.example_input,
+    exampleOutput: item.example_output,
+    categoryId: item.category_id,
     tags: tagNames,
+    sourceUrl: item.source_url,
+    copyCount: item.copy_count,
+    favoriteCount: item.favorite_count,
+    status: item.status,
+    createdAt: item.created_at,
+    updatedAt: item.updated_at,
+    isActive: item.is_active,
+
+    category: categoryName,
     description: item.intro,
-    promptContent: item.promptContent,
-    exampleContent: item.exampleInput, // Maps to exampleInput in the schema
+    exampleContent: item.example_input, // Maps to exampleInput in the schema
     phoneDesc: item.intro,
-    phoneCode: item.promptContent.slice(0, 40),
+    phoneCode: item.prompt_content.slice(0, 40),
   };
 
   return Promise.resolve(promptData);
@@ -106,7 +145,7 @@ export function incrementCopyCount(id) {
   const skills = seedSkills();
   const list = skills.map((s) => {
     if (s.id === id) {
-      return { ...s, copyCount: (s.copyCount || 0) + 1 };
+      return { ...s, copy_count: (s.copy_count || 0) + 1 };
     }
     return s;
   });
@@ -118,7 +157,7 @@ export function updateFavoriteCount(id, amount) {
   const skills = seedSkills();
   const list = skills.map((s) => {
     if (s.id === id) {
-      return { ...s, favoriteCount: Math.max(0, (s.favoriteCount || 0) + amount) };
+      return { ...s, favorite_count: Math.max(0, (s.favorite_count || 0) + amount) };
     }
     return s;
   });

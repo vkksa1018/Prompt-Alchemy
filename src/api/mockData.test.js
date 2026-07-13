@@ -43,7 +43,7 @@ describe("Relational Mock Database Helper Tests", () => {
       expect(categories.length).toBeGreaterThan(0);
       categories.forEach((cat) => {
         expect(cat.type).toBe("category");
-        expect(cat.isActive).toBe(true);
+        expect(cat.is_active).toBe(true);
       });
     });
 
@@ -58,8 +58,8 @@ describe("Relational Mock Database Helper Tests", () => {
       const prompts = getPrompts();
       expect(prompts.length).toBeGreaterThan(0);
       prompts.forEach((prompt) => {
-        expect(prompt.isActive).toBe(true);
-        expect(prompt.status).toBe("published");
+        expect(prompt.is_active).toBe(true);
+        expect(prompt.status).toBe(true);
       });
     });
   });
