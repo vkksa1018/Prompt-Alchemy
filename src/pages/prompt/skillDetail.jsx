@@ -2,7 +2,11 @@ import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { copyToClipboard } from "../../utils/copyToClipboard";
 import useAuth from "../../hooks/useAuth";
-import { getPromptById, getPublishedPrompts, incrementCopyCount } from "../../api/promptApi";
+import {
+  getPromptById,
+  getPublishedPrompts,
+  incrementCopyCount,
+} from "../../api/promptApi";
 
 export default function SkillDetail() {
   const { id } = useParams();
@@ -64,6 +68,16 @@ export default function SkillDetail() {
     toggleFavorite(id);
   };
 
+  const exampleOutputText =
+    typeof promptData?.exampleOutput === "string"
+      ? promptData.exampleOutput
+      : promptData?.exampleOutput?.outputText || "";
+
+  const exampleOutputImages = Array.isArray(
+    promptData?.exampleOutput?.outputImages
+  )
+    ? promptData.exampleOutput.outputImages.filter((image) => image?.url)
+    : [];
 
   const getTagStyles = (tag) => {
     const cleanTag = tag.trim().toLowerCase().replace("#", "");
@@ -259,7 +273,7 @@ export default function SkillDetail() {
                 >
                   Prompt / Skill 內容
                 </div>
-                 <button
+                <button
                   type="button"
                   onClick={handleCopyPrompt}
                   data-pencil-name="Copy Action"
@@ -286,7 +300,7 @@ export default function SkillDetail() {
               </div>
             </div>
 
-            {/* Example Section */}
+            {/* Example Input Section */}
             <div
               data-pencil-name="Example Section"
               className="box-border w-full h-fit shrink-0 flex flex-col gap-3 justify-start items-start"
@@ -325,6 +339,56 @@ export default function SkillDetail() {
                 >
                   {promptData.exampleContent}
                 </pre>
+              </div>
+            </div>
+            {/* Example Output Section */}
+            <div
+              data-pencil-name="Example Section"
+              className="box-border w-full h-fit shrink-0 flex flex-col gap-3 justify-start items-start"
+            >
+              <div
+                data-pencil-name="Example Header"
+                className="box-border w-full h-fit shrink-0 flex flex-row gap-0 justify-between items-center"
+              >
+                <div
+                  data-pencil-name="Example Title"
+                  className="text-[18px] sm:text-[20px]/[normal] box-border text-[#00FFFF] font-bold text-left whitespace-nowrap"
+                >
+                  範例輸出
+                </div>
+              </div>
+              <div
+                data-pencil-name="Example Box"
+                className="box-border w-full h-fit shrink-0 flex flex-col gap-4 p-4.5 justify-start items-start bg-[#080C12] border border-[#00FFFF]/50 rounded-[18px]"
+              >
+                {exampleOutputText ? (
+                  <pre
+                    data-pencil-name="Example Code"
+                    className="text-[13px] sm:text-[14px]/[22px] box-border w-full text-[#E0F0E8] font-normal text-left whitespace-pre-wrap wrap-break-word "
+                  >
+                    {exampleOutputText}
+                  </pre>
+                ) : (
+                  <div className="box-border w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {exampleOutputImages.map((image, index) => (
+                      <figure
+                        key={`${image.url}-${index}`}
+                        className="box-border w-full flex flex-col gap-2"
+                      >
+                        <img
+                          src={image.url}
+                          alt={image.alt || `example-output-${index + 1}`}
+                          className="w-full rounded-xl border border-[#00FFFF]/30 bg-[#05080C] object-contain"
+                        />
+                        {image.caption ? (
+                          <figcaption className="text-[12px]/[18px] text-[#7DCEA0]">
+                            {image.caption}
+                          </figcaption>
+                        ) : null}
+                      </figure>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>

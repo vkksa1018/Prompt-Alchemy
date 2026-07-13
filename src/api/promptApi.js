@@ -120,7 +120,7 @@ export function getPromptById(id) {
     promptContent: item.prompt_content,
     useCase: item.use_case,
     exampleInput: item.example_input,
-    exampleOutput: item.example_output,
+    exampleOutput: { ...item.example_output },
     categoryId: item.category_id,
     tags: tagNames,
     sourceUrl: item.source_url,
