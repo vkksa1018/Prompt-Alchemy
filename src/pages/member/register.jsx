@@ -8,7 +8,7 @@ export default function Register() {
   const { login } = useAuth();
 
   const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -29,15 +29,15 @@ export default function Register() {
       return;
     }
 
-    // 2. Username validation
-    const trimmedUsername = username.trim();
-    if (trimmedUsername.length < 3) {
-      setError("使用者名稱長度必須至少為 3 個字元！");
+    // 2. Name validation
+    const trimmedName = name.trim();
+    if (trimmedName.length < 3) {
+      setError("姓名長度必須至少為 3 個字元！");
       return;
     }
-    const usernameRegex = /^[a-zA-Z0-9_]+$/;
-    if (!usernameRegex.test(trimmedUsername)) {
-      setError("使用者名稱只能包含英文字母、數字與底線！");
+    const nameRegex = /^[a-zA-Z0-9_\u4e00-\u9fa5]+$/;
+    if (!nameRegex.test(trimmedName)) {
+      setError("姓名只能包含中英文字母、數字與底線！");
       return;
     }
 
@@ -61,11 +61,10 @@ export default function Register() {
 
     registerUser({
       email,
-      username: trimmedUsername,
+      name: trimmedName,
       password,
       avatar: "👤",
-      role: "前端工程師",
-      bio: "這個使用者很懶，還沒有寫下任何個人簡介。",
+      role: "member",
     })
       .then((userData) => {
         // Mock register: log them in immediately
@@ -139,7 +138,7 @@ export default function Register() {
           />
         </div>
 
-        {/* Username Field */}
+        {/* Name Field */}
         <div
           data-pencil-name="Field Username"
           className="box-border w-full h-fit shrink-0 flex flex-col gap-2 justify-start items-start"
@@ -148,13 +147,13 @@ export default function Register() {
             data-pencil-name="Field Label Username"
             className="text-[13px]/[normal] box-border text-[#E0F0E8] font-semibold text-left whitespace-nowrap"
           >
-            使用者名稱 Username
+            姓名 Name
           </div>
           <input
             type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="例如: cyber_alchemist"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="例如: 王小明"
             required
             className="box-border w-full h-fit shrink-0 p-3.5 bg-[#0F1F18] border border-[#1A3A2A] rounded-xl text-[14px] text-[#E0F0E8] placeholder-[#3D6B50] focus:outline-none focus:border-[#39FF14] transition-all"
           />
@@ -253,10 +252,9 @@ export default function Register() {
             login({
               id: "user-member-uuid-0000-000000000002",
               email: "user@promptalchemy.com",
-              username: "Jane User",
+              name: "Jane User",
               avatar: "👤",
-              bio: "預設測試帳號，專門用於系統測試與功能展示。",
-              role: "前端工程師",
+              role: "member",
             });
             navigate("/");
           }}

@@ -200,10 +200,9 @@ export default function Login() {
             login({
               id: "user-member-uuid-0000-000000000002",
               email: "user@promptalchemy.com",
-              username: "Jane User",
+              name: "Jane User",
               avatar: "👤",
-              bio: "預設測試帳號，專門用於系統測試與功能展示。",
-              role: "前端工程師",
+              role: "member",
             });
             navigate("/");
           }}

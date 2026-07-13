@@ -6,43 +6,29 @@ export default function Profile() {
   const navigate = useNavigate();
   const { user, updateUser } = useAuth();
 
-  const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
   const [avatar, setAvatar] = useState("👤");
-  const [role, setRole] = useState("前端工程師");
-  const [bio, setBio] = useState("");
+  const [role, setRole] = useState("member");
   const [successMsg, setSuccessMsg] = useState("");
 
   const avatarOptions = ["👤", "🤖", "💻", "✦", "🔥", "🧬", "🧪", "🚀"];
-  const roleOptions = [
-    "前端工程師",
-    "後端工程師",
-    "全端工程師",
-    "UI/UX 設計師",
-    "專案經理",
-    "AI 訓練師",
-    "資料科學家",
-    "其他",
-  ];
 
   // Load user data on mount/change
   useEffect(() => {
     if (user) {
-      setUsername(user.username || "");
+      setName(user.name || "");
       setAvatar(user.avatar || "👤");
-      setRole(user.role || "前端工程師");
-      setBio(user.bio || "");
+      setRole(user.role || "member");
     }
   }, [user]);
-
 
   const handleSave = (e) => {
     e.preventDefault();
     updateUser({
-      username,
+      name,
       avatar,
       role,
       theme: "default",
-      bio,
     });
     setSuccessMsg("個人資料已成功更新！");
     setTimeout(() => setSuccessMsg(""), 3000);
@@ -115,68 +101,25 @@ export default function Profile() {
           />
         </div>
 
-        {/* Username */}
+        {/* Name */}
         <div className="box-border w-full flex flex-col gap-2">
           <label
-            htmlFor="username-input"
+            htmlFor="name-input"
             className="text-[13px] font-semibold text-[#E0F0E8]"
           >
-            使用者名稱 Username
+            姓名 Name
           </label>
           <input
-            id="username-input"
+            id="name-input"
             type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             required
-            placeholder="請輸入使用者名稱"
+            placeholder="請輸入姓名"
             className="box-border w-full p-3.5 bg-[#0F1F18] border border-[#1A3A2A] rounded-xl text-[14px] text-[#E0F0E8] focus:outline-none focus:border-[#39FF14] transition-all"
           />
         </div>
 
-        {/* Role Select */}
-        <div className="box-border w-full flex flex-col gap-2">
-          <label
-            htmlFor="role-select"
-            className="text-[13px] font-semibold text-[#E0F0E8]"
-          >
-            專業角色 Role
-          </label>
-          <select
-            id="role-select"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            className="box-border w-full p-3.5 bg-[#0F1F18] border border-[#1A3A2A] rounded-xl text-[14px] text-[#E0F0E8] focus:outline-none focus:border-[#39FF14] transition-all cursor-pointer"
-          >
-            {roleOptions.map((opt) => (
-              <option
-                key={opt}
-                value={opt}
-                className="bg-[#111827] text-[#E0F0E8]"
-              >
-                {opt}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Bio */}
-        <div className="box-border w-full flex flex-col gap-2">
-          <label
-            htmlFor="bio-input"
-            className="text-[13px] font-semibold text-[#E0F0E8]"
-          >
-            個人簡介 Bio
-          </label>
-          <textarea
-            id="bio-input"
-            rows="4"
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-            placeholder="寫些什麼來介紹自己吧..."
-            className="box-border w-full p-3.5 bg-[#0F1F18] border border-[#1A3A2A] rounded-xl text-[14px] text-[#E0F0E8] placeholder-[#3D6B50] focus:outline-none focus:border-[#39FF14] transition-all resize-none"
-          />
-        </div>
 
         {/* Action Button */}
         <button

@@ -74,7 +74,7 @@ export default function Navbar() {
           <>
             <Link
               to="/favorites/profile"
-              title={`個人資料 (${user.username})`}
+              title={`個人資料 (${user.name})`}
               data-pencil-name="Avatar Wrap"
               className="box-border w-8 shrink-0 h-8 relative cursor-pointer group"
             >

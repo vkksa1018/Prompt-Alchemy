@@ -7,8 +7,8 @@ export function getUserFavorites(email, userDbId) {
     return Promise.resolve(storedFavs);
   }
   const dbFavs = favoritesTable
-    .filter((f) => f.userId === userDbId)
-    .map((f) => f.SkillItemId);
+    .filter((f) => f.user_id === userDbId)
+    .map((f) => f.skill_item_id);
   storage.set(`favorites_${email}`, dbFavs);
   return Promise.resolve(dbFavs);
 }
