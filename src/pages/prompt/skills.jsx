@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import PromptCard from "../../components/PromptCard/promptCard";
-import { getPublishedPrompts, getCategories, getTags } from "../../api/promptApi";
+import {
+  getPublishedPrompts,
+  getCategories,
+  getTags,
+} from "../../api/promptApi";
 
 const getTagStyles = (label) => {
   const cleanLabel = label.toLowerCase().replace("#", "");
@@ -73,8 +77,8 @@ export default function Skills() {
     getCategories().then((cats) => {
       setCategories([
         { name: "全部", icon: null },
-        { name: "最新技能", icon: "✦", iconColor: "text-[#00FFFF]" },
-        { name: "熱門分類", icon: "🔥", iconColor: "text-[#FF8C00]" },
+        { name: "最新技能", icon: null },
+        { name: "熱門分類", icon: null },
         ...cats.map((c) => ({ name: c.name, icon: null })),
       ]);
     });
@@ -115,7 +119,9 @@ export default function Skills() {
           (prompt.title || "").toLowerCase().includes(query) ||
           (prompt.description || "").toLowerCase().includes(query) ||
           (prompt.category || "").toLowerCase().includes(query) ||
-          (prompt.tags || []).some((tag) => (tag || "").toLowerCase().includes(query))
+          (prompt.tags || []).some((tag) =>
+            (tag || "").toLowerCase().includes(query)
+          )
         );
       }
 
@@ -301,4 +307,3 @@ export default function Skills() {
     </div>
   );
 }
-
