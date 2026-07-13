@@ -201,7 +201,6 @@ export default function Login() {
               id: "user-member-uuid-0000-000000000002",
               email: "user@promptalchemy.com",
               name: "Jane User",
-              avatar: "👤",
               role: "member",
             });
             navigate("/");

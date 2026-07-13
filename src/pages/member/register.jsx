@@ -63,7 +63,6 @@ export default function Register() {
       email,
       name: trimmedName,
       password,
-      avatar: "👤",
       role: "member",
     })
       .then((userData) => {
@@ -253,7 +252,6 @@ export default function Register() {
               id: "user-member-uuid-0000-000000000002",
               email: "user@promptalchemy.com",
               name: "Jane User",
-              avatar: "👤",
               role: "member",
             });
             navigate("/");

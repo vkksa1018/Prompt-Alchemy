@@ -6,7 +6,11 @@ const USERS_KEY = "admin_users";
 function seedUsers() {
   const existing = storage.get(USERS_KEY);
   if (existing) {
-    if (existing.length > 0 && !("is_active" in existing[0])) {
+    // If it's old schema data (contains role_id, is_active, or avatar), force overwrite to reset
+    if (
+      existing.length > 0 &&
+      ("role_id" in existing[0] || "is_active" in existing[0] || "avatar" in existing[0])
+    ) {
       storage.set(USERS_KEY, usersTable);
       return usersTable;
     }
@@ -27,7 +31,7 @@ function seedUsers() {
 
 export function loginUser({ email, password }) {
   const users = seedUsers();
-  const found = users.find((u) => u.email === email && u.is_active);
+  const found = users.find((u) => u.email === email);
   if (!found) {
     return Promise.reject(new Error("此帳號不存在或已停用"));
   }
@@ -60,13 +64,12 @@ export function loginUser({ email, password }) {
     id: found.id,
     email: found.email,
     name: found.name,
-    avatar: found.avatar || "👤",
     role: found.role || "member",
   };
   return Promise.resolve(userData);
 }
 
-export function registerUser({ email, name, password, avatar, role }) {
+export function registerUser({ email, name, password, role }) {
   const users = seedUsers();
   const exists = users.some((u) => u.email === email);
   if (exists) {
@@ -78,9 +81,7 @@ export function registerUser({ email, name, password, avatar, role }) {
     name: name,
     email: email,
     password_hash: `mock-hash-${password}`,
-    avatar: avatar || "👤",
     role: role || "member",
-    is_active: true,
     created_at: new Date().toISOString(),
   };
 
@@ -90,7 +91,6 @@ export function registerUser({ email, name, password, avatar, role }) {
     id: newUser.id,
     email: newUser.email,
     name: newUser.name,
-    avatar: newUser.avatar,
     role: newUser.role,
   };
   return Promise.resolve(userData);
@@ -104,7 +104,6 @@ export function updateUserProfile(email, data) {
       updated = {
         ...u,
         name: data.name ?? u.name,
-        avatar: data.avatar ?? u.avatar,
         role: data.role ?? u.role,
       };
       return updated;
@@ -117,7 +116,6 @@ export function updateUserProfile(email, data) {
       id: updated.id,
       email: updated.email,
       name: updated.name,
-      avatar: updated.avatar,
       role: updated.role,
     });
   }

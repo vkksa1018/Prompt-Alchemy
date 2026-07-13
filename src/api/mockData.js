@@ -221,8 +221,6 @@ export const usersTable = [
     email: "admin@promptalchemy.com",
     password_hash: "bcrypt-hash-placeholder-admin",
     role: "admin",
-    is_active: true,
-    avatar: "👤",
   },
   {
     id: "user-member-uuid-0000-000000000002",
@@ -230,8 +228,6 @@ export const usersTable = [
     email: "user@promptalchemy.com",
     password_hash: "bcrypt-hash-placeholder-member",
     role: "member",
-    is_active: true,
-    avatar: "👤",
   },
 ];
 

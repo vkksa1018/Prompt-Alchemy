@@ -7,17 +7,13 @@ export default function Profile() {
   const { user, updateUser } = useAuth();
 
   const [name, setName] = useState("");
-  const [avatar, setAvatar] = useState("👤");
   const [role, setRole] = useState("member");
   const [successMsg, setSuccessMsg] = useState("");
-
-  const avatarOptions = ["👤", "🤖", "💻", "✦", "🔥", "🧬", "🧪", "🚀"];
 
   // Load user data on mount/change
   useEffect(() => {
     if (user) {
       setName(user.name || "");
-      setAvatar(user.avatar || "👤");
       setRole(user.role || "member");
     }
   }, [user]);
@@ -26,7 +22,6 @@ export default function Profile() {
     e.preventDefault();
     updateUser({
       name,
-      avatar,
       role,
       theme: "default",
     });
@@ -55,38 +50,6 @@ export default function Profile() {
         onSubmit={handleSave}
         className="box-border w-full flex flex-col gap-5"
       >
-        {/* Avatar Select */}
-        <div className="box-border w-full flex flex-col gap-2.5 md:flex-row md:items-center md:gap-7">
-          <div className="shrink-0 flex flex-col items-center gap-2">
-            <div className="text-[13px] font-semibold text-[#E0F0E8]">
-              當前頭像
-            </div>
-            <div className="box-border w-17.5 h-17.5 bg-[#0F1F18] border border-[#39FF14]/40 rounded-full flex items-center justify-center text-[32px] shadow-[0_0_15px_rgba(57,255,20,0.15)]">
-              {avatar}
-            </div>
-          </div>
-          <div className="flex-1 flex flex-col gap-2">
-            <div className="text-[13px] font-semibold text-[#E0F0E8]">
-              選擇新頭像
-            </div>
-            <div className="flex flex-wrap gap-2.5">
-              {avatarOptions.map((opt) => (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => setAvatar(opt)}
-                  className={`box-border w-9.5 h-9.5 rounded-full flex items-center justify-center text-[18px] cursor-pointer transition-all duration-200 ${
-                    avatar === opt
-                      ? "bg-[#39FF14] border border-[#39FF14] text-[#0A0E1A] scale-110"
-                      : "bg-[#0F1F18] border border-[#1A3A2A] hover:border-[#39FF14]/60 text-[#7DCEA0]"
-                  }`}
-                >
-                  {opt}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
 
         {/* Email Read-only */}
         <div className="box-border w-full flex flex-col gap-2">

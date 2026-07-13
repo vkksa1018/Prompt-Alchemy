@@ -86,7 +86,7 @@ export default function Navbar() {
                 data-pencil-name="Avatar Text"
                 className="text-[14px]/[normal] box-border absolute left-1.75 top-1.5 text-[#7DCEA0] group-hover:text-[#39FF14] font-normal text-left whitespace-nowrap z-10 transition-colors"
               >
-                {user.avatar || "👤"}
+                👤
               </div>
             </Link>
           </>
