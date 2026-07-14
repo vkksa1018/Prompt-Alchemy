@@ -79,6 +79,54 @@ export default function SkillDetail() {
     ? promptData.exampleOutput.outputImages.filter((image) => image?.url)
     : [];
 
+  // 讓promptContent的內容透過 [...],{...}有不同顏色
+  const renderPromptContent = (content) => {
+    if (!content) return null;
+
+    const tokenPattern =
+      /(\[[^\]\n]+\]|\{[^}\n]+\}|【[^】\n]+】|\([^\)\n]+\))/g;
+    const parts = content.split(tokenPattern);
+
+    return parts.map((part, index) => {
+      if (!part) return null;
+
+      if (/^\[[^\]\n]+\]$/.test(part)) {
+        return (
+          <span key={index} className="text-[#00FFFF] font-semibold">
+            {part}
+          </span>
+        );
+      }
+
+      if (/^\{[^}\n]+\}$/.test(part)) {
+        return (
+          <span
+            key={index}
+            className="text-[#00bfff] text-[1.05em] font-semibold"
+          >
+            {part}
+          </span>
+        );
+      }
+
+      if (/^【[^】\n]+】$/.test(part)) {
+        return (
+          <span key={index} className="text-[#ffab2e] text-[1.1em] font-bold">
+            {part}
+          </span>
+        );
+      }
+      if (/^\([^\)\n]+\)$/.test(part)) {
+        return (
+          <span key={index} className="text-[#ffab2e] text-[1.1em] font-bold">
+            {part}
+          </span>
+        );
+      }
+      return <span key={index}>{part}</span>;
+    });
+  };
+
   const getTagStyles = (tag) => {
     const cleanTag = tag.trim().toLowerCase().replace("#", "");
     switch (cleanTag) {
@@ -281,7 +329,7 @@ export default function SkillDetail() {
                 >
                   <div
                     data-pencil-name="Copy Action Label"
-                    className="text-[13px]/[normal] box-border text-[#0A0E1A] font-semibold text-left whitespace-nowrap"
+                    className="text-[14px]/[normal] box-border text-[#0A0E1A] font-semibold text-left whitespace-nowrap"
                   >
                     {copiedPrompt ? "已複製" : "複製內容"}
                   </div>
@@ -293,9 +341,9 @@ export default function SkillDetail() {
               >
                 <pre
                   data-pencil-name="Prompt Text"
-                  className="text-[15px] sm:text-[17px]/[28px] box-border w-full text-[#E0F0E8] font-normal text-left whitespace-pre-wrap wrap-break-word "
+                  className="text-[14px] sm:text-[14px]/[22px] box-border w-full text-[#E0F0E8] font-normal text-left whitespace-pre-wrap wrap-break-word "
                 >
-                  {promptData.promptContent}
+                  {renderPromptContent(promptData.promptContent)}
                 </pre>
               </div>
             </div>
@@ -323,7 +371,7 @@ export default function SkillDetail() {
                 >
                   <div
                     data-pencil-name="Example Copy Label"
-                    className="text-[13px]/[normal] box-border text-[#00FFFF] font-normal text-left whitespace-nowrap"
+                    className="text-[14px]/[normal] box-border text-[#00FFFF] font-normal text-left whitespace-nowrap"
                   >
                     {copiedExample ? "已複製" : "複製範例"}
                   </div>
@@ -335,7 +383,7 @@ export default function SkillDetail() {
               >
                 <pre
                   data-pencil-name="Example Code"
-                  className="text-[13px] sm:text-[14px]/[22px] box-border w-full text-[#E0F0E8] font-normal text-left whitespace-pre-wrap wrap-break-word "
+                  className="text-[14px] sm:text-[14px]/[22px] box-border w-full text-[#E0F0E8] font-normal text-left whitespace-pre-wrap wrap-break-word "
                 >
                   {promptData.exampleContent}
                 </pre>
@@ -354,7 +402,7 @@ export default function SkillDetail() {
                   data-pencil-name="Example Title"
                   className="text-[18px] sm:text-[20px]/[normal] box-border text-[#00FFFF] font-bold text-left whitespace-nowrap"
                 >
-                  範例輸出
+                  輸出效果
                 </div>
               </div>
               <div
@@ -364,7 +412,7 @@ export default function SkillDetail() {
                 {exampleOutputText ? (
                   <pre
                     data-pencil-name="Example Code"
-                    className="text-[13px] sm:text-[14px]/[22px] box-border w-full text-[#E0F0E8] font-normal text-left whitespace-pre-wrap wrap-break-word "
+                    className="text-[14px] sm:text-[14px]/[22px] box-border w-full text-[#E0F0E8] font-normal text-left whitespace-pre-wrap wrap-break-word "
                   >
                     {exampleOutputText}
                   </pre>

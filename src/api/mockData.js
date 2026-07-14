@@ -43,7 +43,7 @@ export const parametersTable = [
     id: "cat-frontend-uuid-0000-000000000001",
     type: "category",
     name: "前端開發",
-    memo: "React, Vue, CSS 等前端開發技能",
+    memo: "React / Vue / CSS / UI 相關",
     is_active: true,
     sort_order: 1,
   },
@@ -51,7 +51,7 @@ export const parametersTable = [
     id: "cat-backend-uuid-0000-000000000002",
     type: "category",
     name: "後端開發",
-    memo: "Node.js, Python, API 設計等後端開發技能",
+    memo: "Node.js / API / 資料庫設計",
     is_active: true,
     sort_order: 2,
   },
@@ -59,7 +59,7 @@ export const parametersTable = [
     id: "cat-security-uuid-0000-000000000003",
     type: "category",
     name: "資安相關",
-    memo: "漏洞檢測, 安全性檢查等資安相關技能",
+    memo: "漏洞檢測、滲透測試、安全審查",
     is_active: true,
     sort_order: 3,
   },
@@ -67,7 +67,7 @@ export const parametersTable = [
     id: "cat-debug-uuid-0000-000000000004",
     type: "category",
     name: "除錯技巧",
-    memo: "除錯助手, 錯誤訊息分析等技能",
+    memo: "	Debug、錯誤訊息分析、Log 分析",
     is_active: true,
     sort_order: 4,
   },
@@ -87,7 +87,42 @@ export const parametersTable = [
     is_active: true,
     sort_order: 6,
   },
-
+  {
+    id: "cat-utility-uuid-0000-000000000007",
+    type: "category",
+    name: "DevOps / 部署維運",
+    memo: "CI/CD、Docker、雲端服務、監控",
+    is_active: true,
+    sort_order: 7,
+  }, {
+    id: "cat-utility-uuid-0000-000000000008",
+    type: "category",
+    name: "測試 / 品質保證",
+    memo: "單元測試、E2E、Code Review",
+    is_active: true,
+    sort_order: 8,
+  }, {
+    id: "cat-utility-uuid-0000-000000000009",
+    type: "category",
+    name: "文件 / 寫作",
+    memo: "技術文件、README、註解生成",
+    is_active: true,
+    sort_order: 9,
+  }, {
+    id: "cat-utility-uuid-0000-000000000010",
+    type: "category",
+    name: "教育 / 學習",
+    memo: "觀念解釋、教材產生、學習輔助",
+    is_active: true,
+    sort_order: 10,
+  }, {
+    id: "cat-utility-uuid-0000-000000000011",
+    type: "category",
+    name: "設計 / UX",
+    memo: "UI 設計、Wireframe、使用者研究",
+    is_active: true,
+    sort_order: 11,
+  },
   // Models
   {
     id: "model-gpt-uuid-0000-000000000001",
@@ -210,6 +245,27 @@ export const parametersTable = [
     memo: "網頁應用開發",
     is_active: true,
     sort_order: 12,
+  }, {
+    id: "tag-design-uuid-0000-000000000013",
+    type: "tag",
+    name: "#Design",
+    memo: "設計相關",
+    is_active: true,
+    sort_order: 13,
+  }, {
+    id: "tag-education-uuid-0000-000000000014",
+    type: "tag",
+    name: "#Education",
+    memo: "教育相關",
+    is_active: true,
+    sort_order: 14,
+  }, {
+    id: "tag-drawing-uuid-0000-000000000015",
+    type: "tag",
+    name: "#Drawing",
+    memo: "繪圖相關",
+    is_active: true,
+    sort_order: 15,
   },
 ];
 
@@ -246,9 +302,9 @@ export const skillItemsTable = [
 並提出改善建議。
 
 輸出請包含：
-【程式碼問題】
-【改善建議程式碼】
-【為什麼這樣改】`,
+[程式碼問題]
+[改善建議程式碼]
+[為什麼這樣改]`,
     use_case: "當你接收一支 API，需要 AI 幫你檢查安全性、錯誤處理與資料結構時使用。",
     example_input: "app.get('/api/user', async (req, res) => {\n  const id = req.query.id;\n  const user = await db.query(...);\n  res.json(user);\n});",
     example_output:
@@ -316,29 +372,28 @@ export const skillItemsTable = [
     content_type_id: "ct-prompt-uuid-0000-000000000001", // prompt
     model_type: ["model-gpt-uuid-0000-000000000001", "model-codex-uuid-0000-000000000003"],
     prompt_content: `# ---- Inputs ----
-character_description = (目標物設定，具體性 + 品質提示)
-short_copy = (文字設定)
+{character_description} = (目標物設定，具體性 + 品質提示)
+{short_copy} = (文字設定)
 
 # ---- Prompt ----
 prompt = f"""
-製作一個以 {character_description} 為主題的商品視覺設計。
-請註明預期用途。
+製作一個以 {character_description} 為主題的[商品名稱，說明想要的視覺設計，以及預期用途]。
 
 概念（Concept）：
-{說明概念，構圖要點：背景 / 場景 -> 主題 -> 關鍵細節 -> 限制條件}
+[說明概念，構圖要點：背景 / 場景 -> 主題 -> 關鍵細節 -> 限制條件]
 
-包裝上僅能出現以下文字（完全一致）：
+包裝上僅能出現以下文字 [完全一致]：
 "{short_copy}"
 """
 
 result = client.images.generate(
-    model={使用模型},
+    model=[使用模型],
     prompt=prompt,
-    size={尺寸大小},
-    quality={圖片品質},
+    size=[尺寸大小],
+    quality=[圖片品質],
 )
 
-save_image(result, {檔案名稱})`,
+save_image(result, [檔案名稱])`,
     use_case: "商品設計, 用於商品早期創意構思和方案視覺設計",
     example_input: `# ---- Inputs ---- 
 character_description = 
@@ -403,8 +458,8 @@ save_image(result, "LEGO_collectible_toy_gpt-image-2.png")`,
         }
       ]
     },
-    category_id: "cat-frontend-uuid-0000-000000000001", // 前端開發
-    tags: ["tag-sql-uuid-0000-000000000005", "tag-database-uuid-0000-000000000010", "tag-mysql-uuid-0000-000000000011"],
+    category_id: "cat-utility-uuid-0000-000000000011", // 設計
+    tags: ["tag-design-uuid-0000-000000000013", "tag-drawing-uuid-0000-000000000015"],
     source_url: "",
     copy_count: 99,
     favorite_count: 105,
@@ -495,11 +550,9 @@ save_image(result, "LEGO_collectible_toy_gpt-image-2.png")`,
 並附上測試案例說明：
 
 - 匹配：[條件]
-- 排除：[條件]
-
-輸入字串範例：`,
+- 排除：[條件]`,
     use_case: "驗證複雜輸入（如密碼複雜度、身分證字號、特定日誌格式）時。",
-    example_input: "匹配 email 格式，並排除 .com 結尾...",
+    example_input: "請根據以下條件生成一個高效的正則表達式，並附上測試案例說明：匹配 email 格式，並排除 .com 結尾...",
     example_output:
     {
       outputText: "`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.(?!com$)[a-zA-Z]{2,}$`",
