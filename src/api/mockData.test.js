@@ -77,4 +77,20 @@ describe("Relational Mock Database Helper Tests", () => {
       expect(prompt).toBeUndefined();
     });
   });
+
+  describe("skillItemsTable example_output structure", () => {
+    it("should have outputText (string) and outputImages (array) for all items", () => {
+      skillItemsTable.forEach((item) => {
+        expect(item.example_output).toBeDefined();
+        expect(item.example_output).toBeTypeOf("object");
+        expect(item.example_output.outputText).toBeTypeOf("string");
+        expect(Array.isArray(item.example_output.outputImages)).toBe(true);
+        item.example_output.outputImages.forEach((img) => {
+          expect(img.url).toBeTypeOf("string");
+          expect(img.alt).toBeTypeOf("string");
+          expect(img.caption).toBeTypeOf("string");
+        });
+      });
+    });
+  });
 });

@@ -5,7 +5,7 @@ import useAuth from "../../hooks/useAuth";
 import { getParameterName } from "../../api/mockData";
 import { Heart } from "lucide-react";
 
-export default function PromptCard({ prompt }) {
+export default function PromptCard({ prompt, hideStats = false }) {
   const navigate = useNavigate();
   const { user, favorites, toggleFavorite } = useAuth();
   const [copied, setCopied] = useState(false);
@@ -275,15 +275,17 @@ export default function PromptCard({ prompt }) {
           >
             {prompt?.title || "後端 API 審查"}
           </div>
-          <button
-            type="button"
-            onClick={handleLike}
-            data-pencil-name="Heart"
-            className="text-[14px]/[normal] box-border text-[#fc4c87] hover:text-[#ff1476] active:scale-95 transition-all bg-transparent border-0 cursor-pointer font-normal text-left whitespace-nowrap flex align-middle items-center gap-1"
-          >
-            {liked ? <Heart size={14} fill="#fc4c87" /> : <Heart size={14} />}
-            {likesCount}
-          </button>
+          {!hideStats && (
+            <button
+              type="button"
+              onClick={handleLike}
+              data-pencil-name="Heart"
+              className="text-[14px]/[normal] box-border text-[#fc4c87] hover:text-[#ff1476] active:scale-95 transition-all bg-transparent border-0 cursor-pointer font-normal text-left whitespace-nowrap flex align-middle items-center gap-1"
+            >
+              {liked ? <Heart size={14} fill="#fc4c87" /> : <Heart size={14} />}
+              {likesCount}
+            </button>
+          )}
         </div>
 
         <div
@@ -333,12 +335,14 @@ export default function PromptCard({ prompt }) {
             {copied ? "已複製" : "複製"}
           </div>
         </button>
-        <div
-          data-pencil-name="Uses"
-          className="text-[12px]/[normal] box-border text-[#7DCEA0] font-normal text-left whitespace-nowrap"
-        >
-          Copied {prompt?.copyCount || 0} 次
-        </div>
+        {!hideStats && (
+          <div
+            data-pencil-name="Uses"
+            className="text-[12px]/[normal] box-border text-[#7DCEA0] font-normal text-left whitespace-nowrap"
+          >
+            Copied {prompt?.copyCount || 0} 次
+          </div>
+        )}
       </div>
     </div>
   );

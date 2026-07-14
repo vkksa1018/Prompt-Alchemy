@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { getPublishedPrompts, getPromptById, incrementCopyCount, updateFavoriteCount } from "./promptApi";
+import { getPublishedPrompts, getPromptById, incrementCopyCount, updateFavoriteCount, normalizeExampleOutput } from "./promptApi";
 import { loginUser, registerUser, updateUserProfile, updateUserPassword } from "./authApi";
 import { getUserFavorites, saveUserFavorites } from "./favoriteApi";
 
@@ -17,6 +17,10 @@ describe("New Frontend Dynamic Mock APIs Tests", () => {
       expect(first.tags).toBeInstanceOf(Array);
       expect(first.date).toBeDefined();
       expect(first.likes).toBeDefined();
+      expect(first.exampleOutput).toBeDefined();
+      expect(first.exampleOutput).toBeTypeOf("object");
+      expect(first.exampleOutput.outputText).toBeTypeOf("string");
+      expect(Array.isArray(first.exampleOutput.outputImages)).toBe(true);
     });
 
     it("should fetch prompt by ID", async () => {
@@ -25,6 +29,32 @@ describe("New Frontend Dynamic Mock APIs Tests", () => {
       const detail = await getPromptById(first.id);
       expect(detail).not.toBeNull();
       expect(detail.title).toBe(first.title);
+      expect(detail.exampleOutput).toBeDefined();
+      expect(detail.exampleOutput).toBeTypeOf("object");
+      expect(detail.exampleOutput.outputText).toBeTypeOf("string");
+      expect(Array.isArray(detail.exampleOutput.outputImages)).toBe(true);
+    });
+
+    it("should normalize string exampleOutput correctly", () => {
+      const normalized = normalizeExampleOutput("plain text output");
+      expect(normalized.outputText).toBe("plain text output");
+      expect(normalized.outputImages).toEqual([]);
+    });
+
+    it("should normalize object exampleOutput correctly", () => {
+      const original = {
+        outputText: "some text",
+        outputImages: [{ url: "http://example.com/img.png", alt: "img", caption: "caption" }]
+      };
+      const normalized = normalizeExampleOutput(original);
+      expect(normalized.outputText).toBe("some text");
+      expect(normalized.outputImages).toEqual(original.outputImages);
+    });
+
+    it("should fallback for null/undefined or invalid exampleOutput", () => {
+      expect(normalizeExampleOutput(null)).toEqual({ outputText: "", outputImages: [] });
+      expect(normalizeExampleOutput(undefined)).toEqual({ outputText: "", outputImages: [] });
+      expect(normalizeExampleOutput(123)).toEqual({ outputText: "", outputImages: [] });
     });
 
     it("should increment copy count", async () => {

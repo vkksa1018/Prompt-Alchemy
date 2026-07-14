@@ -76,8 +76,8 @@ export default function Favorite() {
           className="box-border w-full h-fit shrink-0 grid grid-cols-1 md:grid-cols-2 gap-4.5 justify-start items-start"
         >
           {favoritePrompts.map((prompt) => (
-            <PromptCard key={prompt.id} prompt={prompt} />
-          ))}
+            <PromptCard key={prompt.id} prompt={prompt} hideStats={true} />
+          )) }
         </div>
       ) : (
         /* Empty State */

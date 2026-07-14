@@ -2,6 +2,7 @@ import { createContext, useState, useEffect } from "react";
 import { getUserFavorites, saveUserFavorites } from "../api/favoriteApi";
 import { updateUserProfile } from "../api/authApi";
 import { updateFavoriteCount } from "../api/promptApi";
+import { alertHelper } from "../utils/sweetAlert";
 
 export const AuthContext = createContext(null);
 
@@ -25,6 +26,7 @@ export function AuthProvider({ children }) {
     localStorage.setItem("user", JSON.stringify(userData));
     getUserFavorites(userData.email, userData.id).then((favs) => {
       setFavorites(favs);
+      alertHelper.success("登入成功", `歡迎回來，${userData.name || "成員"}！`, true);
     });
   };
 
@@ -32,6 +34,7 @@ export function AuthProvider({ children }) {
     setUser(null);
     setFavorites([]);
     localStorage.removeItem("user");
+    alertHelper.success("已登出", "您已安全登出帳號", true);
   };
 
   const updateUser = (newUserData) => {
@@ -49,25 +52,26 @@ export function AuthProvider({ children }) {
 
   const toggleFavorite = (promptId) => {
     if (!user) return;
-    let isAdding = false;
+    const isAlreadyFav = favorites.includes(promptId);
+
     setFavorites((prev) => {
-      let updated;
-      if (prev.includes(promptId)) {
-        updated = prev.filter((id) => id !== promptId);
-        isAdding = false;
-      } else {
-        updated = [...prev, promptId];
-        isAdding = true;
-      }
+      const updated = prev.includes(promptId)
+        ? prev.filter((id) => id !== promptId)
+        : [...prev, promptId];
       saveUserFavorites(user.email, updated);
-
-      // Sync back favorite count increment/decrement to dynamic skills db
-      updateFavoriteCount(promptId, isAdding ? 1 : -1).catch((err) => {
-        console.error("Failed to sync favorite count to db", err);
-      });
-
       return updated;
     });
+
+    const amount = isAlreadyFav ? -1 : 1;
+    updateFavoriteCount(promptId, amount).catch((err) => {
+      console.error("Failed to sync favorite count to db", err);
+    });
+
+    if (!isAlreadyFav) {
+      alertHelper.success("已收藏", "已加入您的收藏清單", true);
+    } else {
+      alertHelper.success("已取消收藏", "已從您的收藏清單移除", true);
+    }
   };
 
   const clearFavorites = () => {

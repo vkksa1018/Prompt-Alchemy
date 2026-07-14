@@ -38,6 +38,27 @@ export function getParameterName(id) {
   return p ? p.name : "";
 }
 
+export function normalizeExampleOutput(exampleOutput) {
+  if (typeof exampleOutput === "string") {
+    return {
+      outputText: exampleOutput,
+      outputImages: [],
+    };
+  }
+  if (exampleOutput && typeof exampleOutput === "object") {
+    return {
+      outputText: exampleOutput.outputText || "",
+      outputImages: Array.isArray(exampleOutput.outputImages)
+        ? exampleOutput.outputImages
+        : [],
+    };
+  }
+  return {
+    outputText: "",
+    outputImages: [],
+  };
+}
+
 export function getPublishedPrompts() {
   const skills = seedSkills();
   const params = seedParameters();
@@ -68,7 +89,7 @@ export function getPublishedPrompts() {
         promptContent: item.prompt_content,
         useCase: item.use_case,
         exampleInput: item.example_input,
-        exampleOutput: item.example_output,
+        exampleOutput: normalizeExampleOutput(item.example_output),
         categoryId: item.category_id,
         tags: tagNames,
         sourceUrl: item.source_url,
@@ -120,7 +141,7 @@ export function getPromptById(id) {
     promptContent: item.prompt_content,
     useCase: item.use_case,
     exampleInput: item.example_input,
-    exampleOutput: { ...item.example_output },
+    exampleOutput: normalizeExampleOutput(item.example_output),
     categoryId: item.category_id,
     tags: tagNames,
     sourceUrl: item.source_url,

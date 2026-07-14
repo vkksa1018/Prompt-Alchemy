@@ -368,7 +368,8 @@ export default function SkillDetail() {
                   >
                     {exampleOutputText}
                   </pre>
-                ) : (
+                ) : null}
+                {exampleOutputImages.length > 0 ? (
                   <div className="box-border w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {exampleOutputImages.map((image, index) => (
                       <figure
@@ -388,7 +389,7 @@ export default function SkillDetail() {
                       </figure>
                     ))}
                   </div>
-                )}
+                ) : null}
               </div>
             </div>
           </div>
