@@ -1,65 +1,21 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import Swal from "sweetalert2";
 import PromptCard from "../../components/PromptCard/promptCard";
 import {
   getPublishedPrompts,
   getCategories,
   getTags,
 } from "../../api/promptApi";
+import { getTagStyles } from "../../utils/tagStyles";
 
-const getTagStyles = (label) => {
-  const cleanLabel = label.toLowerCase().replace("#", "");
-  switch (cleanLabel) {
-    case "api":
-      return {
-        bg: "bg-[#0A1520]",
-        border: "border-[#00FFFF]",
-        text: "text-[#00FFFF]",
-      };
-    case "react":
-    case "vite":
-      return {
-        bg: "bg-[#1A0A1A]",
-        border: "border-[#FF00FF]",
-        text: "text-[#FF00FF]",
-      };
-    case "sql":
-    case "database":
-    case "mysql":
-      return {
-        bg: "bg-[#1A1A0A]",
-        border: "border-[#FFD700]",
-        text: "text-[#FFD700]",
-      };
-    case "security":
-    case "web":
-      return {
-        bg: "bg-[#0A1F1A]",
-        border: "border-[#39FF14]",
-        text: "text-[#39FF14]",
-      };
-    case "debug":
-      return {
-        bg: "bg-[#1A0A0A]",
-        border: "border-[#FF8C00]",
-        text: "text-[#FF8C00]",
-      };
-    case "node.js":
-    case "node":
-    case "express":
-      return {
-        bg: "bg-[#1A0A15]",
-        border: "border-[#FF3366]",
-        text: "text-[#FF3366]",
-      };
-    default:
-      return {
-        bg: "bg-[#0F1E24]",
-        border: "border-[#3b82f6]",
-        text: "text-[#3b82f6]",
-      };
-  }
-};
+const categoryMemoToast = Swal.mixin({
+  toast: true,
+  position: "top-end",
+  showConfirmButton: false,
+  showClass: { popup: "" },
+  hideClass: { popup: "" },
+});
 
 export default function Skills() {
   const location = useLocation();
@@ -76,10 +32,10 @@ export default function Skills() {
     // Load categories
     getCategories().then((cats) => {
       setCategories([
-        { name: "全部", icon: null },
-        { name: "最新技能", icon: null },
-        { name: "熱門分類", icon: null },
-        ...cats.map((c) => ({ name: c.name, icon: null })),
+        { name: "全部", icon: null, memo: "" },
+        { name: "最新技能", icon: null, memo: "" },
+        // { name: "熱門分類", icon: null, memo: "" },
+        ...cats.map((c) => ({ name: c.name, icon: null, memo: c.memo })),
       ]);
     });
 
@@ -138,6 +94,31 @@ export default function Skills() {
     setSelectedCategory(categoryName);
   };
 
+  const handleCategoryMouseEnter = (cat, event) => {
+    if (!cat.memo) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    categoryMemoToast.fire({
+      text: cat.memo,
+      didOpen: (popup) => {
+        popup.style.position = "fixed";
+        popup.style.margin = "0";
+        popup.style.left = `${rect.left + rect.width / 2}px`;
+        popup.style.top = `${rect.top - rect.height / 2}px`;
+        popup.style.width = "fit-content";
+        popup.style.display = "inline-block";
+        popup.style.whiteSpace = "nowrap";
+        popup.style.fontSize = "12px";
+        popup.style.backgroundColor = "rgba(26, 58, 42,0.6)";
+        popup.style.color = "#E0F0E8";
+        popup.style.padding = "8px 8px";
+      },
+    });
+  };
+
+  const handleCategoryMouseLeave = () => {
+    Swal.close();
+  };
+
   const handleTagToggle = (tagLabel) => {
     setSelectedTag((prev) => (prev === tagLabel ? null : tagLabel));
   };
@@ -157,7 +138,7 @@ export default function Skills() {
             data-pencil-name="Sidebar Heading"
             className="text-[16px]/[normal] box-border text-[#FFD700] font-bold text-left whitespace-nowrap"
           >
-            分類
+            分類清單
           </div>
 
           {categories.map((cat) => {
@@ -167,6 +148,8 @@ export default function Skills() {
                 key={cat.name}
                 type="button"
                 onClick={() => handleCategorySelect(cat.name)}
+                onMouseEnter={(e) => handleCategoryMouseEnter(cat, e)}
+                onMouseLeave={handleCategoryMouseLeave}
                 className={`box-border w-full h-fit flex flex-row gap-2 py-2.5 px-3 justify-start items-center border-0 rounded-lg cursor-pointer transition-all duration-200 ${
                   isSelected
                     ? "bg-[#39FF14] text-[#0A0E1A] font-semibold"
@@ -196,7 +179,7 @@ export default function Skills() {
 
           <div
             data-pencil-name="Tag Column"
-            className="box-border w-full h-fit flex flex-wrap gap-2 justify-start items-start"
+            className="box-border w-full h-fit flex flex-wrap gap-2 justify-start items-start mt-2"
           >
             {tags.map((tag) => {
               const style = getTagStyles(tag.name);
@@ -209,11 +192,11 @@ export default function Skills() {
                   className={`box-border w-fit h-fit flex flex-row gap-0 py-1.5 px-2.5 justify-start items-start rounded-[999px] border cursor-pointer transition-all ${
                     isSelected
                       ? `bg-transparent ${style.border} ring-2 ring-offset-2 ring-offset-[#111827] ring-[#00FFFF]`
-                      : `${style.bg} ${style.border} hover:opacity-80`
+                      : `${style.bg} ${style.border} hover:font-bold hover:opacity-80 `
                   }`}
                 >
                   <span
-                    className={`text-[12px]/[normal] ${style.text} whitespace-nowrap`}
+                    className={`text-[14px]/[normal] ${style.text} whitespace-nowrap`}
                   >
                     {tag.name}
                   </span>
