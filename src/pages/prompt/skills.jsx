@@ -132,7 +132,7 @@ export default function Skills() {
         {/* Filters Sidebar */}
         <div
           data-pencil-name="Filters Sidebar"
-          className="box-border w-full lg:w-62.5 shrink-0 flex flex-col gap-3.5 p-4.5 justify-start items-start bg-[#111827] border border-[#1A3A2A] rounded-2xl"
+          className="box-border w-full lg:w-62.5 shrink-0 flex flex-col gap-3.5 p-4.5 justify-start items-stretch bg-[#111827] border border-[#1A3A2A] rounded-2xl"
         >
           <div
             data-pencil-name="Sidebar Heading"
