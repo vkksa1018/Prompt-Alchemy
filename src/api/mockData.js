@@ -246,9 +246,9 @@ export const skillItemsTable = [
 並提出改善建議。
 
 輸出請包含：
-【程式碼問題】
-【改善建議程式碼】
-【為什麼這樣改】`,
+[程式碼問題]
+[改善建議程式碼]
+[為什麼這樣改]`,
     use_case: "當你接收一支 API，需要 AI 幫你檢查安全性、錯誤處理與資料結構時使用。",
     example_input: "app.get('/api/user', async (req, res) => {\n  const id = req.query.id;\n  const user = await db.query(...);\n  res.json(user);\n});",
     example_output:
@@ -316,29 +316,28 @@ export const skillItemsTable = [
     content_type_id: "ct-prompt-uuid-0000-000000000001", // prompt
     model_type: ["model-gpt-uuid-0000-000000000001", "model-codex-uuid-0000-000000000003"],
     prompt_content: `# ---- Inputs ----
-character_description = (目標物設定，具體性 + 品質提示)
-short_copy = (文字設定)
+{character_description} = (目標物設定，具體性 + 品質提示)
+{short_copy} = (文字設定)
 
 # ---- Prompt ----
 prompt = f"""
-製作一個以 {character_description} 為主題的商品視覺設計。
-請註明預期用途。
+製作一個以 {character_description} 為主題的[商品名稱，說明想要的視覺設計，以及預期用途]。
 
 概念（Concept）：
-{說明概念，構圖要點：背景 / 場景 -> 主題 -> 關鍵細節 -> 限制條件}
+[說明概念，構圖要點：背景 / 場景 -> 主題 -> 關鍵細節 -> 限制條件]
 
-包裝上僅能出現以下文字（完全一致）：
+包裝上僅能出現以下文字 [完全一致]：
 "{short_copy}"
 """
 
 result = client.images.generate(
-    model={使用模型},
+    model=[使用模型],
     prompt=prompt,
-    size={尺寸大小},
-    quality={圖片品質},
+    size=[尺寸大小],
+    quality=[圖片品質],
 )
 
-save_image(result, {檔案名稱})`,
+save_image(result, [檔案名稱])`,
     use_case: "商品設計, 用於商品早期創意構思和方案視覺設計",
     example_input: `# ---- Inputs ---- 
 character_description = 
@@ -495,11 +494,9 @@ save_image(result, "LEGO_collectible_toy_gpt-image-2.png")`,
 並附上測試案例說明：
 
 - 匹配：[條件]
-- 排除：[條件]
-
-輸入字串範例：`,
+- 排除：[條件]`,
     use_case: "驗證複雜輸入（如密碼複雜度、身分證字號、特定日誌格式）時。",
-    example_input: "匹配 email 格式，並排除 .com 結尾...",
+    example_input: "請根據以下條件生成一個高效的正則表達式，並附上測試案例說明：匹配 email 格式，並排除 .com 結尾...",
     example_output:
     {
       outputText: "`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.(?!com$)[a-zA-Z]{2,}$`",
