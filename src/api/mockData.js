@@ -94,28 +94,32 @@ export const parametersTable = [
     memo: "CI/CD、Docker、雲端服務、監控",
     is_active: true,
     sort_order: 7,
-  }, {
+  },
+  {
     id: "cat-utility-uuid-0000-000000000008",
     type: "category",
     name: "測試 / 品質保證",
     memo: "單元測試、E2E、Code Review",
     is_active: true,
     sort_order: 8,
-  }, {
+  },
+  {
     id: "cat-utility-uuid-0000-000000000009",
     type: "category",
     name: "文件 / 寫作",
     memo: "技術文件、README、註解生成",
     is_active: true,
     sort_order: 9,
-  }, {
+  },
+  {
     id: "cat-utility-uuid-0000-000000000010",
     type: "category",
     name: "教育 / 學習",
     memo: "觀念解釋、教材產生、學習輔助",
     is_active: true,
     sort_order: 10,
-  }, {
+  },
+  {
     id: "cat-utility-uuid-0000-000000000011",
     type: "category",
     name: "設計 / UX",
@@ -148,7 +152,14 @@ export const parametersTable = [
     is_active: true,
     sort_order: 3,
   },
-
+  {
+    id: "model-gemini-uuid-0000-000000000004",
+    type: "model",
+    name: "gemini",
+    memo: "Google Gemini",
+    is_active: true,
+    sort_order: 4,
+  },
   // Tags
   {
     id: "tag-api-uuid-0000-000000000001",
@@ -245,21 +256,24 @@ export const parametersTable = [
     memo: "網頁應用開發",
     is_active: true,
     sort_order: 12,
-  }, {
+  },
+  {
     id: "tag-design-uuid-0000-000000000013",
     type: "tag",
     name: "#Design",
     memo: "設計相關",
     is_active: true,
     sort_order: 13,
-  }, {
+  },
+  {
     id: "tag-education-uuid-0000-000000000014",
     type: "tag",
     name: "#Education",
     memo: "教育相關",
     is_active: true,
     sort_order: 14,
-  }, {
+  },
+  {
     id: "tag-drawing-uuid-0000-000000000015",
     type: "tag",
     name: "#Drawing",
@@ -280,7 +294,7 @@ export const usersTable = [
   },
   {
     id: "user-member-uuid-0000-000000000002",
-    name: "Jane User",
+    name: "New User",
     email: "user@promptalchemy.com",
     password_hash: "bcrypt-hash-placeholder-member",
     role: "member",
@@ -295,7 +309,10 @@ export const skillItemsTable = [
     slug: "backend-api-review",
     intro: "檢查 Express / Next.js API 的錯誤處理、安全性與回傳結構。",
     content_type_id: "ct-prompt-uuid-0000-000000000001", // prompt
-    model_type: ["model-gpt-uuid-0000-000000000001", "model-claude-uuid-0000-000000000002"],
+    model_type: [
+      "model-gpt-uuid-0000-000000000001",
+      "model-claude-uuid-0000-000000000002",
+    ],
     prompt_content: `請你扮演資深後端工程師，檢查以下 API 程式碼。
 
 幫我找出可能的錯誤、安全性風險、效能問題，
@@ -305,23 +322,36 @@ export const skillItemsTable = [
 [程式碼問題]
 [改善建議程式碼]
 [為什麼這樣改]`,
-    use_case: "當你接收一支 API，需要 AI 幫你檢查安全性、錯誤處理與資料結構時使用。",
-    example_input: "app.get('/api/user', async (req, res) => {\n  const id = req.query.id;\n  const user = await db.query(...);\n  res.json(user);\n});",
-    example_output:
-    {
-      outputText: "【程式碼問題】\n1. 未進行輸入驗證，可能存在 SQL Injection 安全風險。\n2. 缺乏 try-catch 區塊，若資料庫查詢失敗會導致 server 當機。\n\n【改善建議程式碼】\n```javascript\napp.get('/api/user', async (req, res, next) => {\n  try {\n    const id = parseInt(req.query.id, 10);\n    if (isNaN(id)) {\n      return res.status(400).json({ error: 'Invalid ID format' });\n    }\n\n    const user = await db.query('SELECT * FROM users WHERE id = $1', [id]);\n    res.json(user);\n  } catch (error) {\n    next(error);\n  }\n});\n```",
+    use_case:
+      "當你接收一支 API，需要 AI 幫你檢查安全性、錯誤處理與資料結構時使用。",
+    example_input: `請你扮演資深後端工程師，檢查以下 API 程式碼。
+
+幫我找出可能的錯誤、安全性風險、效能問題，
+並提出改善建議。
+
+輸出請包含：
+[程式碼問題]
+[改善建議程式碼]
+[為什麼這樣改] \n app.get('/api/user', async (req, res) => {\n  const id = req.query.id;\n  const user = await db.query(...);\n  res.json(user);\n});`,
+    example_output: {
+      outputText:
+        "【程式碼問題】\n1. 未進行輸入驗證，可能存在 SQL Injection 安全風險。\n2. 缺乏 try-catch 區塊，若資料庫查詢失敗會導致 server 當機。\n\n【改善建議程式碼】\n```javascript\napp.get('/api/user', async (req, res, next) => {\n  try {\n    const id = parseInt(req.query.id, 10);\n    if (isNaN(id)) {\n      return res.status(400).json({ error: 'Invalid ID format' });\n    }\n\n    const user = await db.query('SELECT * FROM users WHERE id = $1', [id]);\n    res.json(user);\n  } catch (error) {\n    next(error);\n  }\n});\n```",
       outputImages: [
         {
-          url: '',
-          alt: '',
-          caption: ''
-        }
-      ]
-    }
-    ,
+          url: "",
+          alt: "",
+          caption: "",
+        },
+      ],
+    },
     category_id: "cat-backend-uuid-0000-000000000002", // 後端開發
-    tags: ["tag-api-uuid-0000-000000000001", "tag-security-uuid-0000-000000000002", "tag-express-uuid-0000-000000000008"],
-    source_url: "https://expressjs.com/zh-tw/advanced/best-practice-security.html",
+    tags: [
+      "tag-api-uuid-0000-000000000001",
+      "tag-security-uuid-0000-000000000002",
+      "tag-express-uuid-0000-000000000008",
+    ],
+    source_url:
+      "https://expressjs.com/zh-tw/advanced/best-practice-security.html",
     copy_count: 125,
     favorite_count: 32,
     status: true,
@@ -340,22 +370,28 @@ export const skillItemsTable = [
 並給出可能的修復方案及除錯步驟：
 
 [在此輸入錯誤訊息]`,
-    use_case: "當 React 網頁發生 Runtime Error 或編譯失敗時，用於快速定位問題。",
-    example_input: "TypeError: Cannot read properties of undefined (reading 'map')\n  at ProductList (ProductList.jsx:12)",
-    example_output:
-    {
-      outputText: "【錯誤原因】\nProductList 組件中的資料（如 products）在渲染時尚為 undefined，就直接調用了 .map() 方法。\n\n【解決方案】\n使用 Optional Chaining (`products?.map(...)`) 或短路求值提供預設空陣列 (`(products || []).map(...)`)。",
+    use_case:
+      "當 React 網頁發生 Runtime Error 或編譯失敗時，用於快速定位問題。",
+    example_input: `請分析以下 React / Next.js 錯誤訊息，
+並給出可能的修復方案及除錯步驟：
+TypeError: Cannot read properties of undefined (reading 'map') at ProductList (ProductList.jsx:12)`,
+    example_output: {
+      outputText:
+        "【錯誤原因】\nProductList 組件中的資料（如 products）在渲染時尚為 undefined，就直接調用了 .map() 方法。\n\n【解決方案】\n使用 Optional Chaining (`products?.map(...)`) 或短路求值提供預設空陣列 (`(products || []).map(...)`)。",
       outputImages: [
         {
-          url: '',
-          alt: '',
-          caption: ''
-        }
-      ]
-    }
-    ,
+          url: "",
+          alt: "",
+          caption: "",
+        },
+      ],
+    },
     category_id: "cat-frontend-uuid-0000-000000000001", // 前端開發
-    tags: ["tag-react-uuid-0000-000000000003", "tag-debug-uuid-0000-000000000004", "tag-vite-uuid-0000-000000000009"],
+    tags: [
+      "tag-react-uuid-0000-000000000003",
+      "tag-debug-uuid-0000-000000000004",
+      "tag-vite-uuid-0000-000000000009",
+    ],
     source_url: "https://react.dev/reference/react",
     copy_count: 98,
     favorite_count: 21,
@@ -368,9 +404,13 @@ export const skillItemsTable = [
     id: "prompt-uuid-0001-0000-000000000003",
     title: "玩偶、周邊商品圖形產出",
     slug: "generator-image-prototype",
-    intro: "用於商品早期創意構思和方案視覺設計。專注於高端產品攝影要素（材質、包裝、印刷清晰度），同時確保設計原創且不侵權。非常適合快速測試多個角色或包裝方案。",
+    intro:
+      "用於商品早期創意構思和方案視覺設計。專注於高端產品攝影要素（材質、包裝、印刷清晰度），同時確保設計原創且不侵權。非常適合快速測試多個角色或包裝方案。",
     content_type_id: "ct-prompt-uuid-0000-000000000001", // prompt
-    model_type: ["model-gpt-uuid-0000-000000000001", "model-codex-uuid-0000-000000000003"],
+    model_type: [
+      "model-gpt-uuid-0000-000000000001",
+      "model-codex-uuid-0000-000000000003",
+    ],
     prompt_content: `# ---- Inputs ----
 {character_description} = (目標物設定，具體性 + 品質提示)
 {short_copy} = (文字設定)
@@ -441,25 +481,30 @@ result = client.images.generate(
 
 save_image(result, "LEGO_collectible_toy_gpt-image-2.png")`,
     example_output: {
-      outputText: '',
+      outputText: "",
       outputImages: [
         {
-          url: '/Prompt-Alchemy/LEGO_collectible_toy_gpt-image-2.png',
-          alt: 'LEGO_collectible_toy_gpt-image-2.png',
-          caption: 'gpt-image-2'
-        }, {
-          url: '/Prompt-Alchemy/LEGO_collectible_toy_grok.png',
-          alt: 'LEGO_collectible_toy_grok.png',
-          caption: 'grok'
-        }, {
-          url: '/Prompt-Alchemy/LEGO_collectible_toy_gemini-3-pro-image.png',
-          alt: 'LEGO_collectible_toy_gemini-3-pro-image.png',
-          caption: 'gemini-3-pro-image'
-        }
-      ]
+          url: "/Prompt-Alchemy/LEGO_collectible_toy_gpt-image-2.png",
+          alt: "LEGO_collectible_toy_gpt-image-2.png",
+          caption: "gpt-image-2",
+        },
+        {
+          url: "/Prompt-Alchemy/LEGO_collectible_toy_grok.png",
+          alt: "LEGO_collectible_toy_grok.png",
+          caption: "grok",
+        },
+        {
+          url: "/Prompt-Alchemy/LEGO_collectible_toy_gemini-3-pro-image.png",
+          alt: "LEGO_collectible_toy_gemini-3-pro-image.png",
+          caption: "gemini-3-pro-image",
+        },
+      ],
     },
     category_id: "cat-utility-uuid-0000-000000000011", // 設計
-    tags: ["tag-design-uuid-0000-000000000013", "tag-drawing-uuid-0000-000000000015"],
+    tags: [
+      "tag-design-uuid-0000-000000000013",
+      "tag-drawing-uuid-0000-000000000015",
+    ],
     source_url: "",
     copy_count: 99,
     favorite_count: 105,
@@ -474,28 +519,35 @@ save_image(result, "LEGO_collectible_toy_gpt-image-2.png")`,
     slug: "security-vulnerabilities-checklist",
     intro: "檢查常見的 Web 與雲端環境風險掃描方式。",
     content_type_id: "ct-prompt-uuid-0000-000000000001", // prompt
-    model_type: ["model-gpt-uuid-0000-000000000001", "model-claude-uuid-0000-000000000002"],
+    model_type: [
+      "model-gpt-uuid-0000-000000000001",
+      "model-claude-uuid-0000-000000000002",
+    ],
     prompt_content: `請提供一份針對以下環境的 Web 應用程式安全檢測清單，
 以及常見漏洞的防範建議：
 
 [在此說明技術棧環境]`,
     use_case: "部署前進行安全性弱點自檢，或準備進行滲透測試時。",
-    example_input: "Web API Node.js environment...",
-    example_output:
-    {
-      outputText: "1. 檢查並停用不安全的 HTTP Header (建議使用 helmet 中間件)\n2. 防範 CORS 跨網域資源共享不當設定\n3. 限制 API 請求頻率 (Rate Limiting) 避免 DDoS 攻擊",
+    example_input: `請提供一份針對以下環境的 Web 應用程式安全檢測清單，
+以及常見漏洞的防範建議：
+Web API Node.js environment...`,
+    example_output: {
+      outputText:
+        "1. 檢查並停用不安全的 HTTP Header (建議使用 helmet 中間件)\n2. 防範 CORS 跨網域資源共享不當設定\n3. 限制 API 請求頻率 (Rate Limiting) 避免 DDoS 攻擊",
       outputImages: [
         {
-          url: '',
-          alt: '',
-          caption: ''
-        }
-      ]
-    }
+          url: "",
+          alt: "",
+          caption: "",
+        },
+      ],
+    },
 
-    ,
     category_id: "cat-security-uuid-0000-000000000003", // 資安相關
-    tags: ["tag-security-uuid-0000-000000000002", "tag-web-uuid-0000-000000000012"],
+    tags: [
+      "tag-security-uuid-0000-000000000002",
+      "tag-web-uuid-0000-000000000012",
+    ],
     source_url: "https://owasp.org/www-project-top-ten/",
     copy_count: 63,
     favorite_count: 15,
@@ -516,21 +568,25 @@ save_image(result, "LEGO_collectible_toy_gpt-image-2.png")`,
 
 [在此輸入內容]`,
     use_case: "需要撰寫英文 API 文件、發布 PR 說明或學術發表論文時。",
-    example_input: "如何使用 React 進行狀態管理...",
-    example_output:
-    {
-      outputText: "Academic: How to leverage React for state management within web applications...\nProfessional: Efficient ways to manage state in your React projects...",
+    example_input: `請將以下中文技術內容翻譯成專業、自然的英文，
+並提供 Academic 與 Professional 兩種口吻：
+如何使用 React 進行狀態管理...`,
+    example_output: {
+      outputText:
+        "Academic: How to leverage React for state management within web applications...\nProfessional: Efficient ways to manage state in your React projects...",
       outputImages: [
         {
-          url: '',
-          alt: '',
-          caption: ''
-        }
-      ]
-    }
-    ,
+          url: "",
+          alt: "",
+          caption: "",
+        },
+      ],
+    },
     category_id: "cat-translate-uuid-0000-000000000005", // 翻譯助手
-    tags: ["tag-translation-uuid-0000-000000000006", "tag-web-uuid-0000-000000000012"],
+    tags: [
+      "tag-translation-uuid-0000-000000000006",
+      "tag-web-uuid-0000-000000000012",
+    ],
     source_url: "",
     copy_count: 180,
     favorite_count: 42,
@@ -545,28 +601,33 @@ save_image(result, "LEGO_collectible_toy_gpt-image-2.png")`,
     slug: "regex-generator",
     intro: "輸入期望匹配與排除的規則，自動產生高效率的正則表達式。",
     content_type_id: "ct-prompt-uuid-0000-000000000001", // prompt
-    model_type: ["model-gpt-uuid-0000-000000000001", "model-codex-uuid-0000-000000000003"],
+    model_type: [
+      "model-gpt-uuid-0000-000000000001",
+      "model-codex-uuid-0000-000000000003",
+    ],
     prompt_content: `請根據以下條件生成一個高效的正則表達式，
 並附上測試案例說明：
 
 - 匹配：[條件]
 - 排除：[條件]`,
     use_case: "驗證複雜輸入（如密碼複雜度、身分證字號、特定日誌格式）時。",
-    example_input: "請根據以下條件生成一個高效的正則表達式，並附上測試案例說明：匹配 email 格式，並排除 .com 結尾...",
-    example_output:
-    {
+    example_input:
+      "請根據以下條件生成一個高效的正則表達式，並附上測試案例說明：匹配 email 格式，並排除 .com 結尾...",
+    example_output: {
       outputText: "`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.(?!com$)[a-zA-Z]{2,}$`",
       outputImages: [
         {
-          url: '',
-          alt: '',
-          caption: ''
-        }
-      ]
-    }
-    ,
+          url: "",
+          alt: "",
+          caption: "",
+        },
+      ],
+    },
     category_id: "cat-utility-uuid-0000-000000000006", // 小工具
-    tags: ["tag-debug-uuid-0000-000000000004", "tag-web-uuid-0000-000000000012"],
+    tags: [
+      "tag-debug-uuid-0000-000000000004",
+      "tag-web-uuid-0000-000000000012",
+    ],
     source_url: "https://regex101.com/",
     copy_count: 110,
     favorite_count: 29,
@@ -582,27 +643,36 @@ save_image(result, "LEGO_collectible_toy_gpt-image-2.png")`,
     slug: "sql-query-optimization",
     intro: "分析 SQL 查詢效能瓶頸與最佳化建議。",
     content_type_id: "ct-prompt-uuid-0000-000000000001", // prompt
-    model_type: ["model-gpt-uuid-0000-000000000001", "model-codex-uuid-0000-000000000003"],
+    model_type: [
+      "model-gpt-uuid-0000-000000000001",
+      "model-codex-uuid-0000-000000000003",
+    ],
     prompt_content: `請分析以下 SQL 查詢的效能瓶頸，
 並提供最佳化建議及索引設計：
 
 [在此輸入 SQL 語句]`,
-    use_case: "資料庫查詢速度過慢，或 Explain 計畫顯示進行全表掃描（Full Table Scan）時。",
-    example_input: "SELECT * FROM orders WHERE user_id = 5 AND status = 'pending' ORDER BY created_at DESC;",
-    example_output:
-    {
-      outputText: "【效能評估】\n如果 user_id 與 status 欄位沒有建立聯合索引（Composite Index），將會導致慢查詢。\n\n【建議索引】\n`CREATE INDEX idx_user_status_created ON orders (user_id, status, created_at DESC);`",
+    use_case:
+      "資料庫查詢速度過慢，或 Explain 計畫顯示進行全表掃描（Full Table Scan）時。",
+    example_input: `請分析以下 SQL 查詢的效能瓶頸，
+並提供最佳化建議及索引設計：
+"SELECT * FROM orders WHERE user_id = 5 AND status = 'pending' ORDER BY created_at DESC;"`,
+    example_output: {
+      outputText:
+        "【效能評估】\n如果 user_id 與 status 欄位沒有建立聯合索引（Composite Index），將會導致慢查詢。\n\n【建議索引】\n`CREATE INDEX idx_user_status_created ON orders (user_id, status, created_at DESC);`",
       outputImages: [
         {
-          url: '',
-          alt: '',
-          caption: ''
-        }
-      ]
-    }
-    ,
+          url: "",
+          alt: "",
+          caption: "",
+        },
+      ],
+    },
     category_id: "cat-backend-uuid-0000-000000000002", // 後端開發
-    tags: ["tag-sql-uuid-0000-000000000005", "tag-database-uuid-0000-000000000010", "tag-mysql-uuid-0000-000000000011"],
+    tags: [
+      "tag-sql-uuid-0000-000000000005",
+      "tag-database-uuid-0000-000000000010",
+      "tag-mysql-uuid-0000-000000000011",
+    ],
     source_url: "",
     copy_count: 77,
     favorite_count: 18,
@@ -610,7 +680,212 @@ save_image(result, "LEGO_collectible_toy_gpt-image-2.png")`,
     created_at: "2026-06-25T14:15:00Z",
     updated_at: "2026-06-25T14:15:00Z",
     is_active: true,
-  }
+  },
+  {
+    id: "prompt-uuid-0001-0000-000000000008",
+    title: "動畫、影像產出_Gemini I",
+    slug: "generator-video-prototype",
+    intro: "用於創意構思和動畫效果。可供快速測試角色或場景的動畫方案。",
+    content_type_id: "ct-prompt-uuid-0000-000000000001", // prompt
+    model_type: ["model-gemini-uuid-0000-000000000004"],
+    prompt_content: `製作影片
+    Project:
+    Title: [影片標題]
+    Style: [影像風格描敘,例如: Anime cinematic, Realistic 3D, 好萊塢, Slow-motion]
+    Duration: [影片長度,例如: 10 seconds]
+    Aspect Ratio: [影片比例,例如: 16:9, 1:1, 9:16]
+    FPS: [影片幀率,例如: 24, 30, 60]
+    Global Style:
+    - [全局風格描述,例如: Soft cinematic lighting, Warm color grading, High detail, Consistent character design, Realistic skateboard physics, Dynamic camera motion]
+    Character:
+    [角色設定,如果有要求盡量寫多一點]
+    Shots:
+    - id: [分鏡編號]
+    duration: [鏡頭時間長度,例如: 1s, 2s]
+    shot: [鏡頭角度類型,例如: Establishing, Low Angle, Wide, Close Up]
+    camera: [攝影機運動方式,例如: Dolly Back, Tracking, Side Tracking, Static]
+    action: [鏡頭中發生的動作或事件描述]
+    `,
+    use_case: "影像製作, 用於商業設計或靈感輸出",
+    example_input: `製作影片
+    Project:
+    Title: Skateboard Cat Adventure
+    Style: Anime cinematic
+    Duration: 10 seconds
+    Aspect Ratio: 16:9
+    FPS: 24
+    Global Style:
+    - Soft cinematic lighting
+    - Warm color grading
+    - High detail
+    - Consistent character design
+    - Realistic skateboard physics
+    - Dynamic camera motion
+    Character:
+    Girl:
+    Age: 17
+    Outfit:
+    White hoodie
+    Beige skirt
+    Black backpack
+    Skate shoes
+    Hair:
+    Short black hair
+    Cat:
+    White short-haired cat
+    Shots:
+    - id: 1
+    duration: 1s
+    shot: Establishing
+    camera: Dolly Back
+    action: Girl crouches on skateboard while cat follows.
+    - id: 2
+    duration: 1s
+    shot: Low Angle
+    camera: Tracking
+    action: Skateboard accelerates.
+    - id: 3
+    duration: 1s
+    shot: Wide
+    camera: Side Tracking
+    action: Girl jumps over obstacle.
+    - id: 4
+    duration: 2s
+    shot: Close Up
+    camera: Static
+    action: Girl pets the white cat while smiling. `,
+    example_output: {
+      outputText: "",
+      outputImages: [
+        {
+          url: "/Prompt-Alchemy/Project___Title_Skateb.mp4",
+          alt: "Project___Title_Skateb.mp4",
+          caption: "Gemini Veo 3",
+        },
+      ],
+    },
+    category_id: "cat-utility-uuid-0000-000000000011", // 設計
+    tags: [
+      "tag-design-uuid-0000-000000000013",
+      "tag-drawing-uuid-0000-000000000015",
+    ],
+    source_url: "",
+    copy_count: 112,
+    favorite_count: 115,
+    status: true,
+    created_at: "2026-07-15T18:15:00Z",
+    updated_at: "2026-07-15T18:15:00Z",
+    is_active: true,
+  },
+  {
+    id: "prompt-uuid-0001-0000-000000000009",
+    title: "動畫、影像產出_Gemini II",
+    slug: "generator-video-prototype2",
+    intro: "用於銜接原先創意構思和動畫效果。可供快速測試角色或場景的動畫方案。",
+    content_type_id: "ct-prompt-uuid-0000-000000000001", // prompt
+    model_type: ["model-gemini-uuid-0000-000000000004"],
+    prompt_content: `製作影片
+    Project:
+    Title: [影片標題]
+    Style: [影像風格描敘,例如: Anime cinematic, Realistic 3D, 好萊塢, Slow-motion]
+    Duration: [影片長度,例如: 10 seconds]
+    Aspect Ratio: [影片比例,例如: 16:9, 1:1, 9:16]
+    FPS: [影片幀率,例如: 24, 30, 60]
+    Global Style:
+    - [全局風格描述,例如: Soft cinematic lighting, Warm color grading, High detail, Consistent character design, Realistic skateboard physics, Dynamic camera motion]
+    Character:
+    [角色設定,如果有要求盡量寫多一點]
+    The same characters as the video [提供參考影片檔案].
+    Shots:
+    - id: [分鏡編號]
+    duration: [鏡頭時間長度,例如: 1s, 2s]
+    shot: [鏡頭角度類型,例如: Establishing, Low Angle, Wide, Close Up]
+    camera: [攝影機運動方式,例如: Dolly Back, Tracking, Side Tracking, Static]
+    action: [鏡頭中發生的動作或事件描述]
+    `,
+    use_case: "影像製作, 用於商業設計或靈感輸出",
+    example_input: `製作影片
+    Project:
+    Title: Skateboard Cat Adventure 2
+    Style: Anime cinematic
+    Duration: 10 seconds
+    Aspect Ratio: 16:9
+    FPS: 24
+    Global Style:
+    - Soft cinematic lighting
+    - Warm color grading
+    - High detail
+    - Consistent character design
+    - Realistic skateboard physics
+    - Dynamic camera motion
+    Character:
+    Girl:
+    Age: 17
+    Outfit:
+    White hoodie
+    Beige skirt
+    Black backpack
+    Skate shoes
+    Hair:
+    Short black hair
+    Cat:
+    White short-haired cat
+    The same characters as the video [Project___Title_Skateb.mp4].
+    Shots:
+    - id: 1
+    duration: 2s
+    shot: Establishing
+    camera: Dolly Back
+    action: 女孩用滑板在比賽練習U型場地鍛鍊滑板技巧，貓在旁邊慵懶的睡覺
+    - id: 2
+    duration: 1s
+    shot: Low Angle
+    camera: Tracking
+    action: Skateboard accelerates and reach the highest point with skateboard rotation.
+    - id: 3
+    duration: 2s
+    shot: Wide
+    camera: Front angle
+    action: 女孩很開心的跟貓分享完成高難度動作，用日文說‘太好了’.
+    - id:4
+    duration: 1s
+    shot: side
+    camera: side tracking
+    action: 一隻藍綠色的和尚鸚鵡快速飛過，吸引到貓的注意力.
+    - id: 5
+    duration: 1s
+    shot: single from cat
+    camera: narrow
+    action: 從貓的視野看到那隻藍綠色和尚鸚鵡在打招呼說’hello’.
+    -id:6
+    duration: 3s
+    shot: Close Up
+    camera: Static
+    action: 貓到處追著藍綠色和尚鸚鵡，不斷的‘喵喵’叫，女孩表現出無奈受不了的樣子，雙手抱頭。 
+    `,
+    example_output: {
+      outputText: "",
+      outputImages: [
+        {
+          url: "/Prompt-Alchemy/Project___Title_Skatebo2.mp4",
+          alt: "Project___Title_Skatebo2.mp4",
+          caption: "Gemini Veo 3",
+        },
+      ],
+    },
+    category_id: "cat-utility-uuid-0000-000000000011", // 設計
+    tags: [
+      "tag-design-uuid-0000-000000000013",
+      "tag-drawing-uuid-0000-000000000015",
+    ],
+    source_url: "",
+    copy_count: 52,
+    favorite_count: 35,
+    status: true,
+    created_at: "2026-07-15T18:25:00Z",
+    updated_at: "2026-07-15T18:25:00Z",
+    is_active: true,
+  },
 ];
 
 // 4. Favorites Table (Composite PK: user_id, skill_item_id)
@@ -646,7 +921,9 @@ export function getParametersByType(type) {
 }
 
 export function getPrompts() {
-  return skillItemsTable.filter((item) => item.is_active && item.status === true);
+  return skillItemsTable.filter(
+    (item) => item.is_active && item.status === true
+  );
 }
 
 export function getPromptById(id) {

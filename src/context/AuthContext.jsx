@@ -21,12 +21,20 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  const loginUser = (userData) => {
+  const loginUser = (userData, options = {}) => {
+    const { showSuccessAlert = true } = options;
+    console.log("Logging in user:", userData);
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
     getUserFavorites(userData.email, userData.id).then((favs) => {
       setFavorites(favs);
-      alertHelper.success("登入成功", `歡迎回來，${userData.name || "成員"}！`, true);
+      if (showSuccessAlert) {
+        alertHelper.success(
+          "登入成功",
+          `歡迎回來，${userData.name || "成員"}！`,
+          true
+        );
+      }
     });
   };
 
@@ -86,7 +94,10 @@ export function AuthProvider({ children }) {
 
   const resetFavorites = () => {
     if (!user) return;
-    const defaults = ["prompt-uuid-0001-0000-000000000001", "prompt-uuid-0001-0000-000000000002"];
+    const defaults = [
+      "prompt-uuid-0001-0000-000000000001",
+      "prompt-uuid-0001-0000-000000000002",
+    ];
     setFavorites(defaults);
     saveUserFavorites(user.email, defaults);
     // Optional: sync counts
@@ -105,11 +116,10 @@ export function AuthProvider({ children }) {
         favorites,
         toggleFavorite,
         clearFavorites,
-        resetFavorites
+        resetFavorites,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
 }
-

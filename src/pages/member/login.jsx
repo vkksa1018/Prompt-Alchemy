@@ -33,7 +33,7 @@ export default function Login() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0A0E1A]/85 backdrop-blur-md p-4">
+    <div className="w-full min-h-[70vh] flex items-center justify-center bg-[#0A0E1A] p-4">
       <form
         onSubmit={handleSubmit}
         data-pencil-name="Login Modal"
@@ -70,7 +70,6 @@ export default function Login() {
             ⚠️ {error}
           </div>
         )}
-
 
         {/* Email Field */}
         <div
@@ -151,7 +150,11 @@ export default function Login() {
             </div>
           </button>
           <div
-            onClick={() => alert("此為展示專案，請使用預設帳密 (user@promptalchemy.com) 登入，或直接註冊新帳號。")}
+            onClick={() =>
+              alert(
+                "此為展示專案，請使用預設帳密 (user@promptalchemy.com) 登入，或直接註冊新帳號。"
+              )
+            }
             data-pencil-name="Forgot Password"
             className="text-[13px]/[normal] box-border text-[#00FFFF] hover:text-[#39FF14] transition-colors cursor-pointer font-normal text-left whitespace-nowrap"
           >
@@ -200,7 +203,7 @@ export default function Login() {
             login({
               id: "user-member-uuid-0000-000000000002",
               email: "user@promptalchemy.com",
-              name: "Jane User",
+              name: "New User",
               role: "member",
             });
             navigate("/");

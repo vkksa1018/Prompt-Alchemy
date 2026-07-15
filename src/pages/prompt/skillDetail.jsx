@@ -7,6 +7,7 @@ import {
   getPublishedPrompts,
   incrementCopyCount,
 } from "../../api/promptApi";
+import { Heart, Undo2 } from "lucide-react";
 
 export default function SkillDetail() {
   const { id } = useParams();
@@ -78,6 +79,13 @@ export default function SkillDetail() {
   )
     ? promptData.exampleOutput.outputImages.filter((image) => image?.url)
     : [];
+
+  const isVideoMedia = (media = {}) => {
+    const url = media.url || "";
+    const explicitVideo = media.type === "video";
+    const videoExtPattern = /\.(mp4|webm|ogg|mov|m4v)(\?|#|$)/i;
+    return explicitVideo || videoExtPattern.test(url);
+  };
 
   // 讓promptContent的內容透過 [...],{...}有不同顏色
   const renderPromptContent = (content) => {
@@ -221,7 +229,7 @@ export default function SkillDetail() {
     <div className="w-full min-h-screen bg-[#0A0E1A] text-[#E0F0E8] py-8 px-6 flex flex-col items-center">
       <div
         data-pencil-name="Page Content"
-        className="box-border w-full max-w-275 flex flex-col lg:flex-row gap-6 justify-start items-start"
+        className="box-border w-full max-w-350 flex flex-col lg:flex-row gap-6 justify-start items-start"
       >
         {/* Detail Main */}
         <div
@@ -242,7 +250,7 @@ export default function SkillDetail() {
                 data-pencil-name="Back Arrow"
                 className="text-[18px]/[normal] box-border text-[#E0F0E8] font-normal text-left whitespace-nowrap"
               >
-                ←
+                <Undo2 className="w-4 h-4 shrink-0" />
               </div>
               <div
                 data-pencil-name="Back Label"
@@ -257,7 +265,21 @@ export default function SkillDetail() {
               data-pencil-name="Favorite Toggle"
               className="text-[14px]/[normal] box-border bg-transparent border-0 cursor-pointer text-[#FF00FF] font-normal text-left whitespace-nowrap hover:scale-105 active:scale-95 transition-all"
             >
-              {isFavorited ? "♥ 已收藏" : "♡ 收藏"}
+              {isFavorited ? (
+                <span className="inline-flex items-center gap-1">
+                  <Heart className="w-4 h-4 shrink-0" fill="#FF00FF" />
+                  <span className="text-[16px] font-semibold leading-none">
+                    已收藏
+                  </span>
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1">
+                  <Heart className="w-4 h-4 shrink-0" />
+                  <span className="text-[16px] font-semibold leading-none">
+                    收藏
+                  </span>
+                </span>
+              )}
             </button>
           </div>
 
@@ -306,7 +328,7 @@ export default function SkillDetail() {
               </div>
             </div>
 
-            {/* Prompt Section */}
+            {/* Prompt / Skill 內容 */}
             <div
               data-pencil-name="Prompt Section"
               className="box-border w-full h-fit shrink-0 flex flex-col gap-3 justify-start items-start"
@@ -325,11 +347,11 @@ export default function SkillDetail() {
                   type="button"
                   onClick={handleCopyPrompt}
                   data-pencil-name="Copy Action"
-                  className="box-border w-fit shrink-0 h-fit flex flex-row gap-0 py-2 px-3.5 justify-start items-start bg-[#39FF14] hover:bg-[#32dd10] active:scale-95 border-0 transition-all rounded-[999px] cursor-pointer"
+                  className="box-border w-fit shrink-0 h-fit flex flex-row gap-0 py-2 px-3.5 justify-start items-start  border border-[#39FF14] hover:bg-[#32dd10] active:scale-95 transition-all rounded-[999px] cursor-pointer  text-[#39FF14] hover:text-[#000000]"
                 >
                   <div
                     data-pencil-name="Copy Action Label"
-                    className="text-[14px]/[normal] box-border text-[#0A0E1A] font-semibold text-left whitespace-nowrap"
+                    className="text-[14px]/[normal] box-border font-semibold text-left whitespace-nowrap"
                   >
                     {copiedPrompt ? "已複製" : "複製內容"}
                   </div>
@@ -347,97 +369,110 @@ export default function SkillDetail() {
                 </pre>
               </div>
             </div>
-
-            {/* Example Input Section */}
-            <div
-              data-pencil-name="Example Section"
-              className="box-border w-full h-fit shrink-0 flex flex-col gap-3 justify-start items-start"
-            >
+            <div className="w-full flex flex-col md:flex-row gap-4">
+              {/* 範例輸入 Section */}
               <div
-                data-pencil-name="Example Header"
-                className="box-border w-full h-fit shrink-0 flex flex-row gap-0 justify-between items-center"
+                data-pencil-name="Example Section"
+                className="box-border w-full md:w-[calc(50%-0.5rem)] md:max-w-1/2 h-fit shrink-0 flex flex-col gap-3 justify-start items-start"
               >
                 <div
-                  data-pencil-name="Example Title"
-                  className="text-[18px] sm:text-[20px]/[normal] box-border text-[#00FFFF] font-bold text-left whitespace-nowrap"
-                >
-                  範例輸入
-                </div>
-                <button
-                  type="button"
-                  onClick={handleCopyExample}
-                  data-pencil-name="Example Copy"
-                  className="box-border w-fit shrink-0 h-fit flex flex-row gap-0 py-2 px-3.5 justify-start items-start bg-[#0A1520] border border-[#00FFFF] hover:bg-[#00FFFF]/10 active:scale-95 transition-all rounded-[999px] cursor-pointer"
+                  data-pencil-name="Example Header"
+                  className="box-border w-full h-9 shrink-0 flex flex-row gap-0 justify-between items-center"
                 >
                   <div
-                    data-pencil-name="Example Copy Label"
-                    className="text-[14px]/[normal] box-border text-[#00FFFF] font-normal text-left whitespace-nowrap"
+                    data-pencil-name="Example Title"
+                    className="text-[18px] sm:text-[20px]/[normal] box-border text-[#00FFFF] font-bold text-left whitespace-nowrap"
                   >
-                    {copiedExample ? "已複製" : "複製範例"}
+                    範例輸入
                   </div>
-                </button>
-              </div>
-              <div
-                data-pencil-name="Example Box"
-                className="box-border w-full h-fit shrink-0 flex flex-col gap-0 p-4.5 justify-start items-start bg-[#080C12] border border-[#00FFFF]/50 rounded-[18px]"
-              >
-                <pre
-                  data-pencil-name="Example Code"
-                  className="text-[14px] sm:text-[14px]/[22px] box-border w-full text-[#E0F0E8] font-normal text-left whitespace-pre-wrap wrap-break-word "
-                >
-                  {promptData.exampleContent}
-                </pre>
-              </div>
-            </div>
-            {/* Example Output Section */}
-            <div
-              data-pencil-name="Example Section"
-              className="box-border w-full h-fit shrink-0 flex flex-col gap-3 justify-start items-start"
-            >
-              <div
-                data-pencil-name="Example Header"
-                className="box-border w-full h-fit shrink-0 flex flex-row gap-0 justify-between items-center"
-              >
-                <div
-                  data-pencil-name="Example Title"
-                  className="text-[18px] sm:text-[20px]/[normal] box-border text-[#00FFFF] font-bold text-left whitespace-nowrap"
-                >
-                  輸出效果
                 </div>
-              </div>
-              <div
-                data-pencil-name="Example Box"
-                className="box-border w-full h-fit shrink-0 flex flex-col gap-4 p-4.5 justify-start items-start bg-[#080C12] border border-[#00FFFF]/50 rounded-[18px]"
-              >
-                {exampleOutputText ? (
+                <div
+                  data-pencil-name="Example Box"
+                  className="box-border w-full h-fit shrink-0 flex flex-col gap-0 px-4.5 py-12 justify-start items-start bg-[#080C12] border border-[#00FFFF]/50 rounded-[18px] relative"
+                >
+                  <button
+                    type="button"
+                    onClick={handleCopyExample}
+                    data-pencil-name="Example Copy"
+                    className="box-border w-fit shrink-0 h-fit flex flex-row gap-0 py-2 px-3.5 justify-start items-start bg-[rgba(10,21,32,0.6)] border border-[rgba(0,255,255,0.6)] hover:bg-[rgba(0,255,255,0.9)] active:scale-95 transition-all rounded-[999px] cursor-pointer text-[#00FFFF] hover:text-[#000000] hover:font-bold absolute top-3 right-3"
+                  >
+                    <div
+                      data-pencil-name="Example Copy Label"
+                      className="text-[14px]/[normal] box-border text-left whitespace-nowrap"
+                    >
+                      {copiedExample ? "已複製" : "複製範例"}
+                    </div>
+                  </button>
                   <pre
                     data-pencil-name="Example Code"
                     className="text-[14px] sm:text-[14px]/[22px] box-border w-full text-[#E0F0E8] font-normal text-left whitespace-pre-wrap wrap-break-word "
                   >
-                    {exampleOutputText}
+                    {promptData.exampleContent}
                   </pre>
-                ) : null}
-                {exampleOutputImages.length > 0 ? (
-                  <div className="box-border w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {exampleOutputImages.map((image, index) => (
-                      <figure
-                        key={`${image.url}-${index}`}
-                        className="box-border w-full flex flex-col gap-2"
-                      >
-                        <img
-                          src={image.url}
-                          alt={image.alt || `example-output-${index + 1}`}
-                          className="w-full rounded-xl border border-[#00FFFF]/30 bg-[#05080C] object-contain"
-                        />
-                        {image.caption ? (
-                          <figcaption className="text-[12px]/[18px] text-[#7DCEA0]">
-                            {image.caption}
-                          </figcaption>
-                        ) : null}
-                      </figure>
-                    ))}
+                </div>
+              </div>
+              {/* 輸出效果 */}
+              <div
+                data-pencil-name="Example Section"
+                className="box-border w-full md:w-[calc(50%-0.5rem)] md:max-w-1/2 h-fit shrink-0 flex flex-col gap-3 justify-start items-start"
+              >
+                <div
+                  data-pencil-name="Example Header"
+                  className="box-border w-full h-9 shrink-0 flex flex-row gap-0 justify-between items-center"
+                >
+                  <div
+                    data-pencil-name="Example Title"
+                    className="text-[18px] sm:text-[20px]/[normal] box-border text-[#00FFFF] font-bold text-left whitespace-nowrap"
+                  >
+                    輸出效果
                   </div>
-                ) : null}
+                </div>
+                <div
+                  data-pencil-name="Example Box"
+                  className="box-border w-full h-fit shrink-0 flex flex-col gap-4  px-4.5 py-12 justify-start items-start bg-[#080C12] border border-[#00FFFF]/50 rounded-[18px]"
+                >
+                  {exampleOutputText ? (
+                    <pre
+                      data-pencil-name="Example Code"
+                      className="text-[14px] sm:text-[14px]/[22px] box-border w-full text-[#E0F0E8] font-normal text-left whitespace-pre-wrap wrap-break-word "
+                    >
+                      {exampleOutputText}
+                    </pre>
+                  ) : null}
+                  {exampleOutputImages.length > 0 ? (
+                    <div
+                      className={`box-border w-full grid grid-cols-1 ${exampleOutputImages.length > 1 ? "sm:grid-cols-2" : ""} gap-4`}
+                    >
+                      {exampleOutputImages.map((image, index) => (
+                        <figure
+                          key={`${image.url}-${index}`}
+                          className="box-border w-full flex flex-col gap-2"
+                        >
+                          {isVideoMedia(image) ? (
+                            <video
+                              src={image.url}
+                              controls
+                              preload="metadata"
+                              playsInline
+                              className="w-full rounded-xl border border-[#00FFFF]/30 bg-[#05080C] object-contain"
+                            />
+                          ) : (
+                            <img
+                              src={image.url}
+                              alt={image.alt || `example-output-${index + 1}`}
+                              className="w-full rounded-xl border border-[#00FFFF]/30 bg-[#05080C] object-contain"
+                            />
+                          )}
+                          {image.caption ? (
+                            <figcaption className="text-[12px]/[18px] text-[#7DCEA0]">
+                              {image.caption}
+                            </figcaption>
+                          ) : null}
+                        </figure>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
               </div>
             </div>
           </div>
