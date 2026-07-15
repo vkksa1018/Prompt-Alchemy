@@ -23,6 +23,10 @@ export default function Skills() {
   const [selectedCategory, setSelectedCategory] = useState("全部");
   const [selectedTag, setSelectedTag] = useState(null);
   const [sortBy, setSortBy] = useState("date"); // "date" | "popularity"
+  const [isCategoryExpanded, setIsCategoryExpanded] = useState(false);
+  const [isCompactScreen, setIsCompactScreen] = useState(
+    typeof window !== "undefined" ? window.innerWidth < 2400 : false
+  );
 
   const [prompts, setPrompts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -55,6 +59,17 @@ export default function Skills() {
       setSelectedCategory(location.state.category);
     }
   }, [location.state]);
+
+  useEffect(() => {
+    const onResize = () => {
+      const compact = window.innerWidth < 2400;
+      setIsCompactScreen(compact);
+      if (!compact) setIsCategoryExpanded(false);
+    };
+
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   // Filter & Sort logic
   const filteredPrompts = prompts
@@ -123,11 +138,16 @@ export default function Skills() {
     setSelectedTag((prev) => (prev === tagLabel ? null : tagLabel));
   };
 
+  const visibleCategories =
+    isCompactScreen && !isCategoryExpanded
+      ? categories.slice(0, 5)
+      : categories;
+
   return (
     <div className="w-full min-h-screen bg-[#0A0E1A] text-[#E0F0E8] py-8 px-6 flex flex-col items-center">
       <div
         data-pencil-name="List Content"
-        className="box-border w-full max-w-300 flex flex-col lg:flex-row gap-6 justify-start items-start"
+        className="box-border w-full max-w-400 flex flex-col lg:flex-row gap-6 justify-start items-start"
       >
         {/* Filters Sidebar */}
         <div
@@ -136,12 +156,12 @@ export default function Skills() {
         >
           <div
             data-pencil-name="Sidebar Heading"
-            className="text-[16px]/[normal] box-border text-[#FFD700] font-bold text-left whitespace-nowrap"
+            className="text-[18px]/[normal] box-border text-[#FFD700] font-bold text-left whitespace-nowrap"
           >
             分類清單
           </div>
 
-          {categories.map((cat) => {
+          {visibleCategories.map((cat) => {
             const isSelected = selectedCategory === cat.name;
             return (
               <button
@@ -163,16 +183,26 @@ export default function Skills() {
                     {cat.icon}
                   </span>
                 )}
-                <span className="text-[14px]/[normal] whitespace-nowrap">
+                <span className="text-[16px]/[normal] whitespace-nowrap">
                   {cat.name}
                 </span>
               </button>
             );
           })}
 
+          {isCompactScreen && categories.length > 5 && (
+            <button
+              type="button"
+              onClick={() => setIsCategoryExpanded((prev) => !prev)}
+              className="mt-1 w-full rounded-lg border border-[#1A3A2A] bg-transparent py-2 text-[14px] text-[#7DCEA0] transition-all hover:bg-[#39FF14]/10"
+            >
+              {isCategoryExpanded ? "收合分類" : "展開更多分類"}
+            </button>
+          )}
+
           <div
             data-pencil-name="Tag Heading"
-            className="text-[16px]/[normal] box-border text-[#FFD700] font-bold text-left whitespace-nowrap mt-4"
+            className="text-[18px]/[normal] box-border text-[#FFD700] font-bold text-left whitespace-nowrap mt-4"
           >
             標籤
           </div>
@@ -218,7 +248,7 @@ export default function Skills() {
           >
             <div
               data-pencil-name="Search Field"
-              className="box-border w-full sm:w-105 shrink-0 h-fit flex flex-row gap-2.5 py-2.5 px-3.5 justify-start items-center bg-[#0F1F18] border border-[#1A3A2A] rounded-[10px] focus-within:border-[#39FF14] transition-all"
+              className="box-border w-full sm:flex-1 sm:min-w-0 h-fit flex flex-row gap-2.5 py-2.5 px-3.5 justify-start items-center bg-[#0F1F18] border border-[#1A3A2A] rounded-[10px] focus-within:border-[#39FF14] transition-all"
             >
               <input
                 type="text"
@@ -233,49 +263,41 @@ export default function Skills() {
               data-pencil-name="Sort Group"
               className="box-border w-fit shrink-0 h-fit flex flex-row gap-2 justify-start items-center"
             >
-              <div
+              <label
+                htmlFor="sortBy"
                 data-pencil-name="Sort Label"
                 className="text-[13px]/[normal] box-border text-[#7DCEA0] font-normal text-left whitespace-nowrap"
               >
                 排序：
+              </label>
+              <div className="relative">
+                <select
+                  id="sortBy"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="box-border appearance-none h-fit py-2 pl-3.5 pr-9 bg-[rgb(15,31,24)] border border-[rgba(26,58,42,0.1)] rounded-[999px] text-[#7DCEA0] text-[13px]/[normal] cursor-pointer transition-all focus:outline-none focus:border-[rgb(57,255,20,0.3)]"
+                >
+                  <option value="date">依日期</option>
+                  <option value="popularity">依熱門度</option>
+                </select>
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#39FF14] text-[11px]"
+                >
+                  ▾
+                </span>
               </div>
-              <button
-                type="button"
-                onClick={() => setSortBy("date")}
-                className={`box-border w-fit shrink-0 h-fit flex flex-row gap-1.5 py-2 px-3.5 justify-start items-center border-0 rounded-lg cursor-pointer transition-all ${
-                  sortBy === "date"
-                    ? "bg-[#39FF14] text-[#0A0E1A] font-semibold"
-                    : "bg-transparent text-[#7DCEA0] hover:bg-[#39FF14]/10"
-                }`}
-              >
-                <span className="text-[13px]/[normal] whitespace-nowrap">
-                  依日期
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setSortBy("popularity")}
-                className={`box-border w-fit shrink-0 h-fit flex flex-row gap-1.5 py-2 px-3.5 justify-start items-center border rounded-lg cursor-pointer transition-all ${
-                  sortBy === "popularity"
-                    ? "bg-[#39FF14] border-[#39FF14] text-[#0A0E1A] font-semibold"
-                    : "bg-transparent border-[#1A3A2A] text-[#7DCEA0] hover:bg-[#39FF14]/10"
-                }`}
-              >
-                <span className="text-[13px]/[normal] whitespace-nowrap">
-                  依熱門度
-                </span>
-              </button>
             </div>
           </div>
 
           {/* List Cards */}
           <div
             data-pencil-name="List Cards"
-            className="box-border w-full h-fit flex flex-col gap-4 justify-start items-start"
+            className="box-border w-full h-fit grid grid-cols-1 md:grid-cols-2 gap-4 justify-start items-start mt-4"
           >
             {filteredPrompts.length > 0 ? (
               filteredPrompts.map((prompt) => (
-                <div key={prompt.id} className="w-full flex">
+                <div key={prompt.id} className="w-full">
                   <PromptCard prompt={prompt} />
                 </div>
               ))

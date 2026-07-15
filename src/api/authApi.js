@@ -2,6 +2,8 @@ import { storage } from "../utils/storage";
 import { usersTable } from "./mockData";
 
 const USERS_KEY = "admin_users";
+const DEFAULT_MEMBER_EMAIL = "user@promptalchemy.com";
+const LEGACY_MEMBER_NAME = "Jane User";
 
 function seedUsers() {
   const existing = storage.get(USERS_KEY);
@@ -14,9 +16,27 @@ function seedUsers() {
       storage.set(USERS_KEY, usersTable);
       return usersTable;
     }
-    const hasUser = existing.some((u) => u.email === "user@promptalchemy.com");
+    const defaultMember = usersTable.find((u) => u.email === DEFAULT_MEMBER_EMAIL);
+    const memberIndex = existing.findIndex((u) => u.email === DEFAULT_MEMBER_EMAIL);
+
+    // Migrate legacy seed data once: rename old default member from Jane User.
+    if (
+      defaultMember &&
+      memberIndex >= 0 &&
+      existing[memberIndex].name === LEGACY_MEMBER_NAME
+    ) {
+      const migrated = [...existing];
+      migrated[memberIndex] = {
+        ...migrated[memberIndex],
+        name: defaultMember.name,
+      };
+      storage.set(USERS_KEY, migrated);
+      return migrated;
+    }
+
+    const hasUser = existing.some((u) => u.email === DEFAULT_MEMBER_EMAIL);
     if (!hasUser) {
-      const defUser = usersTable.find((u) => u.email === "user@promptalchemy.com");
+      const defUser = usersTable.find((u) => u.email === DEFAULT_MEMBER_EMAIL);
       if (defUser) {
         const updated = [defUser, ...existing];
         storage.set(USERS_KEY, updated);
@@ -50,7 +70,7 @@ export function loginUser({ email, password }) {
     // 測試套件會以 "any" 密碼登入，在此予以放行。若非 "any"，則比對預設密碼
     if (password !== "any") {
       const isDefaultAdmin = found.email === "admin@promptalchemy.com";
-      const isDefaultUser = found.email === "user@promptalchemy.com";
+      const isDefaultUser = found.email === DEFAULT_MEMBER_EMAIL;
       if (isDefaultAdmin && password !== "admin123") {
         return Promise.reject(new Error("密碼錯誤，請重新輸入"));
       }

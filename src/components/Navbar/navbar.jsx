@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { ClipboardList, FolderHeart } from "lucide-react";
 import useAuth from "../../hooks/useAuth";
 
 export default function Navbar() {
@@ -12,7 +13,7 @@ export default function Navbar() {
       <Link
         to="/"
         data-pencil-name="Brand"
-        className="box-border w-fit shrink-0 h-fit flex flex-row gap-3 justify-start items-center no-underline"
+        className="box-border w-fit shrink-0 h-fit flex flex-row gap-3 justify-start items-center no-underline me-4 sm:me-0"
       >
         <div
           data-pencil-name="Brand Mark Wrap"
@@ -39,29 +40,37 @@ export default function Navbar() {
 
       <div
         data-pencil-name="Nav Links"
-        className="box-border w-fit shrink-0 h-fit flex flex-row gap-7 justify-start items-center"
+        className="box-border flex-1 min-w-0 h-fit flex flex-row gap-2 sm:gap-3 lg:gap-28 justify-evenly lg:justify-start items-center mx-3 sm:mx-6 lg:flex-none lg:w-fit"
       >
         <Link
           to="/"
           data-pencil-name="Nav 首頁"
-          className="text-[16px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] transition-colors font-bold text-left whitespace-nowrap no-underline"
+          className="hidden md:inline-flex flex-1 lg:flex-none justify-center text-[16px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] transition-colors font-bold text-center whitespace-nowrap no-underline"
         >
           首頁
         </Link>
         <Link
           to="/skills"
           data-pencil-name="Nav 技能列表"
-          className="text-[16px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] transition-colors font-bold text-left whitespace-nowrap no-underline"
+          aria-label="技能列表"
+          className="inline-flex flex-1 lg:flex-none justify-center items-center text-[16px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] transition-colors font-bold text-center whitespace-nowrap no-underline"
         >
-          技能列表
+          <span className="hidden sm:inline">技能列表</span>
+          <span className="sm:hidden" aria-hidden="true">
+            <ClipboardList size={20} />
+          </span>
         </Link>
         {user && (
           <Link
             to="/favorites"
             data-pencil-name="Nav 我的收藏"
-            className="text-[16px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] transition-colors font-bold text-left whitespace-nowrap no-underline"
+            aria-label="我的收藏"
+            className="inline-flex flex-1 lg:flex-none justify-center items-center text-[16px]/[normal] box-border text-[#7DCEA0] hover:text-[#39FF14] transition-colors font-bold text-center whitespace-nowrap no-underline"
           >
-            我的收藏
+            <span className="hidden sm:inline">我的收藏</span>
+            <span className="sm:hidden" aria-hidden="true">
+              <FolderHeart size={20} />
+            </span>
           </Link>
         )}
       </div>

@@ -41,7 +41,7 @@ export default function Home() {
       {/* Hero Zone */}
       <div
         data-pencil-name="Hero Zone"
-        className="relative box-border w-full max-w-275 h-auto shrink-0 flex flex-col md:flex-row gap-4 justify-between items-center py-8 border-b border-[#39FF14]/10 overflow-hidden"
+        className="relative box-border w-full max-w-350 h-auto shrink-0 flex flex-col md:flex-row gap-4 justify-between items-center py-8 border-b border-[#39FF14]/10 overflow-hidden"
       >
         <div
           aria-hidden="true"
@@ -50,32 +50,30 @@ export default function Home() {
         <div aria-hidden="true" className="absolute inset-0 bg-[#0A0E1A]/45" />
         <div
           data-pencil-name="Hero Copy"
-          className="relative z-10 box-border w-full md:max-w-[60%] shrink-0 h-fit flex flex-col gap-5.5 justify-start items-start px-4 sm:px-8"
+          className="relative z-10 box-border w-full md:max-w-[50%] shrink-0 h-fit flex flex-col gap-5.5 justify-start items-start px-4"
         >
           <div
             data-pencil-name="Hero Title"
-            className="text-[36px]/[42px] sm:text-[52px]/[57px] box-border w-full text-[#FFFFFF] font-bold text-left"
+            className="text-[24px]/[28px] sm:text-[36px]/[42px] lg:text-[52px]/[57px] box-border w-full text-[#FFFFFF] font-bold text-left flex md:flex-col"
           >
-            整理你的
-            <br />
-            AI Prompt 與 Skill
+            <h3>整理你的</h3>
+            <h3> AI Prompt 與 Skill</h3>
           </div>
           <div
             data-pencil-name="Hero Body"
-            className="text-[16px]/[24px] sm:text-[18px]/[27px] box-border w-full text-[#7DCEA0] font-normal text-left"
+            className="text-[16px]/[24px] lg:text-[18px]/[27px] box-border w-full text-[#7DCEA0] font-normal text-left flex-col"
           >
-            把常用指令分類、搜尋、收藏，
-            <br />
-            下一次不再翻聊天室紀錄。
+            <h5>把常用指令分類、搜尋、收藏，</h5>
+            <h5>下一次不再翻聊天室紀錄。</h5>
           </div>
           <div
             data-pencil-name="Hero Actions"
-            className="box-border w-fit h-fit shrink-0 flex flex-row gap-3.5 justify-start items-start"
+            className="box-border w-full h-fit shrink-0 flex gap-3.5 justify-center sm:justify-start items-start"
           >
             <Link
               to="/skills"
               data-pencil-name="Primary CTA"
-              className="box-border w-fit shrink-0 h-fit flex flex-row gap-0 py-3.5 px-6 justify-start items-start active:scale-95 transition-all rounded-lg no-underline cursor-pointer bg-[#39FF14] hover:bg-[#32dd10]"
+              className="box-border w-fit shrink-0 h-fit flex gap-0 py-3.5 px-6 justify-center sm:justify-start items-start active:scale-95 transition-all rounded-lg no-underline cursor-pointer bg-[#39FF14] hover:bg-[#32dd10]"
             >
               <div
                 data-pencil-name="Primary CTA Label"
@@ -84,7 +82,7 @@ export default function Home() {
                 開始探索
               </div>
             </Link>
-            <a
+            {/* <a
               href="#featured-skills"
               data-pencil-name="Secondary CTA"
               className="box-border w-fit shrink-0 h-fit flex flex-row gap-0 py-3.5 px-6 justify-start items-start bg-transparent border border-[#00FFFF] hover:bg-[#00FFFF]/10 active:scale-95 transition-all rounded-lg no-underline cursor-pointer"
@@ -95,7 +93,7 @@ export default function Home() {
               >
                 查看範例
               </div>
-            </a>
+            </a> */}
           </div>
         </div>
         <div className="relative z-10 w-full md:w-auto flex justify-center md:justify-end px-4 sm:px-8 md:ps-0">
@@ -118,7 +116,7 @@ export default function Home() {
       {/* Category Section */}
       <div
         data-pencil-name="Category Section"
-        className="box-border w-full max-w-275 h-fit shrink-0 flex flex-col gap-5 justify-start items-start mt-12"
+        className="box-border w-full max-w-350 h-fit shrink-0 flex flex-col gap-5 justify-start items-start mt-12"
       >
         <div
           data-pencil-name="Category Heading"
@@ -346,7 +344,7 @@ export default function Home() {
       {/* Featured Prompts Section */}
       <section
         id="featured-skills"
-        className="w-full max-w-275 mt-16 flex flex-col gap-6"
+        className="w-full max-w-350 mt-16 flex flex-col gap-6"
       >
         <div className="flex justify-between items-center border-b border-[#39FF14]/15 pb-3">
           <div className="text-[24px]/[normal] box-border text-[#FFD700] font-bold text-left m-0">

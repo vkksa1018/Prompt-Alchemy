@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import { registerUser } from "../../api/authApi";
+import { alertHelper } from "../../utils/sweetAlert";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -66,8 +67,13 @@ export default function Register() {
       role: "member",
     })
       .then((userData) => {
+        alertHelper.success(
+          "註冊成功",
+          `歡迎加入，${userData.name || "新成員"}！`,
+          true
+        );
         // Mock register: log them in immediately
-        login(userData);
+        login(userData, { showSuccessAlert: false });
         // Redirect to profile page to let them fill out details
         navigate("/favorites/profile");
       })
@@ -76,9 +82,8 @@ export default function Register() {
       });
   };
 
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0A0E1A]/85 backdrop-blur-md p-4">
+    <div className="w-full min-h-[70vh] flex items-center justify-center bg-[#0A0E1A] p-4">
       <form
         onSubmit={handleSubmit}
         data-pencil-name="Register Modal"
@@ -251,7 +256,7 @@ export default function Register() {
             login({
               id: "user-member-uuid-0000-000000000002",
               email: "user@promptalchemy.com",
-              name: "Jane User",
+              name: "New User",
               role: "member",
             });
             navigate("/");
@@ -275,7 +280,7 @@ export default function Register() {
 
         <div
           data-pencil-name="Login Row"
-          className="box-border w-full h-fit shrink-0 flex flex-row gap-[6px] justify-center items-start"
+          className="box-border w-full h-fit shrink-0 flex flex-row gap-1.5 justify-center items-start"
         >
           <div
             data-pencil-name="Login Hint"
