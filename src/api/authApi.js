@@ -14,32 +14,44 @@ function seedUsers() {
       storage.set(USERS_KEY, usersTable);
       return usersTable;
     }
+
+    let modified = false;
+    let migrated = existing.map((u) => {
+      if (u.isActive === undefined) {
+        modified = true;
+        return { ...u, isActive: true };
+      }
+      return u;
+    });
+
     const defaultMember = usersTable.find((u) => u.email === DEFAULT_MEMBER_EMAIL);
-    const memberIndex = existing.findIndex((u) => u.email === DEFAULT_MEMBER_EMAIL);
+    const memberIndex = migrated.findIndex((u) => u.email === DEFAULT_MEMBER_EMAIL);
 
     // Migrate legacy seed data once: rename old default member from Jane User.
     if (
       defaultMember &&
       memberIndex >= 0 &&
-      existing[memberIndex].name === LEGACY_MEMBER_NAME
+      migrated[memberIndex].name === LEGACY_MEMBER_NAME
     ) {
-      const migrated = [...existing];
       migrated[memberIndex] = {
         ...migrated[memberIndex],
         name: defaultMember.name,
       };
-      storage.set(USERS_KEY, migrated);
-      return migrated;
+      modified = true;
     }
 
-    const hasUser = existing.some((u) => u.email === DEFAULT_MEMBER_EMAIL);
+    const hasUser = migrated.some((u) => u.email === DEFAULT_MEMBER_EMAIL);
     if (!hasUser) {
       const defUser = usersTable.find((u) => u.email === DEFAULT_MEMBER_EMAIL);
       if (defUser) {
-        const updated = [defUser, ...existing];
-        storage.set(USERS_KEY, updated);
-        return updated;
+        migrated = [defUser, ...migrated];
+        modified = true;
       }
+    }
+
+    if (modified) {
+      storage.set(USERS_KEY, migrated);
+      return migrated;
     }
     return existing;
   }
