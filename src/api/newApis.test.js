@@ -159,6 +159,7 @@ describe("New Frontend Dynamic Mock APIs Tests", () => {
       // 3. Default member account with correct password should succeed
       const userWithCorrect = await loginUser({ email: "user@promptalchemy.com", password: "password123" });
       expect(userWithCorrect.email).toBe("user@promptalchemy.com");
+      expect(userWithCorrect.name).toBe("New User");
 
       // 4. Default admin account with correct password should succeed
       const adminWithCorrect = await loginUser({ email: "admin@promptalchemy.com", password: "admin123" });
@@ -167,6 +168,26 @@ describe("New Frontend Dynamic Mock APIs Tests", () => {
       // 5. Default admin account with "any" password should also succeed (compatibility with existing tests)
       const adminWithAny = await loginUser({ email: "admin@promptalchemy.com", password: "any" });
       expect(adminWithAny.email).toBe("admin@promptalchemy.com");
+    });
+
+    it("should migrate legacy user 'Jane User' to 'New User' on seed", async () => {
+      const legacyUsers = [
+        {
+          id: "user-member-uuid-0000-000000000002",
+          name: "Jane User",
+          email: "user@promptalchemy.com",
+          password_hash: "bcrypt-hash-placeholder-member",
+          role: "member",
+        }
+      ];
+      localStorage.setItem("admin_users", JSON.stringify(legacyUsers));
+
+      const user = await loginUser({ email: "user@promptalchemy.com", password: "password123" });
+      expect(user.name).toBe("New User");
+
+      const updatedInStorage = JSON.parse(localStorage.getItem("admin_users"));
+      const defaultUser = updatedInStorage.find(u => u.email === "user@promptalchemy.com");
+      expect(defaultUser.name).toBe("New User");
     });
   });
 

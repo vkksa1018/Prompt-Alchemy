@@ -92,5 +92,20 @@ describe("Relational Mock Database Helper Tests", () => {
         });
       });
     });
+
+    it("should return video URLs ending in .mp4 for the new Gemini video generator prompts", () => {
+      const videoPrompts = skillItemsTable.filter(item => 
+        item.id === "prompt-uuid-0001-0000-000000000008" || 
+        item.id === "prompt-uuid-0001-0000-000000000009"
+      );
+      expect(videoPrompts.length).toBe(2);
+      videoPrompts.forEach(item => {
+        const images = item.example_output.outputImages;
+        expect(images.length).toBeGreaterThan(0);
+        images.forEach(media => {
+          expect(media.url).toMatch(/\.mp4(\?|#|$)/i);
+        });
+      });
+    });
   });
 });
