@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import AdminPageHeader from "../../components/admin/adminPageHeader";
 import { getSkills, getParametersByType, getAdminAuth, getUsers } from "../../api/adminApi";
-import { formatDate } from "../../utils/date";
+import { getPublishedPrompts } from "../../api/promptApi";
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -15,12 +15,17 @@ export default function Dashboard() {
     users: 0,
   });
   const [popular, setPopular] = useState([]);
-  const [recent, setRecent] = useState([]);
+  const [mostFavorited, setMostFavorited] = useState([]);
 
   const admin = getAdminAuth();
 
   useEffect(() => {
-    Promise.all([getSkills(), getParametersByType("category"), getUsers()]).then(([skills, categories, users]) => {
+    Promise.all([
+      getSkills(),
+      getParametersByType("category"),
+      getUsers(),
+      getPublishedPrompts(),
+    ]).then(([skills, categories, users, publishedPrompts]) => {
       // 統計數據
       setStats({
         total: skills.length,
@@ -31,18 +36,17 @@ export default function Dashboard() {
         users: users.length,
       });
 
-      // Top 5 熱門榜單（只看已發布的，依複製次數排序）
-      const pop = [...skills]
-        .filter((s) => s.status === "published")
+      // Top 5 熱門榜單（取前台已發布內容，依複製次數排序）
+      const pop = [...publishedPrompts]
         .sort((a, b) => (b.copyCount || 0) - (a.copyCount || 0))
         .slice(0, 5);
       setPopular(pop);
 
-      // 最近更新（不限狀態，依更新時間排序）
-      const rec = [...skills]
-        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+      // Top 5 前台最多被收藏（取前台已發布內容，依收藏數排序）
+      const favs = [...publishedPrompts]
+        .sort((a, b) => (b.favoriteCount || 0) - (a.favoriteCount || 0))
         .slice(0, 5);
-      setRecent(rec);
+      setMostFavorited(favs);
     });
   }, []);
 
@@ -155,39 +159,32 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* 最近更新與草稿 */}
+          {/* 前台最多被收藏 */}
           <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
             <div className="border-b border-gray-100 bg-gray-50/50 p-4 text-sm font-bold text-gray-900 dark:border-gray-800 dark:bg-gray-800/30 dark:text-gray-100">
-              📝 最近更新與草稿
+              ❤️ 前台最多被收藏 (Top 5)
             </div>
             <div className="divide-y divide-gray-100 dark:divide-gray-800">
-              {recent.map((s) => (
+              {mostFavorited.map((s) => (
                 <Link
                   key={s.id}
                   to={`/admin/skills/${s.id}/edit`}
-                  className="group flex items-center justify-between p-4 transition hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                  className="flex items-center justify-between p-4 transition hover:bg-gray-50 dark:hover:bg-gray-800/50"
                 >
                   <div className="min-w-0 pr-4">
-                    <div className="flex items-center gap-2">
-                      <span className="truncate font-medium text-gray-800 dark:text-gray-200">
-                        {s.title || "未命名"}
-                      </span>
-                      {s.status === "draft" && (
-                        <span className="shrink-0 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/50 dark:text-amber-400">
-                          草稿
-                        </span>
-                      )}
+                    <div className="truncate font-medium text-gray-800 dark:text-gray-200">
+                      {s.title}
                     </div>
-                    <div className="mt-1 text-xs text-gray-400 dark:text-gray-500">
-                      {formatDate(s.updatedAt)}
+                    <div className="mt-1 truncate text-xs text-gray-400 dark:text-gray-500">
+                      {s.intro || "無簡介"}
                     </div>
                   </div>
-                  <div className="text-gray-300 transition group-hover:translate-x-1 group-hover:text-indigo-500 dark:text-gray-600 dark:group-hover:text-indigo-400">
-                    ➔
+                  <div className="flex shrink-0 items-center gap-1.5 text-sm font-bold text-pink-500">
+                    ❤️ {s.favoriteCount || 0}
                   </div>
                 </Link>
               ))}
-              {recent.length === 0 && (
+              {mostFavorited.length === 0 && (
                 <div className="p-8 text-center text-sm text-gray-400">尚無資料</div>
               )}
             </div>
