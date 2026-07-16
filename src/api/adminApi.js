@@ -242,16 +242,20 @@ export function getTagLabels(ids = []) {
     .map((o) => o.name);
 }
 
-// 狀態顯示
-export const STATUS_OPTIONS = [
-  { value: "draft", label: "草稿" },
-  { value: "published", label: "已發布" },
-  { value: "archived", label: "封存" },
+// 狀態顯示。狀態只有啟用 / 未啟用兩種，用 isActive 這個布林表示。
+export const ACTIVE_OPTIONS = [
+  { value: "active", label: "啟用" },
+  { value: "inactive", label: "未啟用" },
 ];
 
-export function getStatusLabel(status) {
-  const found = STATUS_OPTIONS.find((s) => s.value === status);
-  return found ? found.label : status;
+// 讀取「這筆資料是否啟用」的唯一入口。
+//
+// 為什麼要 fallback：seed 進來的資料（skillItemsTable）只有 snake_case 的
+// is_active，後台新增的則是 camelCase 的 isActive。兩種命名會同時存在，
+// 所以一律走這裡判斷，不要在各處自己寫 s.isActive。
+// 都沒有時預設為啟用 —舊資料沒這個欄位不代表它被停用。
+export function isSkillActive(skill) {
+  return skill?.isActive ?? skill?.is_active ?? true;
 }
 
 // ---- Auth -------------------------------------------------------------------
@@ -344,7 +348,7 @@ export function disableUser(id) {
 // ---- Skills -----------------------------------------------------------------
 
 export function getSkills(filters = {}) {
-  const { keyword, contentTypeId, categoryId, status } = filters;
+  const { keyword, contentTypeId, categoryId, active } = filters;
   let list = readSkills();
 
   if (keyword) {
@@ -361,8 +365,9 @@ export function getSkills(filters = {}) {
   if (categoryId) {
     list = list.filter((s) => s.categoryId === categoryId);
   }
-  if (status) {
-    list = list.filter((s) => s.status === status);
+  if (active) {
+    const wantActive = active === "active";
+    list = list.filter((s) => isSkillActive(s) === wantActive);
   }
 
   list = [...list].sort(
@@ -392,13 +397,15 @@ export function createSkill(data) {
     promptContent: data.promptContent || "",
     useCase: data.useCase || "",
     exampleInput: data.exampleInput || "",
-    exampleOutput: data.exampleOutput || "",
-    status: data.status || "draft",
+    exampleOutput: data.exampleOutput || [],
     userId: admin?.id || "",
     sourceUrl: "",
     copyCount: 0,
     favoriteCount: 0,
-    isActive: true,
+    // 兩種命名都寫：前台的 getPublishedPrompts 讀的是 snake_case 的 is_active。
+    // 只寫其中一個，停用就會在前台失效。
+    isActive: data.isActive ?? true,
+    is_active: data.isActive ?? true,
     createdAt: timestamp,
     updatedAt: timestamp,
   };
@@ -418,7 +425,6 @@ const EDITABLE_SKILL_FIELDS = [
   "useCase",
   "exampleInput",
   "exampleOutput",
-  "status",
 ];
 
 export function updateSkill(id, data) {
@@ -430,6 +436,11 @@ export function updateSkill(id, data) {
     EDITABLE_SKILL_FIELDS.forEach((field) => {
       if (data[field] !== undefined) updated[field] = data[field];
     });
+    // isActive 不走上面的迴圈：它得同時寫入兩種命名，否則前台讀不到。
+    if (data.isActive !== undefined) {
+      updated.isActive = data.isActive;
+      updated.is_active = data.isActive;
+    }
     updated.updatedAt = nowIso();
     return updated;
   });
@@ -437,6 +448,6 @@ export function updateSkill(id, data) {
   return updated ? resolve(updated) : Promise.reject(new Error("找不到資料"));
 }
 
-export function archiveSkill(id) {
-  return updateSkill(id, { status: "archived" });
+export function setSkillActive(id, isActive) {
+  return updateSkill(id, { isActive });
 }

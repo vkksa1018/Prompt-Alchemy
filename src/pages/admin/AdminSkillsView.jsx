@@ -5,7 +5,12 @@ import { useNavigate } from "react-router-dom";
 import AdminPageHeader from "../../components/admin/adminPageHeader";
 import SkillFilterBar from "../../components/admin/skillFilterBar";
 import SkillTable from "../../components/admin/skillTable";
-import { getSkills, getParametersByType, archiveSkill } from "../../api/adminApi";
+import {
+  getSkills,
+  getParametersByType,
+  setSkillActive,
+  isSkillActive,
+} from "../../api/adminApi";
 import { alertHelper } from "../../utils/sweetAlert";
 
 // 篩選的初始值（空字串代表「全部」）。
@@ -13,7 +18,7 @@ const EMPTY_FILTERS = {
   keyword: "",
   contentTypeId: "",
   categoryId: "",
-  status: "",
+  active: "",
 };
 
 export default function AdminSkillsPage() {
@@ -59,14 +64,18 @@ export default function AdminSkillsPage() {
     getSkills(filters).then(setSkills);
   };
 
-  // 封存：先確認，再把 status 改成 archived（非刪除，資料仍留在後台）。
-  const handleArchive = async (skill) => {
-    const confirmed = await alertHelper.confirm(
-      "確定要封存嗎？",
-      `「${skill.title}」封存後前台將不再顯示，但資料仍保留在後台。`,
-    );
-    if (!confirmed) return;
-    await archiveSkill(skill.id);
+  // 啟用 / 停用：停用只是前台不顯示，資料仍保留在後台，可以再啟用回來。
+  // 停用是會影響前台的動作，所以先跳確認；啟用則直接執行。
+  const handleToggleActive = async (skill) => {
+    const active = isSkillActive(skill);
+    if (active) {
+      const confirmed = await alertHelper.confirm(
+        "確定要停用嗎？",
+        `「${skill.title}」停用後前台將不再顯示，但資料仍保留在後台。`,
+      );
+      if (!confirmed) return;
+    }
+    await setSkillActive(skill.id, !active);
     reload();
   };
 
@@ -96,7 +105,7 @@ export default function AdminSkillsPage() {
         <SkillTable
           skills={skills}
           loading={loading}
-          onArchive={handleArchive}
+          onToggleActive={handleToggleActive}
         />
       </div>
     </>

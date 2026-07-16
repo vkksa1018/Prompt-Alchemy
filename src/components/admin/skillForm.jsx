@@ -5,8 +5,15 @@
 //  - 陣列型欄位（適用模型、標籤）不是原生 input，改用 setValue 手動寫入，
 //    再用 useWatch 讀回目前選取值來畫出「被選中」的樣式。
 //  - 驗證只在送出時觸發；通過後才呼叫 props.onSubmit(data)。
-import { useForm, useWatch } from "react-hook-form";
-import { STATUS_OPTIONS } from "../../api/adminApi";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
+import { isSkillActive } from "../../api/adminApi";
+import {
+  BLOCK_TYPES,
+  createEmptyBlock,
+  hasMetaFields,
+  toBlocks,
+  toPayload,
+} from "./exampleOutputBlocks";
 
 // 共用的 input 樣式，抽出來避免每個欄位重複一長串 className。
 const inputClass =
@@ -25,8 +32,8 @@ const DEFAULTS = {
   promptContent: "",
   useCase: "",
   exampleInput: "",
-  exampleOutput: "",
-  status: "draft",
+  exampleOutput: [],
+  isActive: true,
 };
 
 // 產生「必填文字欄位」的 react-hook-form 驗證規則。
@@ -56,6 +63,129 @@ function Label({ children, required }) {
   );
 }
 
+// 範例輸出的單一區塊。type 決定要畫哪些欄位：
+// text 只有一個多行的「內容」；image / video / html 則是單行的「網址」外加
+// alt / caption 兩個選填欄位。切換 type 時不清空任何欄位，隱藏的值留在表單狀態裡，
+// 由送出時的 toPayload 負責裁掉，避免手滑切錯就把填好的內容弄丟。
+function ExampleOutputBlock({
+  index,
+  control,
+  register,
+  error,
+  onMoveUp,
+  onMoveDown,
+  onRemove,
+  isFirst,
+  isLast,
+}) {
+  const type = useWatch({ control, name: `exampleOutput.${index}.type` });
+  const withMeta = hasMetaFields(type);
+  const contextLabel = withMeta ? "網址" : "內容";
+
+  const moveButtonClass =
+    "rounded border border-gray-300 px-2 py-1 text-xs text-gray-600 transition hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800";
+
+  return (
+    <div className="space-y-3 rounded-lg border border-gray-200 bg-gray-50/50 p-4 dark:border-gray-800 dark:bg-gray-800/30">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+          區塊 {index + 1}
+        </span>
+        <div className="flex gap-1.5">
+          <button
+            type="button"
+            onClick={onMoveUp}
+            disabled={isFirst}
+            aria-label="上移"
+            className={moveButtonClass}
+          >
+            ↑
+          </button>
+          <button
+            type="button"
+            onClick={onMoveDown}
+            disabled={isLast}
+            aria-label="下移"
+            className={moveButtonClass}
+          >
+            ↓
+          </button>
+          <button
+            type="button"
+            onClick={onRemove}
+            aria-label="刪除區塊"
+            className="rounded border border-gray-300 px-2 py-1 text-xs text-red-600 transition hover:bg-red-50 dark:border-gray-700 dark:hover:bg-red-950/30"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <div className="space-y-1.5 sm:max-w-xs">
+        <Label required>類型</Label>
+        <select
+          {...register(`exampleOutput.${index}.type`)}
+          className={inputClass}
+        >
+          {BLOCK_TYPES.map((t) => (
+            <option key={t.value} value={t.value}>
+              {t.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="space-y-1.5">
+        <Label required>{contextLabel}</Label>
+        {withMeta ? (
+          <input
+            type="text"
+            placeholder="https://…"
+            {...register(
+              `exampleOutput.${index}.data.context`,
+              requiredText(contextLabel),
+            )}
+            className={inputClass}
+          />
+        ) : (
+          <textarea
+            rows={4}
+            {...register(
+              `exampleOutput.${index}.data.context`,
+              requiredText(contextLabel),
+            )}
+            className={`${inputClass} resize-y font-mono`}
+          />
+        )}
+        {error?.data?.context && (
+          <p className="text-xs text-red-500">{error.data.context.message}</p>
+        )}
+      </div>
+
+      {withMeta && (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label>替代文字</Label>
+            <input
+              type="text"
+              {...register(`exampleOutput.${index}.data.alt`)}
+              className={inputClass}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label>圖說</Label>
+            <input
+              type="text"
+              {...register(`exampleOutput.${index}.data.caption`)}
+              className={inputClass}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function SkillForm({
   initialValues,
   categories,
@@ -73,8 +203,32 @@ export default function SkillForm({
     formState: { errors, isSubmitting },
   } = useForm({
     // 編輯模式的 initialValues 會覆蓋 DEFAULTS，達成「同一表單、兩種模式」。
-    defaultValues: { ...DEFAULTS, ...initialValues },
+    // exampleOutput 另外過 toBlocks：舊資料可能還是純字串或 { outputText, outputImages }，
+    // 沒轉成 block 陣列的話編輯舊資料會壞掉。
+    defaultValues: {
+      ...DEFAULTS,
+      ...initialValues,
+      exampleOutput: toBlocks(initialValues?.exampleOutput),
+      // 走 isSkillActive 而不是直接讀 initialValues.isActive：
+      // seed 資料只有 snake_case 的 is_active。
+      isActive: initialValues ? isSkillActive(initialValues) : true,
+    },
   });
+
+  const isActive = useWatch({ control, name: "isActive" });
+
+  // 範例輸出是「有序、可重複、可增減」的複合物件，用 useFieldArray 管理，
+  // 而不是像 modelType / tags 那樣手動 setValue。
+  const {
+    fields: outputBlocks,
+    append: appendBlock,
+    remove: removeBlock,
+    swap: swapBlocks,
+  } = useFieldArray({ control, name: "exampleOutput" });
+
+  // seq 不是使用者填的欄位，送出時才依目前排列順序生成。
+  const submitWithSeq = (data) =>
+    onSubmit({ ...data, exampleOutput: toPayload(data.exampleOutput) });
 
   // 選項來源現在全由父層（AdminSkillFormManager）非同步載入後透過 Props 傳入。
 
@@ -97,7 +251,7 @@ export default function SkillForm({
   return (
     // handleSubmit(onSubmit)：送出時先驗證，全部通過才把資料交給 onSubmit。
     // 表單分成 5 個區塊呈現，降低一次填一堆欄位的壓力。
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(submitWithSeq)} className="space-y-6">
       {/* 1. 基本資料 */}
       <Section title="基本資料">
         <div className="space-y-1.5">
@@ -263,34 +417,65 @@ export default function SkillForm({
             className={`${inputClass} resize-y font-mono`}
           />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-3">
           <Label>範例輸出</Label>
-          <textarea
-            rows={4}
-            {...register("exampleOutput")}
-            className={`${inputClass} resize-y font-mono`}
-          />
+          {outputBlocks.length === 0 ? (
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              尚未新增區塊。可依序加入文字、圖片、影片或 HTML。
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {outputBlocks.map((field, index) => (
+                <ExampleOutputBlock
+                  key={field.id}
+                  index={index}
+                  control={control}
+                  register={register}
+                  error={errors.exampleOutput?.[index]}
+                  onMoveUp={() => swapBlocks(index, index - 1)}
+                  onMoveDown={() => swapBlocks(index, index + 1)}
+                  onRemove={() => removeBlock(index)}
+                  isFirst={index === 0}
+                  isLast={index === outputBlocks.length - 1}
+                />
+              ))}
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => appendBlock(createEmptyBlock())}
+            className="rounded-lg border border-dashed border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+          >
+            + 新增區塊
+          </button>
         </div>
       </Section>
 
       {/* 5. 發布設定 */}
       <Section title="發布設定">
-        <div className="space-y-1.5 sm:max-w-xs">
-          <Label required>狀態</Label>
-          <select
-            {...register("status", { required: "狀態為必填" })}
-            className={inputClass}
+        {/* 狀態是布林，沒有驗證的必要 —一定有值。
+            toggle 樣式沿用參數管理 / 會員管理的既有寫法。 */}
+        <div className="flex items-center justify-between sm:max-w-xs">
+          <Label>狀態</Label>
+          <button
+            type="button"
+            onClick={() => setValue("isActive", !isActive, { shouldDirty: true })}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
+              isActive ? "bg-indigo-600" : "bg-gray-300 dark:bg-gray-600"
+            }`}
+            role="switch"
+            aria-checked={isActive}
           >
-            {STATUS_OPTIONS.map((s) => (
-              <option key={s.value} value={s.value}>
-                {s.label}
-              </option>
-            ))}
-          </select>
-          {errors.status && (
-            <p className="text-xs text-red-500">{errors.status.message}</p>
-          )}
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
+                isActive ? "translate-x-6" : "translate-x-1"
+              }`}
+            />
+          </button>
         </div>
+        <p className="text-xs text-gray-400 dark:text-gray-500">
+          {isActive ? "啟用中：會顯示在前台" : "已停用：不會顯示在前台"}
+        </p>
       </Section>
 
       <div className="flex justify-end gap-3">

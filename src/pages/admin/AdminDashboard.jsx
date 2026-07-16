@@ -2,15 +2,20 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import AdminPageHeader from "../../components/admin/adminPageHeader";
-import { getSkills, getParametersByType, getAdminAuth, getUsers } from "../../api/adminApi";
+import {
+  getSkills,
+  getParametersByType,
+  getAdminAuth,
+  getUsers,
+  isSkillActive,
+} from "../../api/adminApi";
 import { getPublishedPrompts } from "../../api/promptApi";
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
     total: 0,
-    published: 0,
-    draft: 0,
-    archived: 0,
+    active: 0,
+    inactive: 0,
     categories: 0,
     users: 0,
   });
@@ -29,9 +34,8 @@ export default function Dashboard() {
       // 統計數據
       setStats({
         total: skills.length,
-        published: skills.filter((s) => s.status === "published").length,
-        draft: skills.filter((s) => s.status === "draft").length,
-        archived: skills.filter((s) => s.status === "archived").length,
+        active: skills.filter((s) => isSkillActive(s)).length,
+        inactive: skills.filter((s) => !isSkillActive(s)).length,
         categories: categories.length,
         users: users.length,
       });
@@ -53,8 +57,8 @@ export default function Dashboard() {
   const cards = [
     { label: "全部 Prompt / Skill", value: stats.total },
     { label: "會員總數", value: stats.users },
-    { label: "已發布", value: stats.published },
-    { label: "草稿", value: stats.draft },
+    { label: "啟用", value: stats.active },
+    { label: "未啟用", value: stats.inactive },
     { label: "分類數量", value: stats.categories },
   ];
 
