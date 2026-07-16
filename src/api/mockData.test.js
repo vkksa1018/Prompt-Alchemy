@@ -54,12 +54,11 @@ describe("Relational Mock Database Helper Tests", () => {
   });
 
   describe("getPrompts", () => {
-    it("should return only active and published prompts", () => {
+    it("should return only active prompts", () => {
       const prompts = getPrompts();
       expect(prompts.length).toBeGreaterThan(0);
       prompts.forEach((prompt) => {
         expect(prompt.is_active).toBe(true);
-        expect(prompt.status).toBe(true);
       });
     });
   });

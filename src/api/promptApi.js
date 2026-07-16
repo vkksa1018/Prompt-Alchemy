@@ -69,7 +69,7 @@ export function getPublishedPrompts() {
   };
 
   const list = skills
-    .filter((s) => s.is_active && s.status === true)
+    .filter((s) => s.is_active)
     .map((item) => {
       const categoryName = getParamName(item.category_id);
       const tagNames = (item.tags || []).map((tagId) => getParamName(tagId));
@@ -124,7 +124,7 @@ export function getPromptById(id) {
   };
 
   const item = skills.find(
-    (s) => s.id === id && s.is_active && s.status === true
+    (s) => s.id === id && s.is_active
   );
   if (!item) return Promise.resolve(null);
 
