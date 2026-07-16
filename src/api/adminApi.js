@@ -356,7 +356,7 @@ export function createSkill(data) {
     promptContent: data.promptContent || "",
     useCase: data.useCase || "",
     exampleInput: data.exampleInput || "",
-    exampleOutput: data.exampleOutput || "",
+    exampleOutput: data.exampleOutput || [],
     status: data.status || "draft",
     userId: admin?.id || "",
     sourceUrl: "",
