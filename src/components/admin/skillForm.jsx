@@ -6,7 +6,7 @@
 //    再用 useWatch 讀回目前選取值來畫出「被選中」的樣式。
 //  - 驗證只在送出時觸發；通過後才呼叫 props.onSubmit(data)。
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
-import { STATUS_OPTIONS } from "../../api/adminApi";
+import { isSkillActive } from "../../api/adminApi";
 import {
   BLOCK_TYPES,
   createEmptyBlock,
@@ -33,7 +33,7 @@ const DEFAULTS = {
   useCase: "",
   exampleInput: "",
   exampleOutput: [],
-  status: "draft",
+  isActive: true,
 };
 
 // 產生「必填文字欄位」的 react-hook-form 驗證規則。
@@ -209,8 +209,13 @@ export default function SkillForm({
       ...DEFAULTS,
       ...initialValues,
       exampleOutput: toBlocks(initialValues?.exampleOutput),
+      // 走 isSkillActive 而不是直接讀 initialValues.isActive：
+      // seed 資料只有 snake_case 的 is_active。
+      isActive: initialValues ? isSkillActive(initialValues) : true,
     },
   });
+
+  const isActive = useWatch({ control, name: "isActive" });
 
   // 範例輸出是「有序、可重複、可增減」的複合物件，用 useFieldArray 管理，
   // 而不是像 modelType / tags 那樣手動 setValue。
@@ -448,22 +453,29 @@ export default function SkillForm({
 
       {/* 5. 發布設定 */}
       <Section title="發布設定">
-        <div className="space-y-1.5 sm:max-w-xs">
-          <Label required>狀態</Label>
-          <select
-            {...register("status", { required: "狀態為必填" })}
-            className={inputClass}
+        {/* 狀態是布林，沒有驗證的必要 —一定有值。
+            toggle 樣式沿用參數管理 / 會員管理的既有寫法。 */}
+        <div className="flex items-center justify-between sm:max-w-xs">
+          <Label>狀態</Label>
+          <button
+            type="button"
+            onClick={() => setValue("isActive", !isActive, { shouldDirty: true })}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
+              isActive ? "bg-indigo-600" : "bg-gray-300 dark:bg-gray-600"
+            }`}
+            role="switch"
+            aria-checked={isActive}
           >
-            {STATUS_OPTIONS.map((s) => (
-              <option key={s.value} value={s.value}>
-                {s.label}
-              </option>
-            ))}
-          </select>
-          {errors.status && (
-            <p className="text-xs text-red-500">{errors.status.message}</p>
-          )}
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
+                isActive ? "translate-x-6" : "translate-x-1"
+              }`}
+            />
+          </button>
         </div>
+        <p className="text-xs text-gray-400 dark:text-gray-500">
+          {isActive ? "啟用中：會顯示在前台" : "已停用：不會顯示在前台"}
+        </p>
       </Section>
 
       <div className="flex justify-end gap-3">

@@ -8,10 +8,11 @@ import {
   getContentTypeLabel,
   getCategoryName,
   getModelLabels,
+  isSkillActive,
 } from "../../api/adminApi";
 import { formatDate } from "../../utils/date";
 
-export default function SkillTable({ skills, loading, onArchive }) {
+export default function SkillTable({ skills, loading, onToggleActive }) {
   const navigate = useNavigate();
 
   return (
@@ -80,7 +81,7 @@ export default function SkillTable({ skills, loading, onArchive }) {
                       )}
                     </td>
                     <td className="whitespace-nowrap px-6 py-4">
-                      <StatusBadge status={skill.status} />
+                      <StatusBadge isActive={isSkillActive(skill)} />
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-gray-500 dark:text-gray-400">
                       {formatDate(skill.updatedAt)}
@@ -96,11 +97,10 @@ export default function SkillTable({ skills, loading, onArchive }) {
                         </button>
                         <button
                           type="button"
-                          onClick={() => onArchive(skill)}
-                          disabled={skill.status === "archived"}
-                          className="rounded-md border border-amber-300 px-3 py-1.5 text-xs font-medium text-amber-700 transition hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-amber-800 dark:text-amber-400 dark:hover:bg-amber-900/30"
+                          onClick={() => onToggleActive(skill)}
+                          className="rounded-md border border-amber-300 px-3 py-1.5 text-xs font-medium text-amber-700 transition hover:bg-amber-50 dark:border-amber-800 dark:text-amber-400 dark:hover:bg-amber-900/30"
                         >
-                          封存
+                          {isSkillActive(skill) ? "停用" : "啟用"}
                         </button>
                       </div>
                     </td>
