@@ -81,6 +81,64 @@ describe("New Frontend Dynamic Mock APIs Tests", () => {
       updated = updatedList.find(s => s.id === first.id);
       expect(updated.favoriteCount).toBe(initialFav);
     });
+
+    it("should merge new skills and parameters when local storage contains only partial/legacy data", async () => {
+      // Pre-seed with partial data (only 1 item)
+      const partialSkills = [
+        {
+          id: "prompt-uuid-0001-0000-000000000001",
+          title: "後端 API 審查",
+          slug: "backend-api-review",
+          intro: "檢查 Express / Next.js API 的錯誤處理、安全性與回傳結構。",
+          content_type_id: "ct-prompt-uuid-0000-000000000001",
+          model_type: [
+            "model-gpt-uuid-0000-000000000001",
+          ],
+          prompt_content: "foo",
+          use_case: "bar",
+          example_input: "baz",
+          example_output: { outputText: "qux", outputImages: [] },
+          category_id: "cat-backend-uuid-0000-000000000002",
+          tags: [],
+          source_url: "",
+          copy_count: 0,
+          favorite_count: 0,
+          created_at: "2026-07-01T08:00:00Z",
+          updated_at: "2026-07-01T12:00:00Z",
+          is_active: true,
+        }
+      ];
+      localStorage.setItem("admin_skills", JSON.stringify(partialSkills));
+
+      const partialParams = [
+        {
+          id: "role-admin-uuid-0000-000000000001",
+          type: "role",
+          name: "Admin",
+          memo: "系統管理員",
+          is_active: true,
+          sort_order: 1,
+        }
+      ];
+      localStorage.setItem("admin_parameters", JSON.stringify(partialParams));
+
+      // This call should merge the rest of the skills and parameters
+      const list = await getPublishedPrompts();
+      
+      // Verify that skills 8 and 9 are present
+      const item8 = list.find(s => s.id === "prompt-uuid-0001-0000-000000000008");
+      const item9 = list.find(s => s.id === "prompt-uuid-0001-0000-000000000009");
+      expect(item8).toBeDefined();
+      expect(item8.title).toBe("動畫、影像產出_Gemini I");
+      expect(item9).toBeDefined();
+      expect(item9.title).toBe("動畫、影像產出_Gemini II");
+
+      // Verify that other parameters (like models and categories) are also merged
+      const cachedParams = JSON.parse(localStorage.getItem("admin_parameters"));
+      const categoryUX = cachedParams.find(p => p.id === "cat-utility-uuid-0000-000000000011");
+      expect(categoryUX).toBeDefined();
+      expect(categoryUX.name).toBe("設計 / UX");
+    });
   });
 
   describe("authApi tests", () => {

@@ -7,6 +7,18 @@ const PARAMETERS_KEY = "admin_parameters";
 function seedSkills() {
   const existing = storage.get(SKILLS_KEY);
   if (existing && existing.length > 0 && "is_active" in existing[0]) {
+    let updated = false;
+    const merged = [...existing];
+    skillItemsTable.forEach((item) => {
+      if (!merged.some((s) => s.id === item.id)) {
+        merged.push({ ...item });
+        updated = true;
+      }
+    });
+    if (updated) {
+      storage.set(SKILLS_KEY, merged);
+      return merged;
+    }
     return existing;
   }
   storage.set(SKILLS_KEY, skillItemsTable);
@@ -16,6 +28,18 @@ function seedSkills() {
 function seedParameters() {
   const existing = storage.get(PARAMETERS_KEY);
   if (existing && existing.length > 0 && "is_active" in existing[0]) {
+    let updated = false;
+    const merged = [...existing];
+    parametersTable.forEach((param) => {
+      if (!merged.some((p) => p.id === param.id)) {
+        merged.push({ ...param });
+        updated = true;
+      }
+    });
+    if (updated) {
+      storage.set(PARAMETERS_KEY, merged);
+      return merged;
+    }
     return existing;
   }
   storage.set(PARAMETERS_KEY, parametersTable);

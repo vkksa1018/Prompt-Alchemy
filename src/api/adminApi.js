@@ -21,16 +21,38 @@ const ADMIN_AUTH_KEY = "admin_auth";
 
 function seedParameters() {
   const existing = storage.get(PARAMETERS_KEY);
-  if (existing) return existing;
+  if (existing) {
+    let updated = false;
+    const merged = [...existing];
+    parametersTable.forEach((p, index) => {
+      if (!merged.some((item) => item.id === p.id)) {
+        merged.push({
+          id: p.id,
+          type: p.type,
+          name: p.name,
+          description: p.memo || p.description || "",
+          isActive: p.isActive ?? p.is_active ?? true,
+          sortOrder: p.sortOrder ?? p.sort_order ?? (merged.length + 1),
+          createdAt: p.createdAt || p.created_at || `2026-06-0${(index % 9) + 1}T08:00:00Z`,
+        });
+        updated = true;
+      }
+    });
+    if (updated) {
+      storage.set(PARAMETERS_KEY, merged);
+      return merged;
+    }
+    return existing;
+  }
 
   const seed = parametersTable.map((p, index) => ({
     id: p.id,
     type: p.type,
     name: p.name,
     description: p.memo || p.description || "",
-    isActive: p.isActive,
-    sortOrder: p.sortOrder,
-    createdAt: p.createdAt || `2026-06-0${(index % 9) + 1}T08:00:00Z`,
+    isActive: p.isActive ?? p.is_active ?? true,
+    sortOrder: p.sortOrder ?? p.sort_order ?? (index + 1),
+    createdAt: p.createdAt || p.created_at || `2026-06-0${(index % 9) + 1}T08:00:00Z`,
   }));
 
   storage.set(PARAMETERS_KEY, seed);
@@ -39,7 +61,21 @@ function seedParameters() {
 
 function seedSkills() {
   const existing = storage.get(SKILLS_KEY);
-  if (existing) return existing;
+  if (existing) {
+    let updated = false;
+    const merged = [...existing];
+    skillItemsTable.forEach((item) => {
+      if (!merged.some((s) => s.id === item.id)) {
+        merged.push({ ...item });
+        updated = true;
+      }
+    });
+    if (updated) {
+      storage.set(SKILLS_KEY, merged);
+      return merged;
+    }
+    return existing;
+  }
 
   const seed = skillItemsTable.map((item) => ({ ...item }));
   storage.set(SKILLS_KEY, seed);
