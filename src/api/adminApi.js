@@ -201,7 +201,7 @@ export function getStatusLabel(status) {
 export function loginAdmin({ email, password }) {
   const list = readUsers();
   const user = list.find(
-    (u) => u.email === email && u.role_id?.startsWith("role-admin") && u.isActive
+    (u) => u.email === email && u.role === "admin" && u.isActive
   );
 
   if (!user) {
