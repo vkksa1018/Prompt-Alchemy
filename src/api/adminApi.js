@@ -48,12 +48,34 @@ function seedSkills() {
 
 function seedUsers() {
   const existing = storage.get(USERS_KEY);
-  if (existing) return existing;
+  if (existing) {
+    let modified = false;
+    const migrated = existing.map((u) => {
+      let updatedUser = { ...u };
+      if (updatedUser.isActive === undefined) {
+        updatedUser.isActive = true;
+        modified = true;
+      }
+      if (updatedUser.role_id !== undefined) {
+        delete updatedUser.role_id;
+        modified = true;
+      }
+      return updatedUser;
+    });
+    if (modified) {
+      storage.set(USERS_KEY, migrated);
+      return migrated;
+    }
+    return existing;
+  }
 
-  const seed = usersTable.map((u) => ({
-    ...u,
-    createdAt: `2026-06-01T08:00:00Z`,
-  }));
+  const seed = usersTable.map((u) => {
+    return {
+      ...u,
+      isActive: true,
+      createdAt: `2026-06-01T08:00:00Z`,
+    };
+  });
   storage.set(USERS_KEY, seed);
   return seed;
 }
@@ -201,7 +223,7 @@ export function getStatusLabel(status) {
 export function loginAdmin({ email, password }) {
   const list = readUsers();
   const user = list.find(
-    (u) => u.email === email && u.role === "admin" && u.isActive
+    (u) => u.email === email && u.role === "admin" && (u.isActive ?? u.is_active ?? true)
   );
 
   if (!user) {
@@ -231,10 +253,10 @@ export function getAdminAuth() {
 
 // ---- Users ------------------------------------------------------------------
 
-export function getUsers(roleId = null) {
+export function getUsers(role = null) {
   let list = readUsers();
-  if (roleId) {
-    list = list.filter((u) => u.role_id === roleId);
+  if (role) {
+    list = list.filter((u) => u.role === role);
   }
   list = list.sort(
     (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
@@ -248,10 +270,13 @@ export function createUser(data) {
     id: generateId("user"),
     name: data.name || "",
     email: data.email || "",
-    role_id: data.role_id || "",
+    role: data.role || "member",
     passwordHash: "bcrypt-hash-placeholder-new",
+    password_hash: "bcrypt-hash-placeholder-new",
     isActive: data.isActive ?? true,
+    is_active: data.isActive ?? true,
     createdAt: nowIso(),
+    created_at: nowIso(),
   };
   writeUsers([user, ...list]);
   return resolve(user);
@@ -266,8 +291,9 @@ export function updateUser(id, data) {
       ...u,
       name: data.name ?? u.name,
       email: data.email ?? u.email,
-      role_id: data.role_id ?? u.role_id,
-      isActive: data.isActive ?? u.isActive,
+      role: data.role ?? u.role ?? "member",
+      isActive: data.isActive ?? u.isActive ?? true,
+      is_active: data.isActive ?? u.isActive ?? true,
     };
     return updated;
   });

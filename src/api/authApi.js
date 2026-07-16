@@ -8,11 +8,9 @@ const LEGACY_MEMBER_NAME = "Jane User";
 function seedUsers() {
   const existing = storage.get(USERS_KEY);
   if (existing) {
-    // If it's old schema data (contains role_id, is_active, or avatar), force overwrite to reset
-    if (
-      existing.length > 0 &&
-      ("role_id" in existing[0] || "is_active" in existing[0] || "avatar" in existing[0])
-    ) {
+    // If it's old schema data (contains avatar or is_active), force overwrite to reset
+    const hasOldSchema = existing.some((u) => "avatar" in u || "is_active" in u);
+    if (hasOldSchema) {
       storage.set(USERS_KEY, usersTable);
       return usersTable;
     }
@@ -51,7 +49,7 @@ function seedUsers() {
 
 export function loginUser({ email, password }) {
   const users = seedUsers();
-  const found = users.find((u) => u.email === email);
+  const found = users.find((u) => u.email === email && u.isActive !== false && u.is_active !== false);
   if (!found) {
     return Promise.reject(new Error("此帳號不存在或已停用"));
   }

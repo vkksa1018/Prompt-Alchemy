@@ -86,8 +86,8 @@ export default function AdminUsersPage() {
     loadData(roleFilter);
   };
 
-  const getRoleName = (roleId) => {
-    const r = roles.find(r => r.id === roleId);
+  const getRoleName = (role) => {
+    const r = roles.find(r => r.name.toLowerCase() === role?.toLowerCase());
     return r ? r.name : "未知";
   };
 
@@ -116,7 +116,7 @@ export default function AdminUsersPage() {
           >
             <option value="">全部角色</option>
             {roles.map((r) => (
-              <option key={r.id} value={r.id}>
+              <option key={r.id} value={r.name.toLowerCase()}>
                 {r.name}
               </option>
             ))}
@@ -163,7 +163,7 @@ export default function AdminUsersPage() {
                       </td>
                       <td className="whitespace-nowrap px-6 py-4">
                         <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
-                          {getRoleName(user.role_id)}
+                          {getRoleName(user.role)}
                         </span>
                       </td>
                       <td className="whitespace-nowrap px-6 py-4">

@@ -11,7 +11,7 @@ export default function UserFormModal({ user, roles, onClose, onSubmit }) {
     defaultValues: {
       name: user?.name || "",
       email: user?.email || "",
-      role_id: user?.role_id || "",
+      role: user?.role || "",
       isActive: user?.isActive ?? true,
     },
   });
@@ -85,18 +85,18 @@ export default function UserFormModal({ user, roles, onClose, onSubmit }) {
               角色指派 <span className="text-red-500">*</span>
             </label>
             <select
-              {...register("role_id", { required: "請選擇角色" })}
+              {...register("role", { required: "請選擇角色" })}
               className={inputClass}
             >
               <option value="">請選擇</option>
               {roles.map((r) => (
-                <option key={r.id} value={r.id}>
+                <option key={r.id} value={r.name.toLowerCase()}>
                   {r.name}
                 </option>
               ))}
             </select>
-            {errors.role_id && (
-              <p className="text-xs text-red-500">{errors.role_id.message}</p>
+            {errors.role && (
+              <p className="text-xs text-red-500">{errors.role.message}</p>
             )}
           </div>
         </div>
