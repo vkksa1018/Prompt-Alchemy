@@ -296,8 +296,8 @@ export const usersTable = [
   },
   {
     id: "user-member-uuid-0000-000000000002",
-    name: "New User",
-    email: "user@promptalchemy.com",
+    name: "member",
+    email: "member@example.com",
     password_hash: "bcrypt-hash-placeholder-member",
     role: "member",
     isActive: true,

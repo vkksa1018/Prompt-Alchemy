@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import { loginUser } from "../../api/authApi";
@@ -13,17 +13,41 @@ export default function Login() {
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("remembered_email");
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+  }, []);
+
   const handleClose = () => {
     navigate("/");
+  };
+
+  const handleQuickFill = () => {
+    setEmail("member@example.com");
+    setPassword("Member1234");
+    setRememberMe(true);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setError("");
 
-    const targetEmail = email || "user@promptalchemy.com";
-    loginUser({ email: targetEmail, password })
+    if (!email || !password) {
+      setError("請填寫 Email 與密碼！");
+      return;
+    }
+
+    loginUser({ email, password })
       .then((userData) => {
+        if (rememberMe) {
+          localStorage.setItem("remembered_email", email);
+        } else {
+          localStorage.removeItem("remembered_email");
+        }
+
         login(userData);
         navigate("/");
       })
@@ -60,10 +84,19 @@ export default function Login() {
         </div>
         <div
           data-pencil-name="Modal Subtitle"
-          className="text-[14px]/[21px] box-border w-full text-[#7DCEA0] font-normal text-left"
+          className="text-[14px]/[21px] box-border w-full text-[#7DCEA0] font-normal text-left flex justify-between items-center"
         >
-          登入你的帳號，管理收藏的 Prompt 與 Skill。
+          <span>登入你的帳號，管理收藏的 Prompt 與 Skill。</span>
         </div>
+
+        {/* Quick Fill Button */}
+        <button
+          type="button"
+          onClick={handleQuickFill}
+          className="w-full text-xs py-2 px-3 bg-[#0F281C] hover:bg-[#1A3A2A] text-[#39FF14] border border-[#39FF14]/40 rounded-xl cursor-pointer transition-all flex items-center justify-center gap-1.5 font-semibold"
+        >
+          ⚡ 點擊快速帶入測試帳號 (member@example.com)
+        </button>
 
         {error && (
           <div className="box-border w-full p-[10px_14px] bg-[#FF00FF]/10 border border-[#FF00FF]/40 rounded-[10px] text-[13px] text-[#FF00FF] font-['JetBrains_Mono',system-ui,sans-serif]">
@@ -152,7 +185,7 @@ export default function Login() {
           <div
             onClick={() =>
               alert(
-                "此為展示專案，請使用預設帳密 (user@promptalchemy.com) 登入，或直接註冊新帳號。"
+                "此為展示專案，請使用預設帳密 (member@example.com / Member1234) 登入，或直接註冊新帳號。"
               )
             }
             data-pencil-name="Forgot Password"
@@ -173,55 +206,6 @@ export default function Login() {
             className="text-[15px]/[normal] box-border text-[#0A0E1A] font-bold text-left whitespace-nowrap"
           >
             登入
-          </div>
-        </button>
-
-        <div
-          data-pencil-name="Divider Row"
-          className="box-border w-full h-fit shrink-0 flex flex-row gap-3.5 justify-start items-center"
-        >
-          <div
-            data-pencil-name="Divider Left"
-            className="box-border flex-1 h-px bg-[#1A3A2A]"
-          ></div>
-          <div
-            data-pencil-name="Divider Text"
-            className="text-[12px]/[normal] box-border text-[#3D6B50] font-normal text-left whitespace-nowrap"
-          >
-            或
-          </div>
-          <div
-            data-pencil-name="Divider Right"
-            className="box-border flex-1 h-px bg-[#1A3A2A]"
-          ></div>
-        </div>
-
-        {/* Google sign-up mockup */}
-        <button
-          type="button"
-          onClick={() => {
-            login({
-              id: "user-member-uuid-0000-000000000002",
-              email: "user@promptalchemy.com",
-              name: "New User",
-              role: "member",
-            });
-            navigate("/");
-          }}
-          data-pencil-name="Google Login Button"
-          className="box-border w-full h-fit shrink-0 flex flex-row gap-2.5 p-3.5 justify-center items-center bg-transparent hover:bg-[#1A3A2A]/20 transition-all border border-[#1A3A2A] rounded-xl cursor-pointer"
-        >
-          <div
-            data-pencil-name="Google Icon"
-            className="text-[16px]/[normal] box-border text-[#FFFFFF] font-bold text-left whitespace-nowrap"
-          >
-            G
-          </div>
-          <div
-            data-pencil-name="Google Login Label"
-            className="text-[14px]/[normal] box-border text-[#E0F0E8] font-normal text-left whitespace-nowrap"
-          >
-            使用 Google 帳號登入
           </div>
         </button>
 

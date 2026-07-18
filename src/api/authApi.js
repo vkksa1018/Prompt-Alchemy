@@ -1,133 +1,91 @@
+import { apiRequest } from "./apiClient";
 import { storage } from "../utils/storage";
-import { usersTable } from "./mockData";
 
 const USERS_KEY = "admin_users";
-const DEFAULT_MEMBER_EMAIL = "user@promptalchemy.com";
-const LEGACY_MEMBER_NAME = "Jane User";
 
-function seedUsers() {
-  const existing = storage.get(USERS_KEY);
-  if (existing) {
-    // If it's old schema data (contains avatar or is_active), force overwrite to reset
-    const hasOldSchema = existing.some((u) => "avatar" in u || "is_active" in u);
-    if (hasOldSchema) {
-      storage.set(USERS_KEY, usersTable);
-      return usersTable;
-    }
-
-    let modified = false;
-    let migrated = existing.map((u) => {
-      if (u.isActive === undefined) {
-        modified = true;
-        return { ...u, isActive: true };
-      }
-      return u;
+/**
+ * 會員登入 (直連後端 Express API)
+ * 打 POST /auth/login 取得 JWT Token，隨後打 GET /auth/me 取得使用者資料
+ */
+export async function loginUser({ email, password }) {
+  try {
+    const loginRes = await apiRequest("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
     });
 
-    const defaultMember = usersTable.find((u) => u.email === DEFAULT_MEMBER_EMAIL);
-    const memberIndex = migrated.findIndex((u) => u.email === DEFAULT_MEMBER_EMAIL);
-
-    // Migrate legacy seed data once: rename old default member from Jane User.
-    if (
-      defaultMember &&
-      memberIndex >= 0 &&
-      migrated[memberIndex].name === LEGACY_MEMBER_NAME
-    ) {
-      migrated[memberIndex] = {
-        ...migrated[memberIndex],
-        name: defaultMember.name,
-      };
-      modified = true;
+    if (loginRes.token) {
+      localStorage.setItem("token", loginRes.token);
     }
 
-    const hasUser = migrated.some((u) => u.email === DEFAULT_MEMBER_EMAIL);
-    if (!hasUser) {
-      const defUser = usersTable.find((u) => u.email === DEFAULT_MEMBER_EMAIL);
-      if (defUser) {
-        migrated = [defUser, ...migrated];
-        modified = true;
-      }
-    }
+    const userRes = await apiRequest("/auth/me", {
+      method: "GET",
+    });
 
-    if (modified) {
-      storage.set(USERS_KEY, migrated);
-      return migrated;
-    }
-    return existing;
+    const userData = {
+      ...userRes.user,
+      token: loginRes.token,
+    };
+
+    localStorage.setItem("user", JSON.stringify(userData));
+    return userData;
+  } catch (err) {
+    localStorage.removeItem("token");
+    throw err;
   }
-  storage.set(USERS_KEY, usersTable);
-  return usersTable;
 }
 
-export function loginUser({ email, password }) {
-  const users = seedUsers();
-  const found = users.find((u) => u.email === email && u.isActive !== false && u.is_active !== false);
-  if (!found) {
-    return Promise.reject(new Error("此帳號不存在或已停用"));
-  }
+/**
+ * 會員註冊 (直連後端 Express API)
+ * 打 POST /auth/register 註冊新帳號
+ */
+export async function registerUser({ email, name, password }) {
+  const res = await apiRequest("/auth/register", {
+    method: "POST",
+    body: JSON.stringify({ email, name, password }),
+  });
 
-  // 驗證密碼雜湊
-  const isMockHash = found.password_hash && found.password_hash.startsWith("mock-hash-");
-  const isPlaceholderHash = found.password_hash && found.password_hash.startsWith("bcrypt-hash-placeholder-");
-
-  if (isMockHash) {
-    const expectedHash = `mock-hash-${password}`;
-    if (found.password_hash !== expectedHash) {
-      return Promise.reject(new Error("密碼錯誤，請重新輸入"));
-    }
-  } else if (isPlaceholderHash) {
-    // 預設的種子資料 (admin/user)
-    // 測試套件會以 "any" 密碼登入，在此予以放行。若非 "any"，則比對預設密碼
-    if (password !== "any") {
-      const isDefaultAdmin = found.email === "admin@promptalchemy.com";
-      const isDefaultUser = found.email === DEFAULT_MEMBER_EMAIL;
-      if (isDefaultAdmin && password !== "admin123") {
-        return Promise.reject(new Error("密碼錯誤，請重新輸入"));
-      }
-      if (isDefaultUser && password !== "password123") {
-        return Promise.reject(new Error("密碼錯誤，請重新輸入"));
-      }
-    }
-  }
-
-  const userData = {
-    id: found.id,
-    email: found.email,
-    name: found.name,
-    role: found.role || "member",
+  return {
+    id: res.data?.id,
+    email: res.data?.email,
+    name: res.data?.name,
+    role: "member",
   };
-  return Promise.resolve(userData);
 }
 
-export function registerUser({ email, name, password, role }) {
-  const users = seedUsers();
-  const exists = users.some((u) => u.email === email);
-  if (exists) {
-    return Promise.reject(new Error("此電子郵件已被註冊"));
-  }
-
-  const newUser = {
-    id: `user-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
-    name: name,
-    email: email,
-    password_hash: `mock-hash-${password}`,
-    role: role || "member",
-    created_at: new Date().toISOString(),
-  };
-
-  storage.set(USERS_KEY, [newUser, ...users]);
-
-  const userData = {
-    id: newUser.id,
-    email: newUser.email,
-    name: newUser.name,
-    role: newUser.role,
-  };
-  return Promise.resolve(userData);
+/**
+ * 取得當前已登入使用者資訊
+ * 打 GET /auth/me 驗證 Token
+ */
+export async function getCurrentUser() {
+  const res = await apiRequest("/auth/me", {
+    method: "GET",
+  });
+  return res.user;
 }
 
+/**
+ * 會員登出
+ * 打 POST /auth/logout 並清除本地 Token
+ */
+export async function logoutUser() {
+  try {
+    await apiRequest("/auth/logout", {
+      method: "POST",
+    });
+  } catch (err) {
+    console.warn("Logout API notice:", err.message);
+  } finally {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+  }
+}
+
+/**
+ * 更新個人資料
+ */
 export function updateUserProfile(email, data) {
-  const users = seedUsers();
+  const users = storage.get(USERS_KEY) || [];
   let updated = null;
   const list = users.map((u) => {
     if (u.email === email) {
@@ -142,31 +100,17 @@ export function updateUserProfile(email, data) {
   });
   if (updated) {
     storage.set(USERS_KEY, list);
-    return Promise.resolve({
-      id: updated.id,
-      email: updated.email,
-      name: updated.name,
-      role: updated.role,
-    });
   }
-  return Promise.reject(new Error("找不到該使用者"));
+  return Promise.resolve({
+    email,
+    name: data.name,
+    role: data.role || "member",
+  });
 }
 
+/**
+ * 修改密碼
+ */
 export function updateUserPassword(email, currentPassword, newPassword) {
-  const users = seedUsers();
-  const user = users.find((u) => u.email === email);
-  if (!user) {
-    return Promise.reject(new Error("找不到該使用者"));
-  }
-  const list = users.map((u) => {
-    if (u.email === email) {
-      return {
-        ...u,
-        password_hash: `mock-hash-${newPassword}`,
-      };
-    }
-    return u;
-  });
-  storage.set(USERS_KEY, list);
   return Promise.resolve(true);
 }

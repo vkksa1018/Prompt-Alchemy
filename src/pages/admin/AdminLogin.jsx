@@ -14,10 +14,16 @@ export default function AdminLogin() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: { email: "", password: "" },
   });
+
+  const handleQuickFill = () => {
+    setValue("email", "admin@promptalchemy.com");
+    setValue("password", "admin123");
+  };
 
   // 通過必填驗證後才進到這裡。
   const onSubmit = async ({ email, password }) => {
@@ -44,6 +50,15 @@ export default function AdminLogin() {
             Prompt Alchemy 後台管理
           </p>
         </div>
+
+        {/* 快速填入測試管理者帳號 */}
+        <button
+          type="button"
+          onClick={handleQuickFill}
+          className="w-full text-xs py-2 px-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 dark:bg-indigo-950/50 dark:hover:bg-indigo-900/50 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 rounded-lg cursor-pointer transition flex items-center justify-center gap-1.5 font-semibold"
+        >
+          ⚡ 點擊快速帶入管理者帳號 (admin@promptalchemy.com)
+        </button>
 
         {error && (
           <div className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-900/30 dark:text-red-400">
@@ -84,13 +99,13 @@ export default function AdminLogin() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+          className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
         >
           {isSubmitting ? "登入中…" : "登入"}
         </button>
 
         <p className="text-center text-xs text-gray-400 dark:text-gray-500">
-          測試帳號：admin@promptalchemy.com（密碼任意）
+          測試帳號：admin@promptalchemy.com（密碼：admin123）
         </p>
       </form>
     </div>

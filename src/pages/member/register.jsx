@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
-import { registerUser } from "../../api/authApi";
+import { registerUser, loginUser } from "../../api/authApi";
 import { alertHelper } from "../../utils/sweetAlert";
 
 export default function Register() {
@@ -66,15 +66,18 @@ export default function Register() {
       password,
       role: "member",
     })
-      .then((userData) => {
+      .then(async (userData) => {
         alertHelper.success(
           "註冊成功",
           `歡迎加入，${userData.name || "新成員"}！`,
           true
         );
-        // Mock register: log them in immediately
-        login(userData, { showSuccessAlert: false });
-        // Redirect to profile page to let them fill out details
+        try {
+          const loggedInUser = await loginUser({ email, password });
+          login(loggedInUser, { showSuccessAlert: false });
+        } catch (loginErr) {
+          console.warn("Auto login after register failed", loginErr);
+        }
         navigate("/favorites/profile");
       })
       .catch((err) => {
@@ -229,54 +232,7 @@ export default function Register() {
           </div>
         </button>
 
-        <div
-          data-pencil-name="Divider Row"
-          className="box-border w-full h-fit shrink-0 flex flex-row gap-3.5 justify-start items-center"
-        >
-          <div
-            data-pencil-name="Divider Left"
-            className="box-border flex-1 h-px bg-[#1A3A2A]"
-          ></div>
-          <div
-            data-pencil-name="Divider Text"
-            className="text-[12px]/[normal] box-border text-[#3D6B50] font-normal text-left whitespace-nowrap"
-          >
-            或
-          </div>
-          <div
-            data-pencil-name="Divider Right"
-            className="box-border flex-1 h-px bg-[#1A3A2A]"
-          ></div>
-        </div>
 
-        {/* Google sign-up mockup */}
-        <button
-          type="button"
-          onClick={() => {
-            login({
-              id: "user-member-uuid-0000-000000000002",
-              email: "user@promptalchemy.com",
-              name: "New User",
-              role: "member",
-            });
-            navigate("/");
-          }}
-          data-pencil-name="Google Register Button"
-          className="box-border w-full h-fit shrink-0 flex flex-row gap-2.5 p-3.5 justify-center items-center bg-transparent hover:bg-[#1A3A2A]/20 transition-all border border-[#1A3A2A] rounded-xl cursor-pointer"
-        >
-          <div
-            data-pencil-name="Google Icon"
-            className="text-[16px]/[normal] box-border text-[#FFFFFF] font-bold text-left whitespace-nowrap"
-          >
-            G
-          </div>
-          <div
-            data-pencil-name="Google Register Label"
-            className="text-[14px]/[normal] box-border text-[#E0F0E8] font-normal text-left whitespace-nowrap"
-          >
-            使用 Google 帳號註冊
-          </div>
-        </button>
 
         <div
           data-pencil-name="Login Row"

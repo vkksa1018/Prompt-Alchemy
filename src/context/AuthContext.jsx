@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 import { getUserFavorites, saveUserFavorites } from "../api/favoriteApi";
-import { updateUserProfile } from "../api/authApi";
+import { updateUserProfile, getCurrentUser, logoutUser as apiLogoutUser } from "../api/authApi";
 import { updateFavoriteCount } from "../api/promptApi";
 import { alertHelper } from "../utils/sweetAlert";
 
@@ -9,23 +9,51 @@ export const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [favorites, setFavorites] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-      getUserFavorites(parsedUser.email, parsedUser.id).then((favs) => {
-        setFavorites(favs);
-      });
-    }
+    const initAuth = async () => {
+      const token = localStorage.getItem("token");
+      const storedUser = localStorage.getItem("user");
+
+      if (token) {
+        try {
+          const fetchedUser = await getCurrentUser();
+          const fullUser = { ...fetchedUser, token };
+          setUser(fullUser);
+          localStorage.setItem("user", JSON.stringify(fullUser));
+
+          const favs = await getUserFavorites(fullUser.email, fullUser.id);
+          setFavorites(favs);
+        } catch (err) {
+          console.warn("Token 即將或已無效，清除本地 Token", err.message);
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          setUser(null);
+        }
+      } else if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+          const favs = await getUserFavorites(parsedUser.email, parsedUser.id);
+          setFavorites(favs);
+        } catch (err) {
+          localStorage.removeItem("user");
+        }
+      }
+      setLoading(false);
+    };
+
+    initAuth();
   }, []);
 
   const loginUser = (userData, options = {}) => {
     const { showSuccessAlert = true } = options;
-    console.log("Logging in user:", userData);
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
+    if (userData.token) {
+      localStorage.setItem("token", userData.token);
+    }
     getUserFavorites(userData.email, userData.id).then((favs) => {
       setFavorites(favs);
       if (showSuccessAlert) {
@@ -39,9 +67,11 @@ export function AuthProvider({ children }) {
   };
 
   const logoutUser = () => {
+    apiLogoutUser();
     setUser(null);
     setFavorites([]);
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
     alertHelper.success("已登出", "您已安全登出帳號", true);
   };
 
@@ -50,7 +80,6 @@ export function AuthProvider({ children }) {
       if (!prevUser) return null;
       const updated = { ...prevUser, ...newUserData };
       localStorage.setItem("user", JSON.stringify(updated));
-      // Sync update to dynamic user database (admin_users)
       updateUserProfile(updated.email, newUserData).catch((err) => {
         console.error("Failed to sync profile update to db", err);
       });
@@ -86,7 +115,6 @@ export function AuthProvider({ children }) {
     if (!user) return;
     setFavorites([]);
     saveUserFavorites(user.email, []);
-    // Optional: decrement favorite counts in database for all previously favorited items
     favorites.forEach((favId) => {
       updateFavoriteCount(favId, -1).catch(console.error);
     });
@@ -100,7 +128,6 @@ export function AuthProvider({ children }) {
     ];
     setFavorites(defaults);
     saveUserFavorites(user.email, defaults);
-    // Optional: sync counts
     defaults.forEach((favId) => {
       updateFavoriteCount(favId, 1).catch(console.error);
     });
@@ -110,6 +137,7 @@ export function AuthProvider({ children }) {
     <AuthContext.Provider
       value={{
         user,
+        loading,
         login: loginUser,
         logout: logoutUser,
         updateUser,
