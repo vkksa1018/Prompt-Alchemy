@@ -1,54 +1,85 @@
+import axios from "axios";
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 /**
- * 統一 API 請求封裝
- * @param {string} endpoint - API 路徑 (例: '/auth/login')
- * @param {RequestInit} options - fetch 選項
- * @returns {Promise<any>}
+ * 建立 Axios 客戶端實例
  */
-export async function apiRequest(endpoint, options = {}) {
-  const token = localStorage.getItem("token");
-
-  const headers = {
+const apiClient = axios.create({
+  baseURL: BASE_URL,
+  timeout: 10000,
+  headers: {
     "Content-Type": "application/json",
-    ...options.headers,
-  };
+  },
+});
 
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
-
-  const url = `${BASE_URL.replace(/\/$/, "")}${endpoint}`;
-
-  try {
-    const response = await fetch(url, {
-      ...options,
-      headers,
-    });
-
-    const contentType = response.headers.get("content-type");
-    let data;
-    if (contentType && contentType.includes("application/json")) {
-      data = await response.json();
-    } else {
-      data = await response.text();
+/**
+ * Request 攔截器：自動於 Header 注入 Bearer Token
+ */
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
-    if (!response.ok) {
+/**
+ * Response 攔截器：自動解包 response.data 並統一處理 4xx / 5xx / 網路連線錯誤
+ */
+apiClient.interceptors.response.use(
+  (response) => {
+    return response.data;
+  },
+  (error) => {
+    if (error.response) {
+      // 伺服器有回傳狀態碼 (4xx, 5xx)
+      const data = error.response.data;
       const errorMessage =
         (typeof data === "object" && (data.message || data.error)) ||
-        `HTTP 錯誤 (${response.status})`;
-      const error = new Error(errorMessage);
-      error.status = response.status;
-      error.data = data;
-      throw error;
+        `HTTP 錯誤 (${error.response.status})`;
+      const err = new Error(errorMessage);
+      err.status = error.response.status;
+      err.data = data;
+      return Promise.reject(err);
+    } else if (error.request) {
+      // 伺服器無回應 / 斷線 (Network Error)
+      return Promise.reject(
+        new Error("無法連線至後端伺服器，請確認後端服務是否正在運行。")
+      );
     }
-
-    return data;
-  } catch (err) {
-    if (err.name === "TypeError" && err.message.includes("fetch")) {
-      throw new Error("無法連線至後端伺服器，請確認後端服務是否正在運行。");
-    }
-    throw err;
+    return Promise.reject(error);
   }
+);
+
+/**
+ * 通用相容 apiRequest 函式
+ * @param {string} endpoint - API 路徑 (例如: '/auth/login')
+ * @param {object} options - 選項 ({ method, body, headers })
+ */
+export async function apiRequest(endpoint, options = {}) {
+  const method = (options.method || "GET").toLowerCase();
+  let data = options.body;
+
+  if (typeof data === "string") {
+    try {
+      data = JSON.parse(data);
+    } catch (e) {
+      // 保留原始字串
+    }
+  }
+
+  return apiClient({
+    url: endpoint,
+    method,
+    data,
+    headers: options.headers,
+  });
 }
+
+export default apiClient;
