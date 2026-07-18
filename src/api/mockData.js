@@ -337,17 +337,16 @@ export const skillItemsTable = [
 [程式碼問題]
 [改善建議程式碼]
 [為什麼這樣改] \n app.get('/api/user', async (req, res) => {\n  const id = req.query.id;\n  const user = await db.query(...);\n  res.json(user);\n});`,
-    example_output: {
-      outputText:
-        "【程式碼問題】\n1. 未進行輸入驗證，可能存在 SQL Injection 安全風險。\n2. 缺乏 try-catch 區塊，若資料庫查詢失敗會導致 server 當機。\n\n【改善建議程式碼】\n```javascript\napp.get('/api/user', async (req, res, next) => {\n  try {\n    const id = parseInt(req.query.id, 10);\n    if (isNaN(id)) {\n      return res.status(400).json({ error: 'Invalid ID format' });\n    }\n\n    const user = await db.query('SELECT * FROM users WHERE id = $1', [id]);\n    res.json(user);\n  } catch (error) {\n    next(error);\n  }\n});\n```",
-      outputImages: [
-        {
-          url: "",
-          alt: "",
-          caption: "",
+    example_output: [
+      {
+        type: "text",
+        data: {
+          context:
+            "【程式碼問題】\n1. 未進行輸入驗證，可能存在 SQL Injection 安全風險。\n2. 缺乏 try-catch 區塊，若資料庫查詢失敗會導致 server 當機。\n\n【改善建議程式碼】\n```javascript\napp.get('/api/user', async (req, res, next) => {\n  try {\n    const id = parseInt(req.query.id, 10);\n    if (isNaN(id)) {\n      return res.status(400).json({ error: 'Invalid ID format' });\n    }\n\n    const user = await db.query('SELECT * FROM users WHERE id = $1', [id]);\n    res.json(user);\n  } catch (error) {\n    next(error);\n  }\n});\n```",
         },
-      ],
-    },
+        seq: 0,
+      },
+    ],
     category_id: "cat-backend-uuid-0000-000000000002", // 後端開發
     tags: [
       "tag-api-uuid-0000-000000000001",
@@ -378,17 +377,16 @@ export const skillItemsTable = [
     example_input: `請分析以下 React / Next.js 錯誤訊息，
 並給出可能的修復方案及除錯步驟：
 TypeError: Cannot read properties of undefined (reading 'map') at ProductList (ProductList.jsx:12)`,
-    example_output: {
-      outputText:
-        "【錯誤原因】\nProductList 組件中的資料（如 products）在渲染時尚為 undefined，就直接調用了 .map() 方法。\n\n【解決方案】\n使用 Optional Chaining (`products?.map(...)`) 或短路求值提供預設空陣列 (`(products || []).map(...)`)。",
-      outputImages: [
-        {
-          url: "",
-          alt: "",
-          caption: "",
+    example_output: [
+      {
+        type: "text",
+        data: {
+          context:
+            "【錯誤原因】\nProductList 組件中的資料（如 products）在渲染時尚為 undefined，就直接調用了 .map() 方法。\n\n【解決方案】\n使用 Optional Chaining (`products?.map(...)`) 或短路求值提供預設空陣列 (`(products || []).map(...)`)。",
         },
-      ],
-    },
+        seq: 0,
+      },
+    ],
     category_id: "cat-frontend-uuid-0000-000000000001", // 前端開發
     tags: [
       "tag-react-uuid-0000-000000000003",
@@ -482,26 +480,35 @@ result = client.images.generate(
 )
 
 save_image(result, "LEGO_collectible_toy_gpt-image-2.png")`,
-    example_output: {
-      outputText: "",
-      outputImages: [
-        {
-          url: "/Prompt-Alchemy/LEGO_collectible_toy_gpt-image-2.png",
+    example_output: [
+      {
+        type: "image",
+        data: {
+          context: "/Prompt-Alchemy/LEGO_collectible_toy_gpt-image-2.png",
           alt: "LEGO_collectible_toy_gpt-image-2.png",
           caption: "gpt-image-2",
         },
-        {
-          url: "/Prompt-Alchemy/LEGO_collectible_toy_grok.png",
+        seq: 0,
+      },
+      {
+        type: "image",
+        data: {
+          context: "/Prompt-Alchemy/LEGO_collectible_toy_grok.png",
           alt: "LEGO_collectible_toy_grok.png",
           caption: "grok",
         },
-        {
-          url: "/Prompt-Alchemy/LEGO_collectible_toy_gemini-3-pro-image.png",
+        seq: 1,
+      },
+      {
+        type: "image",
+        data: {
+          context: "/Prompt-Alchemy/LEGO_collectible_toy_gemini-3-pro-image.png",
           alt: "LEGO_collectible_toy_gemini-3-pro-image.png",
           caption: "gemini-3-pro-image",
         },
-      ],
-    },
+        seq: 2,
+      },
+    ],
     category_id: "cat-utility-uuid-0000-000000000011", // 設計
     tags: [
       "tag-design-uuid-0000-000000000013",
@@ -532,17 +539,16 @@ save_image(result, "LEGO_collectible_toy_gpt-image-2.png")`,
     example_input: `請提供一份針對以下環境的 Web 應用程式安全檢測清單，
 以及常見漏洞的防範建議：
 Web API Node.js environment...`,
-    example_output: {
-      outputText:
-        "1. 檢查並停用不安全的 HTTP Header (建議使用 helmet 中間件)\n2. 防範 CORS 跨網域資源共享不當設定\n3. 限制 API 請求頻率 (Rate Limiting) 避免 DDoS 攻擊",
-      outputImages: [
-        {
-          url: "",
-          alt: "",
-          caption: "",
+    example_output: [
+      {
+        type: "text",
+        data: {
+          context:
+            "1. 檢查並停用不安全的 HTTP Header (建議使用 helmet 中間件)\n2. 防範 CORS 跨網域資源共享不當設定\n3. 限制 API 請求頻率 (Rate Limiting) 避免 DDoS 攻擊",
         },
-      ],
-    },
+        seq: 0,
+      },
+    ],
 
     category_id: "cat-security-uuid-0000-000000000003", // 資安相關
     tags: [
@@ -571,17 +577,16 @@ Web API Node.js environment...`,
     example_input: `請將以下中文技術內容翻譯成專業、自然的英文，
 並提供 Academic 與 Professional 兩種口吻：
 如何使用 React 進行狀態管理...`,
-    example_output: {
-      outputText:
-        "Academic: How to leverage React for state management within web applications...\nProfessional: Efficient ways to manage state in your React projects...",
-      outputImages: [
-        {
-          url: "",
-          alt: "",
-          caption: "",
+    example_output: [
+      {
+        type: "text",
+        data: {
+          context:
+            "Academic: How to leverage React for state management within web applications...\nProfessional: Efficient ways to manage state in your React projects...",
         },
-      ],
-    },
+        seq: 0,
+      },
+    ],
     category_id: "cat-translate-uuid-0000-000000000005", // 翻譯助手
     tags: [
       "tag-translation-uuid-0000-000000000006",
@@ -612,16 +617,15 @@ Web API Node.js environment...`,
     use_case: "驗證複雜輸入（如密碼複雜度、身分證字號、特定日誌格式）時。",
     example_input:
       "請根據以下條件生成一個高效的正則表達式，並附上測試案例說明：匹配 email 格式，並排除 .com 結尾...",
-    example_output: {
-      outputText: "`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.(?!com$)[a-zA-Z]{2,}$`",
-      outputImages: [
-        {
-          url: "",
-          alt: "",
-          caption: "",
+    example_output: [
+      {
+        type: "text",
+        data: {
+          context: "`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.(?!com$)[a-zA-Z]{2,}$`",
         },
-      ],
-    },
+        seq: 0,
+      },
+    ],
     category_id: "cat-utility-uuid-0000-000000000006", // 小工具
     tags: [
       "tag-debug-uuid-0000-000000000004",
@@ -654,17 +658,16 @@ Web API Node.js environment...`,
     example_input: `請分析以下 SQL 查詢的效能瓶頸，
 並提供最佳化建議及索引設計：
 "SELECT * FROM orders WHERE user_id = 5 AND status = 'pending' ORDER BY created_at DESC;"`,
-    example_output: {
-      outputText:
-        "【效能評估】\n如果 user_id 與 status 欄位沒有建立聯合索引（Composite Index），將會導致慢查詢。\n\n【建議索引】\n`CREATE INDEX idx_user_status_created ON orders (user_id, status, created_at DESC);`",
-      outputImages: [
-        {
-          url: "",
-          alt: "",
-          caption: "",
+    example_output: [
+      {
+        type: "text",
+        data: {
+          context:
+            "【效能評估】\n如果 user_id 與 status 欄位沒有建立聯合索引（Composite Index），將會導致慢查詢。\n\n【建議索引】\n`CREATE INDEX idx_user_status_created ON orders (user_id, status, created_at DESC);`",
         },
-      ],
-    },
+        seq: 0,
+      },
+    ],
     category_id: "cat-backend-uuid-0000-000000000002", // 後端開發
     tags: [
       "tag-sql-uuid-0000-000000000005",
@@ -751,16 +754,17 @@ Web API Node.js environment...`,
     shot: Close Up
     camera: Static
     action: Girl pets the white cat while smiling. `,
-    example_output: {
-      outputText: "",
-      outputImages: [
-        {
-          url: "/Prompt-Alchemy/Project___Title_Skateb.mp4",
+    example_output: [
+      {
+        type: "video",
+        data: {
+          context: "/Prompt-Alchemy/Project___Title_Skateb.mp4",
           alt: "Project___Title_Skateb.mp4",
           caption: "Gemini Veo 3",
         },
-      ],
-    },
+        seq: 0,
+      },
+    ],
     category_id: "cat-utility-uuid-0000-000000000011", // 設計
     tags: [
       "tag-design-uuid-0000-000000000013",
@@ -859,16 +863,17 @@ Web API Node.js environment...`,
     camera: Static
     action: 貓到處追著藍綠色和尚鸚鵡，不斷的‘喵喵’叫，女孩表現出無奈受不了的樣子，雙手抱頭。 
     `,
-    example_output: {
-      outputText: "",
-      outputImages: [
-        {
-          url: "/Prompt-Alchemy/Project___Title_Skatebo2.mp4",
+    example_output: [
+      {
+        type: "video",
+        data: {
+          context: "/Prompt-Alchemy/Project___Title_Skatebo2.mp4",
           alt: "Project___Title_Skatebo2.mp4",
           caption: "Gemini Veo 3",
         },
-      ],
-    },
+        seq: 0,
+      },
+    ],
     category_id: "cat-utility-uuid-0000-000000000011", // 設計
     tags: [
       "tag-design-uuid-0000-000000000013",

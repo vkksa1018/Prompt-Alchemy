@@ -75,6 +75,27 @@ describe("toBlocks", () => {
     ]);
   });
 
+  it("converts legacy outputImages with video URLs into video blocks", () => {
+    const result = toBlocks({
+      outputText: "",
+      outputImages: [{ url: "https://example.com/demo.mp4", alt: "影片", caption: "範例" }],
+    });
+
+    expect(result).toEqual([
+      { type: "video", data: { context: "https://example.com/demo.mp4", alt: "影片", caption: "範例" } },
+    ]);
+  });
+
+  it("normalizes an existing image block containing a video URL to video type", () => {
+    const result = toBlocks([
+      { type: "image", data: { context: "https://example.com/demo.mp4", alt: "影片", caption: "範例" }, seq: 0 },
+    ]);
+
+    expect(result).toEqual([
+      { type: "video", data: { context: "https://example.com/demo.mp4", alt: "影片", caption: "範例" } },
+    ]);
+  });
+
   it("returns empty array for unsupported values", () => {
     expect(toBlocks(42)).toEqual([]);
     expect(toBlocks({})).toEqual([]);

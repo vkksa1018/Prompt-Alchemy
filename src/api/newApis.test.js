@@ -18,9 +18,7 @@ describe("New Frontend Dynamic Mock APIs Tests", () => {
       expect(first.date).toBeDefined();
       expect(first.likes).toBeDefined();
       expect(first.exampleOutput).toBeDefined();
-      expect(first.exampleOutput).toBeTypeOf("object");
-      expect(first.exampleOutput.outputText).toBeTypeOf("string");
-      expect(Array.isArray(first.exampleOutput.outputImages)).toBe(true);
+      expect(Array.isArray(first.exampleOutput)).toBe(true);
     });
 
     it("should fetch prompt by ID", async () => {
@@ -30,15 +28,14 @@ describe("New Frontend Dynamic Mock APIs Tests", () => {
       expect(detail).not.toBeNull();
       expect(detail.title).toBe(first.title);
       expect(detail.exampleOutput).toBeDefined();
-      expect(detail.exampleOutput).toBeTypeOf("object");
-      expect(detail.exampleOutput.outputText).toBeTypeOf("string");
-      expect(Array.isArray(detail.exampleOutput.outputImages)).toBe(true);
+      expect(Array.isArray(detail.exampleOutput)).toBe(true);
     });
 
     it("should normalize string exampleOutput correctly", () => {
       const normalized = normalizeExampleOutput("plain text output");
-      expect(normalized.outputText).toBe("plain text output");
-      expect(normalized.outputImages).toEqual([]);
+      expect(normalized).toEqual([
+        { type: "text", data: { context: "plain text output" }, seq: 0 },
+      ]);
     });
 
     it("should normalize object exampleOutput correctly", () => {
@@ -47,14 +44,16 @@ describe("New Frontend Dynamic Mock APIs Tests", () => {
         outputImages: [{ url: "http://example.com/img.png", alt: "img", caption: "caption" }]
       };
       const normalized = normalizeExampleOutput(original);
-      expect(normalized.outputText).toBe("some text");
-      expect(normalized.outputImages).toEqual(original.outputImages);
+      expect(normalized).toEqual([
+        { type: "text", data: { context: "some text" }, seq: 0 },
+        { type: "image", data: { context: "http://example.com/img.png", alt: "img", caption: "caption" }, seq: 1 },
+      ]);
     });
 
     it("should fallback for null/undefined or invalid exampleOutput", () => {
-      expect(normalizeExampleOutput(null)).toEqual({ outputText: "", outputImages: [] });
-      expect(normalizeExampleOutput(undefined)).toEqual({ outputText: "", outputImages: [] });
-      expect(normalizeExampleOutput(123)).toEqual({ outputText: "", outputImages: [] });
+      expect(normalizeExampleOutput(null)).toEqual([]);
+      expect(normalizeExampleOutput(undefined)).toEqual([]);
+      expect(normalizeExampleOutput(123)).toEqual([]);
     });
 
     it("should increment copy count", async () => {
@@ -97,7 +96,7 @@ describe("New Frontend Dynamic Mock APIs Tests", () => {
           prompt_content: "foo",
           use_case: "bar",
           example_input: "baz",
-          example_output: { outputText: "qux", outputImages: [] },
+          example_output: [{ type: "text", data: { context: "qux" }, seq: 0 }],
           category_id: "cat-backend-uuid-0000-000000000002",
           tags: [],
           source_url: "",

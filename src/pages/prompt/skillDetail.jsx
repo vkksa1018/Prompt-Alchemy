@@ -6,6 +6,7 @@ import {
   getPromptById,
   getPublishedPrompts,
   incrementCopyCount,
+  normalizeExampleOutput,
 } from "../../api/promptApi";
 import { Heart, Undo2 } from "lucide-react";
 
@@ -69,23 +70,9 @@ export default function SkillDetail() {
     toggleFavorite(id);
   };
 
-  const exampleOutputText =
-    typeof promptData?.exampleOutput === "string"
-      ? promptData.exampleOutput
-      : promptData?.exampleOutput?.outputText || "";
-
-  const exampleOutputImages = Array.isArray(
-    promptData?.exampleOutput?.outputImages
-  )
-    ? promptData.exampleOutput.outputImages.filter((image) => image?.url)
-    : [];
-
-  const isVideoMedia = (media = {}) => {
-    const url = media.url || "";
-    const explicitVideo = media.type === "video";
-    const videoExtPattern = /\.(mp4|webm|ogg|mov|m4v)(\?|#|$)/i;
-    return explicitVideo || videoExtPattern.test(url);
-  };
+  const exampleOutputBlocks = Array.isArray(promptData?.exampleOutput)
+    ? promptData.exampleOutput
+    : normalizeExampleOutput(promptData?.exampleOutput);
 
   // 讓promptContent的內容透過 [...],{...}有不同顏色
   const renderPromptContent = (content) => {
@@ -431,46 +418,111 @@ export default function SkillDetail() {
                   data-pencil-name="Example Box"
                   className="box-border w-full h-fit shrink-0 flex flex-col gap-4  px-4.5 py-12 justify-start items-start bg-[#080C12] border border-[#00FFFF]/50 rounded-[18px]"
                 >
-                  {exampleOutputText ? (
-                    <pre
-                      data-pencil-name="Example Code"
-                      className="text-[14px] sm:text-[14px]/[22px] box-border w-full text-[#E0F0E8] font-normal text-left whitespace-pre-wrap wrap-break-word "
-                    >
-                      {exampleOutputText}
-                    </pre>
-                  ) : null}
-                  {exampleOutputImages.length > 0 ? (
-                    <div
-                      className={`box-border w-full grid grid-cols-1 ${exampleOutputImages.length > 1 ? "sm:grid-cols-2" : ""} gap-4`}
-                    >
-                      {exampleOutputImages.map((image, index) => (
-                        <figure
-                          key={`${image.url}-${index}`}
-                          className="box-border w-full flex flex-col gap-2"
-                        >
-                          {isVideoMedia(image) ? (
+                  {exampleOutputBlocks.length > 0 ? (
+                    exampleOutputBlocks.map((block, index) => {
+                      const rawType = block?.type || "text";
+                      const context = block?.data?.context || "";
+                      const alt = block?.data?.alt || "";
+                      const caption = block?.data?.caption || "";
+
+                      if (!context) return null;
+
+                      // Resolve base path for relative / static assets
+                      const resolveAssetUrl = (url = "") => {
+                        if (!url) return "";
+                        if (/^(https?:|data:|blob:|\/\/)/i.test(url)) return url;
+                        const baseUrl = import.meta.env.BASE_URL || "/";
+                        if (url.startsWith("/Prompt-Alchemy/")) {
+                          const relative = url.replace(/^\/Prompt-Alchemy\//, "");
+                          return `${baseUrl.endsWith("/") ? baseUrl : baseUrl + "/"}${relative}`;
+                        }
+                        return url;
+                      };
+
+                      const resolvedUrl = resolveAssetUrl(context);
+                      const isVideo =
+                        rawType === "video" ||
+                        /\.(mp4|webm|ogg|mov|m4v)(\?|#|$)/i.test(context);
+
+                      if (rawType === "text") {
+                        return (
+                          <pre
+                            key={index}
+                            data-pencil-name={`Example Block Text ${index}`}
+                            className="text-[14px] sm:text-[14px]/[22px] box-border w-full text-[#E0F0E8] font-normal text-left whitespace-pre-wrap wrap-break-word"
+                          >
+                            {context}
+                          </pre>
+                        );
+                      }
+
+                      if (isVideo) {
+                        return (
+                          <figure
+                            key={index}
+                            className="box-border w-full flex flex-col gap-2"
+                          >
                             <video
-                              src={image.url}
+                              src={resolvedUrl}
                               controls
-                              preload="metadata"
+                              preload="auto"
                               playsInline
-                              className="w-full rounded-xl border border-[#00FFFF]/30 bg-[#05080C] object-contain"
+                              className="w-full rounded-xl border border-[#00FFFF]/30 bg-[#05080C] object-contain max-h-[500px]"
                             />
-                          ) : (
+                            {caption ? (
+                              <figcaption className="text-[12px]/[18px] text-[#7DCEA0]">
+                                {caption}
+                              </figcaption>
+                            ) : null}
+                          </figure>
+                        );
+                      }
+
+                      if (rawType === "image") {
+                        return (
+                          <figure
+                            key={index}
+                            className="box-border w-full flex flex-col gap-2"
+                          >
                             <img
-                              src={image.url}
-                              alt={image.alt || `example-output-${index + 1}`}
-                              className="w-full rounded-xl border border-[#00FFFF]/30 bg-[#05080C] object-contain"
+                              src={resolvedUrl}
+                              alt={alt || `example-output-${index + 1}`}
+                              className="w-full rounded-xl border border-[#00FFFF]/30 bg-[#05080C] object-contain max-h-[500px]"
                             />
-                          )}
-                          {image.caption ? (
-                            <figcaption className="text-[12px]/[18px] text-[#7DCEA0]">
-                              {image.caption}
-                            </figcaption>
-                          ) : null}
-                        </figure>
-                      ))}
-                    </div>
+                            {caption ? (
+                              <figcaption className="text-[12px]/[18px] text-[#7DCEA0]">
+                                {caption}
+                              </figcaption>
+                            ) : null}
+                          </figure>
+                        );
+                      }
+
+                      if (rawType === "html") {
+                        return (
+                          <figure
+                            key={index}
+                            className="box-border w-full flex flex-col gap-2"
+                          >
+                            <div className="w-full rounded-xl border border-[#00FFFF]/30 overflow-hidden bg-white">
+                              <iframe
+                                src={resolvedUrl}
+                                title={alt || `example-output-html-${index + 1}`}
+                                className="w-full h-80 border-0"
+                                sandbox="allow-scripts allow-same-origin"
+                              />
+                            </div>
+                            {caption ? (
+                              <figcaption className="text-[12px]/[18px] text-[#7DCEA0]">
+                                {caption}
+                              </figcaption>
+                            ) : null}
+                          </figure>
+                        );
+                      }
+
+                      return null;
+                    })
                   ) : null}
                 </div>
               </div>

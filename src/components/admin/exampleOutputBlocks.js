@@ -28,20 +28,29 @@ export function createEmptyBlock() {
   return makeBlock("text", "");
 }
 
+function isVideoUrl(url = "") {
+  return /\.(mp4|webm|ogg|mov|m4v)(\?|#|$)/i.test(url);
+}
+
 export function toBlocks(exampleOutput) {
   if (typeof exampleOutput === "string") {
     return exampleOutput.trim() === "" ? [] : [makeBlock("text", exampleOutput)];
   }
 
   if (Array.isArray(exampleOutput)) {
-    return exampleOutput.map((block) =>
-      makeBlock(
-        block?.type || "text",
-        block?.data?.context || "",
+    return exampleOutput.map((block) => {
+      const context = block?.data?.context || "";
+      let type = block?.type || "text";
+      if (type === "image" && isVideoUrl(context)) {
+        type = "video";
+      }
+      return makeBlock(
+        type,
+        context,
         block?.data?.alt || "",
         block?.data?.caption || "",
-      ),
-    );
+      );
+    });
   }
 
   if (exampleOutput && typeof exampleOutput === "object") {
@@ -56,7 +65,8 @@ export function toBlocks(exampleOutput) {
     images.forEach((image) => {
       // 舊資料常有一筆 url 為空的佔位圖，不該帶進表單。
       if (!image?.url) return;
-      blocks.push(makeBlock("image", image.url, image.alt || "", image.caption || ""));
+      const type = isVideoUrl(image.url) ? "video" : "image";
+      blocks.push(makeBlock(type, image.url, image.alt || "", image.caption || ""));
     });
     return blocks;
   }

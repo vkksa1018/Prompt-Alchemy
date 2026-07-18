@@ -1,5 +1,6 @@
 import { storage } from "../utils/storage";
 import { skillItemsTable, parametersTable } from "./mockData";
+import { toBlocks, toPayload } from "../components/admin/exampleOutputBlocks";
 
 const SKILLS_KEY = "admin_skills";
 const PARAMETERS_KEY = "admin_parameters";
@@ -8,7 +9,16 @@ function seedSkills() {
   const existing = storage.get(SKILLS_KEY);
   if (existing && existing.length > 0 && "is_active" in existing[0]) {
     let updated = false;
-    const merged = [...existing];
+    const merged = existing.map((storedItem) => {
+      const seedItem = skillItemsTable.find((s) => s.id === storedItem.id);
+      if (seedItem) {
+        if (!Array.isArray(storedItem.example_output) && Array.isArray(seedItem.example_output)) {
+          updated = true;
+          return { ...storedItem, example_output: seedItem.example_output };
+        }
+      }
+      return storedItem;
+    });
     skillItemsTable.forEach((item) => {
       if (!merged.some((s) => s.id === item.id)) {
         merged.push({ ...item });
@@ -63,24 +73,7 @@ export function getParameterName(id) {
 }
 
 export function normalizeExampleOutput(exampleOutput) {
-  if (typeof exampleOutput === "string") {
-    return {
-      outputText: exampleOutput,
-      outputImages: [],
-    };
-  }
-  if (exampleOutput && typeof exampleOutput === "object") {
-    return {
-      outputText: exampleOutput.outputText || "",
-      outputImages: Array.isArray(exampleOutput.outputImages)
-        ? exampleOutput.outputImages
-        : [],
-    };
-  }
-  return {
-    outputText: "",
-    outputImages: [],
-  };
+  return toPayload(toBlocks(exampleOutput));
 }
 
 export function getPublishedPrompts() {
@@ -113,7 +106,7 @@ export function getPublishedPrompts() {
         promptContent: item.prompt_content,
         useCase: item.use_case,
         exampleInput: item.example_input,
-        exampleOutput: normalizeExampleOutput(item.example_output),
+        exampleOutput: normalizeExampleOutput(item.example_output ?? item.exampleOutput),
         categoryId: item.category_id,
         tags: tagNames,
         sourceUrl: item.source_url,
@@ -164,7 +157,7 @@ export function getPromptById(id) {
     promptContent: item.prompt_content,
     useCase: item.use_case,
     exampleInput: item.example_input,
-    exampleOutput: normalizeExampleOutput(item.example_output),
+    exampleOutput: normalizeExampleOutput(item.example_output ?? item.exampleOutput),
     categoryId: item.category_id,
     tags: tagNames,
     sourceUrl: item.source_url,
