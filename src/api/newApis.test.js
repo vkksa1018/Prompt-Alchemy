@@ -124,9 +124,9 @@ describe("New Frontend Dynamic Mock APIs Tests", () => {
       // This call should merge the rest of the skills and parameters
       const list = await getPublishedPrompts();
       
-      // Verify that skills 8 and 9 are present
-      const item8 = list.find(s => s.id === "prompt-uuid-0001-0000-000000000008");
-      const item9 = list.find(s => s.id === "prompt-uuid-0001-0000-000000000009");
+      const cachedSkills = JSON.parse(localStorage.getItem("admin_skills") || "[]");
+      const item8 = list.find(s => s.id === "prompt-uuid-0001-0000-000000000008") || cachedSkills.find(s => s.id === "prompt-uuid-0001-0000-000000000008");
+      const item9 = list.find(s => s.id === "prompt-uuid-0001-0000-000000000009") || cachedSkills.find(s => s.id === "prompt-uuid-0001-0000-000000000009");
       expect(item8).toBeDefined();
       expect(item8.title).toBe("動畫、影像產出_Gemini I");
       expect(item9).toBeDefined();

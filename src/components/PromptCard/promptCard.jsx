@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { copyToClipboard } from "../../utils/copyToClipboard";
 import useAuth from "../../hooks/useAuth";
-import { getParameterName } from "../../api/mockData";
+import { getParameterName } from "../../api/promptApi";
 import { Heart } from "lucide-react";
 import { getTagStyles } from "../../utils/tagStyles";
 
@@ -41,10 +41,9 @@ export default function PromptCard({ prompt, hideStats = false }) {
   const categoryName =
     prompt?.category || getParameterName(prompt?.categoryId) || "其他";
   const tags = (prompt?.tags || []).map((t) => {
-    if (typeof t === "string" && t.includes("uuid")) {
-      return getParameterName(t);
-    }
-    return t;
+    if (typeof t !== "string") return t;
+    const name = getParameterName(t);
+    return name || t;
   });
 
   // const getCategoryIcon = (category) => {

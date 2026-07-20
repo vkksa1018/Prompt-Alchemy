@@ -436,6 +436,10 @@ export function updateSkill(id, data) {
     updated.updatedAt = nowIso();
     return updated;
   });
+  if (!updated && data && data.isActive !== undefined) {
+    updated = { id, isActive: data.isActive, is_active: data.isActive, updatedAt: nowIso() };
+    next.push(updated);
+  }
   writeSkills(next);
   return updated ? resolve(updated) : Promise.reject(new Error("找不到資料"));
 }

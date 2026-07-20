@@ -1,3 +1,4 @@
+import { apiRequest } from "./apiClient";
 import { storage } from "../utils/storage";
 import { skillItemsTable, parametersTable } from "./mockData";
 import { toBlocks, toPayload } from "../components/admin/exampleOutputBlocks";
@@ -56,14 +57,45 @@ function seedParameters() {
   return parametersTable;
 }
 
-export function getCategories() {
-  const params = seedParameters();
-  return Promise.resolve(params.filter((p) => p.type === "category" && p.is_active));
+export async function syncRemoteParameters() {
+  try {
+    const res = await apiRequest("/admin/parameters", { method: "GET" });
+    if (res && res.status === "success" && Array.isArray(res.data)) {
+      const existing = seedParameters();
+      const merged = [...existing];
+      res.data.forEach((p) => {
+        const idx = merged.findIndex((item) => item.id === p.id);
+        const pObj = {
+          id: p.id,
+          type: p.type,
+          name: p.name,
+          memo: p.memo || p.description || "",
+          is_active: p.isActive ?? p.is_active ?? true,
+          sort_order: p.sortOrder ?? p.sort_order ?? 0,
+        };
+        if (idx >= 0) {
+          merged[idx] = { ...merged[idx], ...pObj };
+        } else {
+          merged.push(pObj);
+        }
+      });
+      storage.set(PARAMETERS_KEY, merged);
+      return merged;
+    }
+  } catch (err) {
+    // Ignore error if backend parameters not accessible
+  }
+  return seedParameters();
 }
 
-export function getTags() {
-  const params = seedParameters();
-  return Promise.resolve(params.filter((p) => p.type === "tag" && p.is_active));
+export async function getCategories() {
+  const params = await syncRemoteParameters();
+  return params.filter((p) => p.type === "category" && (p.is_active ?? p.isActive ?? true));
+}
+
+export async function getTags() {
+  const params = await syncRemoteParameters();
+  return params.filter((p) => p.type === "tag" && (p.is_active ?? p.isActive ?? true));
 }
 
 export function getParameterName(id) {
@@ -76,7 +108,106 @@ export function normalizeExampleOutput(exampleOutput) {
   return toPayload(toBlocks(exampleOutput));
 }
 
-export function getPublishedPrompts() {
+export async function getPublishedPrompts(queryParams = {}) {
+  await syncRemoteParameters();
+  try {
+    let url = "/prompts";
+    const searchParams = new URLSearchParams();
+    if (queryParams.category) searchParams.append("category", queryParams.category);
+    if (queryParams.tag) searchParams.append("tag", queryParams.tag);
+    if (queryParams.search) searchParams.append("search", queryParams.search);
+
+    const queryString = searchParams.toString();
+    if (queryString) {
+      url += `?${queryString}`;
+    }
+
+    const res = await apiRequest(url, { method: "GET" });
+    if (res && res.status === "success" && Array.isArray(res.data)) {
+      const params = seedParameters();
+      const storedSkills = seedSkills();
+      const getParamName = (id) => {
+        const p = params.find((item) => item.id === id);
+        return p ? p.name : "";
+      };
+
+      const remoteList = res.data
+        .filter((item) => {
+          const localItem = storedSkills.find((s) => s.id === item.id);
+          if (localItem && (localItem.isActive === false || localItem.is_active === false)) {
+            return false;
+          }
+          return true;
+        })
+        .map((item) => {
+        const localItem = storedSkills.find((s) => s.id === item.id);
+        const seedItem = skillItemsTable.find((s) => s.id === item.id);
+        const baseFav = item.favoriteCount ?? item.favorite_count ?? 0;
+        const favCount = localItem && typeof localItem.favorite_count === "number"
+          ? (seedItem ? localItem.favorite_count : baseFav + localItem.favorite_count)
+          : baseFav;
+        const cpCount = localItem && typeof localItem.copy_count === "number"
+          ? Math.max(localItem.copy_count, item.copyCount ?? item.copy_count ?? 0)
+          : (item.copyCount ?? item.copy_count ?? 0);
+
+        const categoryName = item.category || getParamName(item.categoryId || item.category_id);
+        const tagNames = (item.tags || []).map((t) => {
+          if (typeof t !== "string") return t;
+          const name = getParamName(t);
+          return name || t;
+        });
+        const createdDate = item.createdAt
+          ? item.createdAt.split("T")[0]
+          : item.created_at
+          ? item.created_at.split("T")[0]
+          : "";
+
+        const isNew =
+          item.isNew ??
+          (item.createdAt || item.created_at
+            ? new Date(item.createdAt || item.created_at) >= new Date("2026-06-25T00:00:00Z")
+            : false);
+        const isHot = item.isHot ?? (favCount >= 20);
+
+        return {
+          id: item.id,
+          title: item.title,
+          slug: item.slug,
+          intro: item.intro,
+          contentTypeId: item.contentTypeId || item.content_type_id,
+          modelType: item.modelType || item.model_type,
+          promptContent: item.promptContent || item.prompt_content,
+          useCase: item.useCase || item.use_case,
+          exampleInput: item.exampleInput || item.example_input,
+          exampleOutput: normalizeExampleOutput(item.exampleOutput ?? item.exampleOutput),
+          categoryId: item.categoryId || item.category_id,
+          tags: tagNames,
+          sourceUrl: item.sourceUrl || item.source_url,
+          copyCount: cpCount,
+          favoriteCount: favCount,
+          createdAt: item.createdAt || item.created_at,
+          updatedAt: item.updatedAt || item.updated_at,
+          isActive: item.isActive ?? item.is_active ?? true,
+
+          category: categoryName,
+          date: createdDate,
+          isNew,
+          isHot,
+          likes: favCount,
+          uses: cpCount,
+          description: item.intro,
+          content: item.promptContent || item.prompt_content,
+          exampleContent: item.exampleInput || item.example_input,
+        };
+      });
+
+      return remoteList;
+    }
+  } catch (err) {
+    console.warn("Backend /prompts API notice, falling back to mock data:", err.message);
+  }
+
+  // Fallback to local mock data
   const skills = seedSkills();
   const params = seedParameters();
 
@@ -89,12 +220,11 @@ export function getPublishedPrompts() {
     .filter((s) => s.is_active)
     .map((item) => {
       const categoryName = getParamName(item.category_id);
-      const tagNames = (item.tags || []).map((tagId) => getParamName(tagId));
-      const createdDate = item.created_at.split("T")[0];
+      const tagNames = (item.tags || []).map((tagId) => getParamName(tagId) || tagId);
+      const createdDate = item.created_at ? item.created_at.split("T")[0] : "";
 
-      // Calculate dynamic tags
       const isNew = new Date(item.created_at) >= new Date("2026-06-25T00:00:00Z");
-      const isHot = item.favorite_count >= 20;
+      const isHot = (item.favorite_count || 0) >= 20;
 
       return {
         id: item.id,
@@ -124,30 +254,81 @@ export function getPublishedPrompts() {
         uses: item.copy_count,
         description: item.intro,
         content: item.prompt_content,
+        exampleContent: item.example_input,
       };
     });
 
-  return Promise.resolve(list);
+  return list;
 }
 
-export function getPromptById(id) {
+export async function getPromptById(id) {
+  try {
+    const res = await apiRequest(`/prompts/${id}`, { method: "GET" });
+    if (res && res.status === "success" && res.data) {
+      const item = res.data;
+      const params = seedParameters();
+      const getParamName = (paramId) => {
+        const p = params.find((pItem) => pItem.id === paramId);
+        return p ? p.name : "";
+      };
+
+      const categoryName = item.category || getParamName(item.categoryId || item.category_id);
+      const tagNames = (item.tags || []).map((t) => {
+        if (typeof t !== "string") return t;
+        const name = getParamName(t);
+        return name || t;
+      });
+
+      return {
+        id: item.id,
+        title: item.title,
+        slug: item.slug,
+        intro: item.intro,
+        contentTypeId: item.contentTypeId || item.content_type_id,
+        modelType: item.modelType || item.model_type,
+        promptContent: item.promptContent || item.prompt_content,
+        useCase: item.useCase || item.use_case,
+        exampleInput: item.exampleInput || item.example_input,
+        exampleOutput: normalizeExampleOutput(item.exampleOutput ?? item.example_output),
+        categoryId: item.categoryId || item.category_id,
+        tags: tagNames,
+        sourceUrl: item.sourceUrl || item.source_url,
+        copyCount: item.copyCount ?? item.copy_count ?? 0,
+        favoriteCount: item.favoriteCount ?? item.favorite_count ?? 0,
+        createdAt: item.createdAt || item.created_at,
+        updatedAt: item.updatedAt || item.updated_at,
+        isActive: item.isActive ?? item.is_active ?? true,
+
+        category: categoryName,
+        description: item.intro,
+        content: item.promptContent || item.prompt_content,
+        exampleContent: item.exampleInput || item.example_input,
+        phoneDesc: item.intro,
+        phoneCode: (item.promptContent || item.prompt_content || "").slice(0, 40),
+      };
+    }
+  } catch (err) {
+    console.warn(`Backend /prompts/${id} API notice, falling back to mock data:`, err.message);
+  }
+
+  // Fallback to local mock data
   const skills = seedSkills();
   const params = seedParameters();
 
-  const getParamName = (id) => {
-    const p = params.find((item) => item.id === id);
+  const getParamName = (paramId) => {
+    const p = params.find((item) => item.id === paramId);
     return p ? p.name : "";
   };
 
   const item = skills.find(
     (s) => s.id === id && s.is_active
   );
-  if (!item) return Promise.resolve(null);
+  if (!item) return null;
 
   const categoryName = getParamName(item.category_id);
   const tagNames = (item.tags || []).map((tagId) => getParamName(tagId));
 
-  const promptData = {
+  return {
     id: item.id,
     title: item.title,
     slug: item.slug,
@@ -169,15 +350,15 @@ export function getPromptById(id) {
 
     category: categoryName,
     description: item.intro,
-    exampleContent: item.example_input, // Maps to exampleInput in the schema
+    content: item.prompt_content,
+    exampleContent: item.example_input,
     phoneDesc: item.intro,
-    phoneCode: item.prompt_content.slice(0, 40),
+    phoneCode: item.prompt_content ? item.prompt_content.slice(0, 40) : "",
   };
-
-  return Promise.resolve(promptData);
 }
 
-export function incrementCopyCount(id) {
+export async function incrementCopyCount(id) {
+  // Update local storage sync as well for fallback / UI state
   const skills = seedSkills();
   const list = skills.map((s) => {
     if (s.id === id) {
@@ -186,17 +367,33 @@ export function incrementCopyCount(id) {
     return s;
   });
   storage.set(SKILLS_KEY, list);
-  return Promise.resolve(true);
+
+  try {
+    const res = await apiRequest(`/prompts/${id}/copy`, { method: "POST" });
+    if (res && res.status === "success") {
+      return res.data || true;
+    }
+  } catch (err) {
+    console.warn(`Backend /prompts/${id}/copy API notice:`, err.message);
+  }
+
+  return true;
 }
 
 export function updateFavoriteCount(id, amount) {
-  const skills = seedSkills();
-  const list = skills.map((s) => {
+  const existing = storage.get(SKILLS_KEY) || seedSkills();
+  let found = false;
+  const list = existing.map((s) => {
     if (s.id === id) {
+      found = true;
       return { ...s, favorite_count: Math.max(0, (s.favorite_count || 0) + amount) };
     }
     return s;
   });
+  if (!found) {
+    list.push({ id, favorite_count: Math.max(0, amount) });
+  }
   storage.set(SKILLS_KEY, list);
   return Promise.resolve(true);
 }
+
