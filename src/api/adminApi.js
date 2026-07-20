@@ -11,6 +11,7 @@ import {
   skillItemsTable,
   usersTable,
 } from "./mockData";
+import { apiRequest } from "./apiClient";
 
 const PARAMETERS_KEY = "admin_parameters";
 const SKILLS_KEY = "admin_skills";
@@ -164,11 +165,9 @@ function resolve(value) {
 
 // ---- 統一參數管理 (Parameters CRUD) -------------------------------------------
 
-export function getParametersByType(type) {
-  const list = readParameters()
-    .filter((p) => p.type === type)
-    .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
-  return resolve(list);
+export async function getParametersByType(type) {
+  const result = await apiRequest(`/admin/parameters?type=${type}`);
+  return result.data;
 }
 
 // 為了相容舊版呼叫，提供別名
@@ -176,40 +175,33 @@ export function getCategories() {
   return getParametersByType("category");
 }
 
-export function createParameter(type, data) {
-  const list = readParameters();
-  const param = {
-    id: generateId(type),
-    type: type,
-    name: data.name,
-    description: data.description || "",
-    isActive: data.isActive ?? true,
-    sortOrder: list.length + 1,
-    createdAt: nowIso(),
-  };
-  writeParameters([...list, param]);
-  return resolve(param);
-}
-
-export function updateParameter(id, data) {
-  const list = readParameters();
-  let updated = null;
-  const next = list.map((p) => {
-    if (p.id !== id) return p;
-    updated = {
-      ...p,
-      name: data.name ?? p.name,
-      description: data.description ?? p.description,
-      isActive: data.isActive ?? p.isActive,
-    };
-    return updated;
+export async function createParameter(type, data) {
+  const result = await apiRequest(`/admin/parameters`, {
+    method: "POST",
+    body: {
+      type,
+      name: data.name,
+      description: data.description || "",
+      isActive: data.isActive ?? true,
+      sortOrder: data.sortOrder
+    },
   });
-  writeParameters(next);
-  return updated ? resolve(updated) : Promise.reject(new Error("找不到參數"));
+  return result.data;
 }
 
-export function disableParameter(id) {
-  return updateParameter(id, { isActive: false });
+export async function updateParameter(id, data) {
+  const result = await apiRequest(`/admin/parameters/${id}`, {
+    method: "PUT",
+    body: data,
+  });
+  return result.data;
+}
+
+export async function disableParameter(id) {
+  const result = await apiRequest(`/admin/parameters/${id}`, {
+    method: "DELETE",
+  });
+  return result.data;
 }
 
 // ---- 顯示用名稱解析（同步，供 Table 渲染用）-----------------------------------
