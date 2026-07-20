@@ -120,7 +120,7 @@ describe("toPayload", () => {
     expect(result).toEqual([{ type: "text", data: { context: "文字" }, seq: 0 }]);
   });
 
-  it("keeps alt and caption on image, video and html blocks", () => {
+  it("keeps alt and caption on image and video blocks", () => {
     const result = toPayload([
       { type: "image", data: { context: "https://a.png", alt: "圖", caption: "說明" } },
       { type: "video", data: { context: "https://v.mp4", alt: "影", caption: "片" } },
@@ -130,7 +130,7 @@ describe("toPayload", () => {
     expect(result).toEqual([
       { type: "image", data: { context: "https://a.png", alt: "圖", caption: "說明" }, seq: 0 },
       { type: "video", data: { context: "https://v.mp4", alt: "影", caption: "片" }, seq: 1 },
-      { type: "html", data: { context: "https://p.html", alt: "頁", caption: "面" }, seq: 2 },
+      { type: "html", data: { context: "https://p.html" }, seq: 2 },
     ]);
   });
 
