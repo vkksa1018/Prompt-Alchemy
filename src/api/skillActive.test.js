@@ -5,6 +5,7 @@ import {
   updateSkill,
   setSkillActive,
   getSkillById,
+  loginAdmin,
 } from "./adminApi";
 import { getPublishedPrompts } from "./promptApi";
 
@@ -29,33 +30,47 @@ describe("isSkillActive", () => {
   });
 });
 
+const mockSkillData = (overrides = {}) => ({
+  title: "測試",
+  slug: `test-slug-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+  intro: "測試簡介",
+  contentTypeId: "content-type-uuid-0000-000000000001",
+  categoryId: "cat-writing-uuid-0000-000000000001",
+  promptContent: "You are a helpful assistant.",
+  useCase: "日常輔助",
+  exampleInput: "你好",
+  exampleOutput: "你好！請問有什麼我可以協助您的？",
+  ...overrides,
+});
+
 describe("skill active field writes", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     localStorage.clear();
+    await loginAdmin({ email: "admin@example.com", password: "Admin1234" });
   });
 
   it("createSkill writes both isActive and is_active", async () => {
-    const skill = await createSkill({ title: "測試", isActive: false });
+    const skill = await createSkill(mockSkillData({ isActive: false }));
 
     expect(skill.isActive).toBe(false);
     expect(skill.is_active).toBe(false);
   });
 
   it("createSkill defaults to active when isActive is omitted", async () => {
-    const skill = await createSkill({ title: "測試" });
+    const skill = await createSkill(mockSkillData());
 
     expect(skill.isActive).toBe(true);
     expect(skill.is_active).toBe(true);
   });
 
   it("createSkill no longer stores a status field", async () => {
-    const skill = await createSkill({ title: "測試" });
+    const skill = await createSkill(mockSkillData());
 
     expect(skill.status).toBeUndefined();
   });
 
   it("updateSkill keeps both fields in sync", async () => {
-    const created = await createSkill({ title: "測試" });
+    const created = await createSkill(mockSkillData());
     const updated = await updateSkill(created.id, { isActive: false });
 
     expect(updated.isActive).toBe(false);
@@ -63,7 +78,7 @@ describe("skill active field writes", () => {
   });
 
   it("setSkillActive deactivates a skill", async () => {
-    const created = await createSkill({ title: "測試" });
+    const created = await createSkill(mockSkillData());
     await setSkillActive(created.id, false);
     const found = await getSkillById(created.id);
 
@@ -71,7 +86,7 @@ describe("skill active field writes", () => {
   });
 
   it("setSkillActive reactivates a deactivated skill", async () => {
-    const created = await createSkill({ title: "測試", isActive: false });
+    const created = await createSkill(mockSkillData({ isActive: false }));
     await setSkillActive(created.id, true);
     const found = await getSkillById(created.id);
 
@@ -80,8 +95,9 @@ describe("skill active field writes", () => {
 });
 
 describe("deactivating a seeded skill hides it from the public list", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     localStorage.clear();
+    await loginAdmin({ email: "admin@example.com", password: "Admin1234" });
   });
 
   // 這是本次設計的核心風險：seed 資料只有 snake_case 的 is_active，

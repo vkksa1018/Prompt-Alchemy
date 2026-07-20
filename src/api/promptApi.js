@@ -109,7 +109,7 @@ export function normalizeExampleOutput(exampleOutput) {
 }
 
 export async function getPublishedPrompts(queryParams = {}) {
-  await syncRemoteParameters();
+  const params = await syncRemoteParameters();
   try {
     let url = "/prompts";
     const searchParams = new URLSearchParams();
@@ -124,7 +124,6 @@ export async function getPublishedPrompts(queryParams = {}) {
 
     const res = await apiRequest(url, { method: "GET" });
     if (res && res.status === "success" && Array.isArray(res.data)) {
-      const params = seedParameters();
       const storedSkills = seedSkills();
       const getParamName = (id) => {
         const p = params.find((item) => item.id === id);
@@ -140,66 +139,68 @@ export async function getPublishedPrompts(queryParams = {}) {
           return true;
         })
         .map((item) => {
-        const localItem = storedSkills.find((s) => s.id === item.id);
-        const seedItem = skillItemsTable.find((s) => s.id === item.id);
-        const baseFav = item.favoriteCount ?? item.favorite_count ?? 0;
-        const favCount = localItem && typeof localItem.favorite_count === "number"
-          ? (seedItem ? localItem.favorite_count : baseFav + localItem.favorite_count)
-          : baseFav;
-        const cpCount = localItem && typeof localItem.copy_count === "number"
-          ? Math.max(localItem.copy_count, item.copyCount ?? item.copy_count ?? 0)
-          : (item.copyCount ?? item.copy_count ?? 0);
+          const localItem = storedSkills.find((s) => s.id === item.id);
+          const seedItem = skillItemsTable.find((s) => s.id === item.id);
+          const baseFav = item.favoriteCount ?? item.favorite_count ?? 0;
+          const seedFav = seedItem ? seedItem.favorite_count || 0 : 0;
+          const localFavDelta = localItem && typeof localItem.favorite_count === "number"
+            ? localItem.favorite_count - seedFav
+            : 0;
+          const favCount = Math.max(0, baseFav + localFavDelta);
+          const cpCount = localItem && typeof localItem.copy_count === "number"
+            ? Math.max(localItem.copy_count, item.copyCount ?? item.copy_count ?? 0)
+            : (item.copyCount ?? item.copy_count ?? 0);
 
-        const categoryName = item.category || getParamName(item.categoryId || item.category_id);
-        const tagNames = (item.tags || []).map((t) => {
-          if (typeof t !== "string") return t;
-          const name = getParamName(t);
-          return name || t;
+          const categoryName = item.category || getParamName(item.categoryId || item.category_id);
+          const tagNames = (item.tags || []).map((t) => {
+            if (typeof t !== "string") return t;
+            const name = getParamName(t);
+            return name || t;
+          });
+          const createdDate = item.createdAt
+            ? item.createdAt.split("T")[0]
+            : item.created_at
+            ? item.created_at.split("T")[0]
+            : "";
+
+          const isNew =
+            item.isNew ??
+            (item.createdAt || item.created_at
+              ? new Date(item.createdAt || item.created_at) >= new Date("2026-06-25T00:00:00Z")
+              : false);
+          const isHot = item.isHot ?? (favCount >= 20);
+
+          return {
+            id: item.id,
+            title: item.title,
+            slug: item.slug,
+            intro: item.intro,
+            contentTypeId: item.contentTypeId || item.content_type_id,
+            modelType: item.modelType || item.model_type,
+            promptContent: item.promptContent || item.prompt_content,
+            useCase: item.useCase || item.use_case,
+            exampleInput: item.exampleInput || item.example_input,
+            exampleOutput: normalizeExampleOutput(item.exampleOutput ?? item.example_output),
+            categoryId: item.categoryId || item.category_id,
+            tags: tagNames,
+            sourceUrl: item.sourceUrl || item.source_url,
+            copyCount: cpCount,
+            favoriteCount: favCount,
+            createdAt: item.createdAt || item.created_at,
+            updatedAt: item.updatedAt || item.updated_at,
+            isActive: item.isActive ?? item.is_active ?? true,
+
+            category: categoryName,
+            date: createdDate,
+            isNew,
+            isHot,
+            likes: favCount,
+            uses: cpCount,
+            description: item.intro,
+            content: item.promptContent || item.prompt_content,
+            exampleContent: item.exampleInput || item.example_input,
+          };
         });
-        const createdDate = item.createdAt
-          ? item.createdAt.split("T")[0]
-          : item.created_at
-          ? item.created_at.split("T")[0]
-          : "";
-
-        const isNew =
-          item.isNew ??
-          (item.createdAt || item.created_at
-            ? new Date(item.createdAt || item.created_at) >= new Date("2026-06-25T00:00:00Z")
-            : false);
-        const isHot = item.isHot ?? (favCount >= 20);
-
-        return {
-          id: item.id,
-          title: item.title,
-          slug: item.slug,
-          intro: item.intro,
-          contentTypeId: item.contentTypeId || item.content_type_id,
-          modelType: item.modelType || item.model_type,
-          promptContent: item.promptContent || item.prompt_content,
-          useCase: item.useCase || item.use_case,
-          exampleInput: item.exampleInput || item.example_input,
-          exampleOutput: normalizeExampleOutput(item.exampleOutput ?? item.exampleOutput),
-          categoryId: item.categoryId || item.category_id,
-          tags: tagNames,
-          sourceUrl: item.sourceUrl || item.source_url,
-          copyCount: cpCount,
-          favoriteCount: favCount,
-          createdAt: item.createdAt || item.created_at,
-          updatedAt: item.updatedAt || item.updated_at,
-          isActive: item.isActive ?? item.is_active ?? true,
-
-          category: categoryName,
-          date: createdDate,
-          isNew,
-          isHot,
-          likes: favCount,
-          uses: cpCount,
-          description: item.intro,
-          content: item.promptContent || item.prompt_content,
-          exampleContent: item.exampleInput || item.example_input,
-        };
-      });
 
       return remoteList;
     }
@@ -209,10 +210,10 @@ export async function getPublishedPrompts(queryParams = {}) {
 
   // Fallback to local mock data
   const skills = seedSkills();
-  const params = seedParameters();
+  const fallbackParams = seedParameters();
 
   const getParamName = (id) => {
-    const p = params.find((item) => item.id === id);
+    const p = fallbackParams.find((item) => item.id === id);
     return p ? p.name : "";
   };
 
@@ -262,11 +263,11 @@ export async function getPublishedPrompts(queryParams = {}) {
 }
 
 export async function getPromptById(id) {
+  const params = await syncRemoteParameters();
   try {
     const res = await apiRequest(`/prompts/${id}`, { method: "GET" });
     if (res && res.status === "success" && res.data) {
       const item = res.data;
-      const params = seedParameters();
       const getParamName = (paramId) => {
         const p = params.find((pItem) => pItem.id === paramId);
         return p ? p.name : "";
@@ -313,10 +314,10 @@ export async function getPromptById(id) {
 
   // Fallback to local mock data
   const skills = seedSkills();
-  const params = seedParameters();
+  const fallbackParams = seedParameters();
 
   const getParamName = (paramId) => {
-    const p = params.find((item) => item.id === paramId);
+    const p = fallbackParams.find((item) => item.id === paramId);
     return p ? p.name : "";
   };
 

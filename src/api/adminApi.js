@@ -350,7 +350,8 @@ export async function getSkills(filters = {}) {
 
 export async function getSkillById(id) {
   const result = await apiRequest(`/admin/skills/${id}`);
-  return result.data;
+  const s = result.data;
+  return s ? { ...s, is_active: s.isActive ?? s.is_active ?? true } : s;
 }
 
 export async function createSkill(data) {
@@ -358,7 +359,8 @@ export async function createSkill(data) {
     method: "POST",
     body: data,
   });
-  return result.data;
+  const s = result.data;
+  return s ? { ...s, is_active: s.isActive ?? s.is_active ?? true } : s;
 }
 
 export async function updateSkill(id, data) {
@@ -366,7 +368,8 @@ export async function updateSkill(id, data) {
     method: "PUT",
     body: data,
   });
-  return result.data;
+  const s = result.data;
+  return s ? { ...s, is_active: s.isActive ?? s.is_active ?? true } : s;
 }
 
 export function setSkillActive(id, isActive) {
