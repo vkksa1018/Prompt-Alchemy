@@ -12,7 +12,7 @@ export const BLOCK_TYPES = [
 ];
 
 // text 只有 context；其餘型別才有 alt / caption。
-const TYPES_WITH_META = ["image", "video", "html"];
+const TYPES_WITH_META = ["image", "video"];
 
 export function hasMetaFields(type) {
   return TYPES_WITH_META.includes(type);
