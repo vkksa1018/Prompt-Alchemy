@@ -252,31 +252,54 @@ export function isSkillActive(skill) {
 
 // ---- Auth -------------------------------------------------------------------
 
-export function loginAdmin({ email, password }) {
-  const list = readUsers();
-  const user = list.find(
-    (u) => u.email === email && u.role === "admin" && (u.isActive ?? u.is_active ?? true)
-  );
+export async function loginAdmin({ email, password }) {
+  try {
+    const loginRes = await apiRequest("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    });
 
-  if (!user) {
-    return Promise.reject(new Error("帳號不存在或非管理者帳號"));
+    if (loginRes.token) {
+      localStorage.setItem("token", loginRes.token);
+    }
+
+    const userRes = await apiRequest("/auth/me", {
+      method: "GET",
+    });
+
+    if (userRes.user.role !== "admin") {
+      throw new Error("帳號不存在或非管理者帳號");
+    }
+
+    const authUser = {
+      id: userRes.user.id,
+      name: userRes.user.name,
+      email: userRes.user.email,
+      role: "admin",
+    };
+    storage.set(ADMIN_AUTH_KEY, authUser);
+    return authUser;
+  } catch (err) {
+    localStorage.removeItem("token");
+    storage.remove(ADMIN_AUTH_KEY);
+    if (err.data && err.data.message) {
+      throw new Error(err.data.message);
+    }
+    throw new Error(err.message || "登入失敗");
   }
-
-  void password;
-
-  const authUser = {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    role: "admin",
-  };
-  storage.set(ADMIN_AUTH_KEY, authUser);
-  return resolve(authUser);
 }
 
-export function logoutAdmin() {
-  storage.remove(ADMIN_AUTH_KEY);
-  return Promise.resolve(true);
+export async function logoutAdmin() {
+  try {
+    await apiRequest("/auth/logout", {
+      method: "POST",
+    });
+  } catch (err) {
+    console.warn("Logout API notice:", err.message);
+  } finally {
+    storage.remove(ADMIN_AUTH_KEY);
+    localStorage.removeItem("token");
+  }
 }
 
 export function getAdminAuth() {
@@ -285,52 +308,26 @@ export function getAdminAuth() {
 
 // ---- Users ------------------------------------------------------------------
 
-export function getUsers(role = null) {
-  let list = readUsers();
-  if (role) {
-    list = list.filter((u) => u.role === role);
-  }
-  list = list.sort(
-    (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
-  );
-  return resolve(list);
+export async function getUsers(role = null) {
+  const query = role ? `?role=${role}` : "";
+  const result = await apiRequest(`/admin/users${query}`);
+  return result.data;
 }
 
-export function createUser(data) {
-  const list = readUsers();
-  const user = {
-    id: generateId("user"),
-    name: data.name || "",
-    email: data.email || "",
-    role: data.role || "member",
-    passwordHash: "bcrypt-hash-placeholder-new",
-    password_hash: "bcrypt-hash-placeholder-new",
-    isActive: data.isActive ?? true,
-    is_active: data.isActive ?? true,
-    createdAt: nowIso(),
-    created_at: nowIso(),
-  };
-  writeUsers([user, ...list]);
-  return resolve(user);
-}
-
-export function updateUser(id, data) {
-  const list = readUsers();
-  let updated = null;
-  const next = list.map((u) => {
-    if (u.id !== id) return u;
-    updated = {
-      ...u,
-      name: data.name ?? u.name,
-      email: data.email ?? u.email,
-      role: data.role ?? u.role ?? "member",
-      isActive: data.isActive ?? u.isActive ?? true,
-      is_active: data.isActive ?? u.isActive ?? true,
-    };
-    return updated;
+export async function createUser(data) {
+  const result = await apiRequest(`/admin/users`, {
+    method: "POST",
+    body: data,
   });
-  writeUsers(next);
-  return updated ? resolve(updated) : Promise.reject(new Error("找不到會員"));
+  return result.data;
+}
+
+export async function updateUser(id, data) {
+  const result = await apiRequest(`/admin/users/${id}`, {
+    method: "PUT",
+    body: data,
+  });
+  return result.data;
 }
 
 export function disableUser(id) {
@@ -339,109 +336,37 @@ export function disableUser(id) {
 
 // ---- Skills -----------------------------------------------------------------
 
-export function getSkills(filters = {}) {
-  const { keyword, contentTypeId, categoryId, active } = filters;
-  let list = readSkills();
+export async function getSkills(filters = {}) {
+  const params = new URLSearchParams();
+  if (filters.keyword) params.append("keyword", filters.keyword);
+  if (filters.contentTypeId) params.append("contentTypeId", filters.contentTypeId);
+  if (filters.categoryId) params.append("categoryId", filters.categoryId);
+  if (filters.active) params.append("active", filters.active);
 
-  if (keyword) {
-    const q = keyword.toLowerCase();
-    list = list.filter(
-      (s) =>
-        (s.title || "").toLowerCase().includes(q) ||
-        (s.intro || "").toLowerCase().includes(q),
-    );
-  }
-  if (contentTypeId) {
-    list = list.filter((s) => s.contentTypeId === contentTypeId);
-  }
-  if (categoryId) {
-    list = list.filter((s) => s.categoryId === categoryId);
-  }
-  if (active) {
-    const wantActive = active === "active";
-    list = list.filter((s) => isSkillActive(s) === wantActive);
-  }
-
-  list = [...list].sort(
-    (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt),
-  );
-  return resolve(list);
+  const query = params.toString() ? `?${params.toString()}` : "";
+  const result = await apiRequest(`/admin/skills${query}`);
+  return result.data;
 }
 
-export function getSkillById(id) {
-  const found = readSkills().find((s) => s.id === id);
-  return found ? resolve(found) : Promise.resolve(null);
+export async function getSkillById(id) {
+  const result = await apiRequest(`/admin/skills/${id}`);
+  return result.data;
 }
 
-export function createSkill(data) {
-  const list = readSkills();
-  const timestamp = nowIso();
-  const admin = getAdminAuth();
-  const skill = {
-    id: generateId("skill"),
-    title: data.title || "",
-    slug: data.slug || "",
-    intro: data.intro || "",
-    contentTypeId: data.contentTypeId || "",
-    categoryId: data.categoryId || "",
-    modelType: data.modelType || [],
-    tags: data.tags || [],
-    promptContent: data.promptContent || "",
-    useCase: data.useCase || "",
-    exampleInput: data.exampleInput || "",
-    exampleOutput: data.exampleOutput || [],
-    userId: admin?.id || "",
-    sourceUrl: "",
-    copyCount: 0,
-    favoriteCount: 0,
-    // 兩種命名都寫：前台的 getPublishedPrompts 讀的是 snake_case 的 is_active。
-    // 只寫其中一個，停用就會在前台失效。
-    isActive: data.isActive ?? true,
-    is_active: data.isActive ?? true,
-    createdAt: timestamp,
-    updatedAt: timestamp,
-  };
-  writeSkills([skill, ...list]);
-  return resolve(skill);
-}
-
-const EDITABLE_SKILL_FIELDS = [
-  "title",
-  "slug",
-  "intro",
-  "contentTypeId",
-  "categoryId",
-  "modelType",
-  "tags",
-  "promptContent",
-  "useCase",
-  "exampleInput",
-  "exampleOutput",
-];
-
-export function updateSkill(id, data) {
-  const list = readSkills();
-  let updated = null;
-  const next = list.map((s) => {
-    if (s.id !== id) return s;
-    updated = { ...s };
-    EDITABLE_SKILL_FIELDS.forEach((field) => {
-      if (data[field] !== undefined) updated[field] = data[field];
-    });
-    // isActive 不走上面的迴圈：它得同時寫入兩種命名，否則前台讀不到。
-    if (data.isActive !== undefined) {
-      updated.isActive = data.isActive;
-      updated.is_active = data.isActive;
-    }
-    updated.updatedAt = nowIso();
-    return updated;
+export async function createSkill(data) {
+  const result = await apiRequest(`/admin/skills`, {
+    method: "POST",
+    body: data,
   });
-  if (!updated && data && data.isActive !== undefined) {
-    updated = { id, isActive: data.isActive, is_active: data.isActive, updatedAt: nowIso() };
-    next.push(updated);
-  }
-  writeSkills(next);
-  return updated ? resolve(updated) : Promise.reject(new Error("找不到資料"));
+  return result.data;
+}
+
+export async function updateSkill(id, data) {
+  const result = await apiRequest(`/admin/skills/${id}`, {
+    method: "PUT",
+    body: data,
+  });
+  return result.data;
 }
 
 export function setSkillActive(id, isActive) {
