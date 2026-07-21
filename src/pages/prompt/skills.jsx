@@ -39,7 +39,12 @@ export default function Skills() {
         { name: "全部", icon: null, memo: "" },
         { name: "最新技能", icon: null, memo: "" },
         // { name: "熱門分類", icon: null, memo: "" },
-        ...cats.map((c) => ({ name: c.name, icon: null, memo: c.memo })),
+        ...cats.map((c) => ({
+          id: c.id,
+          name: c.name,
+          icon: null,
+          memo: c.memo || "",
+        })),
       ]);
     });
 
@@ -50,7 +55,7 @@ export default function Skills() {
 
     // Load prompts
     getPublishedPrompts().then((list) => {
-      console.log("Fetched lists:", list);
+      // console.log("Fetched lists:", list);
       setPrompts(list);
     });
   }, []);
@@ -171,7 +176,7 @@ export default function Skills() {
             const isSelected = selectedCategory === cat.name;
             return (
               <button
-                key={cat.name}
+                key={cat.id || cat.name}
                 type="button"
                 onClick={() => handleCategorySelect(cat.name)}
                 onMouseEnter={(e) => handleCategoryMouseEnter(cat, e)}

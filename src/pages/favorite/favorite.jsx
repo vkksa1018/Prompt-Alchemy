@@ -159,7 +159,7 @@ export default function Favorite() {
           const isSelected = selectedCategory === category.name;
           return (
             <button
-              key={category.id}
+              key={category.id || category.name}
               type="button"
               onClick={() => handleCategoryToggle(category.name)}
               className={`box-border w-fit h-fit flex flex-row gap-0 py-4 px-2.5 justify-start items-start rounded-sm border cursor-pointer transition-all ${

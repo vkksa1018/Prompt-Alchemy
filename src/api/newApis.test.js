@@ -81,7 +81,7 @@ describe("New Frontend Dynamic Mock APIs Tests", () => {
       expect(updated.favoriteCount).toBe(initialFav);
     });
 
-    it("should merge new skills and parameters when local storage contains only partial/legacy data", async () => {
+    it("should merge new skills when local storage contains only partial/legacy data", async () => {
       // Pre-seed with partial data (only 1 item)
       const partialSkills = [
         {
@@ -121,7 +121,7 @@ describe("New Frontend Dynamic Mock APIs Tests", () => {
       ];
       localStorage.setItem("admin_parameters", JSON.stringify(partialParams));
 
-      // This call should merge the rest of the skills and parameters
+      // This call should merge the rest of the skills from fallback data
       const list = await getPublishedPrompts();
       
       const cachedSkills = JSON.parse(localStorage.getItem("admin_skills") || "[]");
@@ -132,11 +132,9 @@ describe("New Frontend Dynamic Mock APIs Tests", () => {
       expect(item9).toBeDefined();
       expect(item9.title).toBe("動畫、影像產出_Gemini II");
 
-      // Verify that other parameters (like models and categories) are also merged
+      // Frontend prompt APIs no longer depend on syncing admin parameters.
       const cachedParams = JSON.parse(localStorage.getItem("admin_parameters"));
-      const categoryUX = cachedParams.find(p => p.id === "cat-utility-uuid-0000-000000000011");
-      expect(categoryUX).toBeDefined();
-      expect(categoryUX.name).toBe("設計 / UX");
+      expect(cachedParams).toEqual(partialParams);
     });
   });
 
