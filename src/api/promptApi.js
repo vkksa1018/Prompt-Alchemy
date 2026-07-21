@@ -6,6 +6,29 @@ import { toBlocks, toPayload } from "../components/admin/exampleOutputBlocks";
 const SKILLS_KEY = "admin_skills";
 const PARAMETERS_KEY = "admin_parameters";
 
+function normalizeTag(tag, getParamName) {
+  if (!tag) return null;
+
+  if (typeof tag === "string") {
+    return {
+      id: tag,
+      name: getParamName(tag) || tag,
+    };
+  }
+
+  if (typeof tag === "object") {
+    const id = tag.id || tag.tagId || tag.tag_id || tag.name || "";
+    const name = tag.name || (id ? getParamName(id) : "") || "";
+    if (!id && !name) return null;
+    return {
+      id: id || name,
+      name: name || id,
+    };
+  }
+
+  return null;
+}
+
 function seedSkills() {
   const existing = storage.get(SKILLS_KEY);
   if (existing && existing.length > 0 && "is_active" in existing[0]) {
@@ -129,7 +152,6 @@ export async function getPublishedPrompts(queryParams = {}) {
         const p = params.find((item) => item.id === id);
         return p ? p.name : "";
       };
-
       const remoteList = res.data
         .filter((item) => {
           const localItem = storedSkills.find((s) => s.id === item.id);
@@ -152,16 +174,14 @@ export async function getPublishedPrompts(queryParams = {}) {
             : (item.copyCount ?? item.copy_count ?? 0);
 
           const categoryName = item.category || getParamName(item.categoryId || item.category_id);
-          const tagNames = (item.tags || []).map((t) => {
-            if (typeof t !== "string") return t;
-            const name = getParamName(t);
-            return name || t;
-          });
+          const tags = (item.tags || [])
+            .map((tag) => normalizeTag(tag, getParamName))
+            .filter(Boolean);
           const createdDate = item.createdAt
             ? item.createdAt.split("T")[0]
             : item.created_at
-            ? item.created_at.split("T")[0]
-            : "";
+              ? item.created_at.split("T")[0]
+              : "";
 
           const isNew =
             item.isNew ??
@@ -182,7 +202,7 @@ export async function getPublishedPrompts(queryParams = {}) {
             exampleInput: item.exampleInput || item.example_input,
             exampleOutput: normalizeExampleOutput(item.exampleOutput ?? item.example_output),
             categoryId: item.categoryId || item.category_id,
-            tags: tagNames,
+            tags,
             sourceUrl: item.sourceUrl || item.source_url,
             copyCount: cpCount,
             favoriteCount: favCount,
@@ -221,7 +241,9 @@ export async function getPublishedPrompts(queryParams = {}) {
     .filter((s) => s.is_active)
     .map((item) => {
       const categoryName = getParamName(item.category_id);
-      const tagNames = (item.tags || []).map((tagId) => getParamName(tagId) || tagId);
+      const tags = (item.tags || [])
+        .map((tag) => normalizeTag(tag, getParamName))
+        .filter(Boolean);
       const createdDate = item.created_at ? item.created_at.split("T")[0] : "";
 
       const isNew = new Date(item.created_at) >= new Date("2026-06-25T00:00:00Z");
@@ -239,7 +261,7 @@ export async function getPublishedPrompts(queryParams = {}) {
         exampleInput: item.example_input,
         exampleOutput: normalizeExampleOutput(item.example_output ?? item.exampleOutput),
         categoryId: item.category_id,
-        tags: tagNames,
+        tags,
         sourceUrl: item.source_url,
         copyCount: item.copy_count,
         favoriteCount: item.favorite_count,
@@ -274,11 +296,9 @@ export async function getPromptById(id) {
       };
 
       const categoryName = item.category || getParamName(item.categoryId || item.category_id);
-      const tagNames = (item.tags || []).map((t) => {
-        if (typeof t !== "string") return t;
-        const name = getParamName(t);
-        return name || t;
-      });
+      const tags = (item.tags || [])
+        .map((tag) => normalizeTag(tag, getParamName))
+        .filter(Boolean);
 
       return {
         id: item.id,
@@ -292,7 +312,7 @@ export async function getPromptById(id) {
         exampleInput: item.exampleInput || item.example_input,
         exampleOutput: normalizeExampleOutput(item.exampleOutput ?? item.example_output),
         categoryId: item.categoryId || item.category_id,
-        tags: tagNames,
+        tags,
         sourceUrl: item.sourceUrl || item.source_url,
         copyCount: item.copyCount ?? item.copy_count ?? 0,
         favoriteCount: item.favoriteCount ?? item.favorite_count ?? 0,
@@ -327,7 +347,9 @@ export async function getPromptById(id) {
   if (!item) return null;
 
   const categoryName = getParamName(item.category_id);
-  const tagNames = (item.tags || []).map((tagId) => getParamName(tagId));
+  const tags = (item.tags || [])
+    .map((tag) => normalizeTag(tag, getParamName))
+    .filter(Boolean);
 
   return {
     id: item.id,
@@ -341,7 +363,7 @@ export async function getPromptById(id) {
     exampleInput: item.example_input,
     exampleOutput: normalizeExampleOutput(item.example_output ?? item.exampleOutput),
     categoryId: item.category_id,
-    tags: tagNames,
+    tags,
     sourceUrl: item.source_url,
     copyCount: item.copy_count,
     favoriteCount: item.favorite_count,

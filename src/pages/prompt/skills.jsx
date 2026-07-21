@@ -50,6 +50,7 @@ export default function Skills() {
 
     // Load prompts
     getPublishedPrompts().then((list) => {
+      console.log("Fetched lists:", list);
       setPrompts(list);
     });
   }, []);
@@ -81,7 +82,12 @@ export default function Skills() {
         return false;
 
       // Tag filter
-      if (selectedTag && !prompt.tags.includes(selectedTag)) return false;
+      if (
+        selectedTag &&
+        !(prompt.tags || []).some((tag) => tag?.name === selectedTag)
+      ) {
+        return false;
+      }
 
       // Search text filter
       if (searchQuery) {
@@ -91,7 +97,7 @@ export default function Skills() {
           (prompt.description || "").toLowerCase().includes(query) ||
           (prompt.category || "").toLowerCase().includes(query) ||
           (prompt.tags || []).some((tag) =>
-            (tag || "").toLowerCase().includes(query)
+            (tag?.name || "").toLowerCase().includes(query)
           )
         );
       }
@@ -214,6 +220,7 @@ export default function Skills() {
             {tags.map((tag) => {
               const style = getTagStyles(tag.name);
               const isSelected = selectedTag === tag.name;
+              // console.log("tag", style);
               return (
                 <button
                   key={tag.id}

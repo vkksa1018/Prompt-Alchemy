@@ -9,6 +9,7 @@ import {
   normalizeExampleOutput,
 } from "../../api/promptApi";
 import { Heart, Undo2 } from "lucide-react";
+import { getTagStyles } from "../../utils/tagStyles";
 
 export default function SkillDetail() {
   const { id } = useParams();
@@ -122,88 +123,6 @@ export default function SkillDetail() {
     });
   };
 
-  const getTagStyles = (tag) => {
-    const cleanTag = tag.trim().toLowerCase().replace("#", "");
-    switch (cleanTag) {
-      case "api":
-        return {
-          bg: "bg-[#0A1520]",
-          border: "border-[#00FFFF]",
-          text: "text-[#00FFFF]",
-        };
-      case "react":
-      case "vite":
-        return {
-          bg: "bg-[#1A0A1A]",
-          border: "border-[#FF00FF]",
-          text: "text-[#FF00FF]",
-        };
-      case "sql":
-      case "database":
-      case "mysql":
-        return {
-          bg: "bg-[#1A1A0A]",
-          border: "border-[#FFD700]",
-          text: "text-[#FFD700]",
-        };
-      case "security":
-      case "web":
-        return {
-          bg: "bg-[#0A1F1A]",
-          border: "border-[#39FF14]",
-          text: "text-[#39FF14]",
-        };
-      case "debug":
-        return {
-          bg: "bg-[#1A0A0A]",
-          border: "border-[#FF8C00]",
-          text: "text-[#FF8C00]",
-        };
-      case "translation":
-      case "english":
-        return {
-          bg: "bg-[#0F1E24]",
-          border: "border-[#3b82f6]",
-          text: "text-[#3b82f6]",
-        };
-      case "helper":
-      case "regex":
-        return {
-          bg: "bg-[#150F24]",
-          border: "border-[#a855f7]",
-          text: "text-[#a855f7]",
-        };
-      default:
-        let hash = 0;
-        for (let i = 0; i < cleanTag.length; i++) {
-          hash = cleanTag.charCodeAt(i) + ((hash << 5) - hash);
-        }
-        const styles = [
-          {
-            bg: "bg-[#0A1F1A]",
-            border: "border-[#39FF14]",
-            text: "text-[#39FF14]",
-          },
-          {
-            bg: "bg-[#0A1520]",
-            border: "border-[#00FFFF]",
-            text: "text-[#00FFFF]",
-          },
-          {
-            bg: "bg-[#1A0A1A]",
-            border: "border-[#FF00FF]",
-            text: "text-[#FF00FF]",
-          },
-          {
-            bg: "bg-[#1A1A0A]",
-            border: "border-[#FF8C00]",
-            text: "text-[#FF8C00]",
-          },
-        ];
-        return styles[Math.abs(hash) % styles.length];
-    }
-  };
-
   if (loading || !promptData) {
     return (
       <div className="w-full min-h-screen bg-[#0A0E1A] text-[#E0F0E8] font-['JetBrains_Mono',system-ui,sans-serif] py-8 px-6 flex items-center justify-center">
@@ -290,18 +209,19 @@ export default function SkillDetail() {
                 className="box-border w-full h-fit shrink-0 flex flex-wrap gap-2 justify-start items-start"
               >
                 {promptData.tags.map((tag, index) => {
-                  const style = getTagStyles(tag);
+                  const tagLabel = tag?.name || "";
+                  const style = getTagStyles(tagLabel);
                   return (
                     <div
-                      key={tag}
-                      data-pencil-name={`Detail Chip ${tag}`}
+                      key={tag?.id || index}
+                      data-pencil-name={`Detail Chip ${tagLabel}`}
                       className={`box-border w-fit shrink-0 h-fit flex flex-row gap-0 py-1.5 px-2.5 justify-start items-start ${style.bg} border ${style.border} rounded-[999px]`}
                     >
                       <div
-                        data-pencil-name={`Detail Chip Label ${tag}`}
+                        data-pencil-name={`Detail Chip Label ${tagLabel}`}
                         className={`text-[12px]/[normal] box-border ${style.text} font-normal text-left whitespace-nowrap`}
                       >
-                        {tag}
+                        {tagLabel}
                       </div>
                     </div>
                   );

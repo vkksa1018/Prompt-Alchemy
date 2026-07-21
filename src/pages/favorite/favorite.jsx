@@ -57,7 +57,10 @@ export default function Favorite() {
     if (selectedCategory && prompt.category !== selectedCategory) {
       return false;
     }
-    if (selectedTag && !(prompt.tags || []).includes(selectedTag)) {
+    if (
+      selectedTag &&
+      !(prompt.tags || []).some((tag) => tag?.name === selectedTag)
+    ) {
       return false;
     }
     return true;
@@ -72,7 +75,9 @@ export default function Favorite() {
   );
 
   const favoriteTagSet = new Set(
-    favoritePrompts.flatMap((prompt) => prompt.tags || [])
+    favoritePrompts.flatMap((prompt) =>
+      (prompt.tags || []).map((tag) => tag?.name).filter(Boolean)
+    )
   );
 
   const visibleTags = tags.filter((tag) => favoriteTagSet.has(tag.name));

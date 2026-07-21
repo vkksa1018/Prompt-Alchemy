@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { copyToClipboard } from "../../utils/copyToClipboard";
 import useAuth from "../../hooks/useAuth";
-import { getParameterName } from "../../api/promptApi";
 import { Heart } from "lucide-react";
 import { getTagStyles } from "../../utils/tagStyles";
 
@@ -39,12 +38,8 @@ export default function PromptCard({ prompt, hideStats = false }) {
   };
 
   const categoryName =
-    prompt?.category || getParameterName(prompt?.categoryId) || "其他";
-  const tags = (prompt?.tags || []).map((t) => {
-    if (typeof t !== "string") return t;
-    const name = getParameterName(t);
-    return name || t;
-  });
+    prompt?.category || "其他";
+  const tags = prompt?.tags || [];
 
   // const getCategoryIcon = (category) => {
   //   switch (category) {
@@ -221,18 +216,20 @@ export default function PromptCard({ prompt, hideStats = false }) {
           className="box-border w-fit h-fit shrink-0 flex flex-row gap-1.5 justify-start items-start overflow-x-auto whitespace-nowrap scrollbar-none"
         >
           {tags.map((tag, idx) => {
-            const style = getTagStyles(tag);
+            const tagLabel = tag?.name || "";
+            const style = getTagStyles(tagLabel);
+            // console.log("Tag style:", tag);
             return (
               <div
-                key={idx}
-                data-pencil-name={`Tag ${tag}`}
+                key={tag?.id || idx}
+                data-pencil-name={`Tag ${tagLabel}`}
                 className={`box-border w-fit shrink-0 h-fit flex flex-row gap-0 py-1 px-2 justify-start items-start ${style.bg} border ${style.border} rounded-[999px]`}
               >
                 <div
-                  data-pencil-name={`Tag Label ${tag}`}
+                  data-pencil-name={`Tag Label ${tagLabel}`}
                   className={`text-[14px]/[normal] box-border ${style.text} font-normal text-left whitespace-nowrap`}
                 >
-                  {tag}
+                  {tagLabel}
                 </div>
               </div>
             );
