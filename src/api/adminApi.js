@@ -351,6 +351,9 @@ export async function getSkills(filters = {}) {
 export async function getSkillById(id) {
   const result = await apiRequest(`/admin/skills/${id}`);
   const s = result.data;
+  if (s && Array.isArray(s.tags)) {
+    s.tags = s.tags.map(t => typeof t === "object" && t !== null ? t.id : t);
+  }
   return s ? { ...s, is_active: s.isActive ?? s.is_active ?? true } : s;
 }
 
@@ -360,6 +363,9 @@ export async function createSkill(data) {
     body: data,
   });
   const s = result.data;
+  if (s && Array.isArray(s.tags)) {
+    s.tags = s.tags.map(t => typeof t === "object" && t !== null ? t.id : t);
+  }
   return s ? { ...s, is_active: s.isActive ?? s.is_active ?? true } : s;
 }
 
@@ -369,6 +375,9 @@ export async function updateSkill(id, data) {
     body: data,
   });
   const s = result.data;
+  if (s && Array.isArray(s.tags)) {
+    s.tags = s.tags.map(t => typeof t === "object" && t !== null ? t.id : t);
+  }
   return s ? { ...s, is_active: s.isActive ?? s.is_active ?? true } : s;
 }
 
