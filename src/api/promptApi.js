@@ -2,6 +2,7 @@ import { apiRequest } from "./apiClient";
 import { storage } from "../utils/storage";
 import { skillItemsTable, parametersTable } from "./mockData";
 import { toBlocks, toPayload } from "../components/admin/exampleOutputBlocks";
+import { IS_ONLINE_MODE } from "../config/runMode";
 
 const SKILLS_KEY = "admin_skills";
 const PARAMETERS_KEY = "admin_parameters";
@@ -130,7 +131,9 @@ function mapRemoteTag(tag) {
 }
 
 function mapRemotePrompt(item, storedSkills) {
-  const localItem = storedSkills.find((s) => s.id === item.id);
+  const localItem = IS_ONLINE_MODE
+    ? null
+    : storedSkills.find((s) => s.id === item.id);
   if (localItem && (localItem.isActive === false || localItem.is_active === false)) {
     return null;
   }

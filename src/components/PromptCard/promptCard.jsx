@@ -7,11 +7,11 @@ import { getTagStyles } from "../../utils/tagStyles";
 
 export default function PromptCard({ prompt, hideStats = false }) {
   const navigate = useNavigate();
-  const { user, favorites, toggleFavorite } = useAuth();
+  const { user, favorites, favoriteCounts, toggleFavorite } = useAuth();
   const [copied, setCopied] = useState(false);
 
   const liked = favorites.includes(prompt.id);
-  const likesCount = (prompt?.favoriteCount ?? 0) + (liked ? 1 : 0);
+  const likesCount = favoriteCounts[prompt.id] ?? prompt?.favoriteCount ?? 0;
 
   const handleCopy = async (e) => {
     e.stopPropagation();

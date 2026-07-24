@@ -1,6 +1,16 @@
 import { createContext, useState, useEffect } from "react";
-import { getUserFavorites, saveUserFavorites } from "../api/favoriteApi";
-import { updateUserProfile, getCurrentUser, logoutUser as apiLogoutUser } from "../api/authApi";
+import { IS_ONLINE_MODE } from "../config/runMode";
+import {
+  getUserFavoriteAPI,
+  toggleFavoriteAPI,
+  getUserFavorites,
+  saveUserFavorites,
+} from "../api/favoriteApi";
+import {
+  updateUserProfile,
+  getCurrentUser,
+  logoutUser as apiLogoutUser,
+} from "../api/authApi";
 import { updateFavoriteCount } from "../api/promptApi";
 import { alertHelper } from "../utils/sweetAlert";
 
@@ -9,7 +19,9 @@ export const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [favorites, setFavorites] = useState([]);
+  const [favoriteCounts, setFavoriteCounts] = useState({});
   const [loading, setLoading] = useState(true);
+  const [favoriteSource, setFavoriteSource] = useState("local"); // "local" or "online"
 
   useEffect(() => {
     const initAuth = async () => {
@@ -23,20 +35,31 @@ export function AuthProvider({ children }) {
           setUser(fullUser);
           localStorage.setItem("user", JSON.stringify(fullUser));
 
-          const favs = await getUserFavorites(fullUser.email, fullUser.id);
+          const favs = IS_ONLINE_MODE
+            ? await getUserFavoriteAPI()
+            : await getUserFavorites(fullUser.email, fullUser.id);
+
           setFavorites(favs);
+          setFavoriteSource(IS_ONLINE_MODE ? "online" : "local");
         } catch (err) {
           console.warn("Token 即將或已無效，清除本地 Token", err.message);
           localStorage.removeItem("token");
           localStorage.removeItem("user");
           setUser(null);
+          setFavorites([]);
+          setFavoriteSource("local");
         }
-      } else if (storedUser) {
+      } else if (!IS_ONLINE_MODE && storedUser) {
         try {
           const parsedUser = JSON.parse(storedUser);
           setUser(parsedUser);
-          const favs = await getUserFavorites(parsedUser.email, parsedUser.id);
+
+          const favs = IS_ONLINE_MODE
+            ? await getUserFavoriteAPI()
+            : await getUserFavorites(parsedUser.email, parsedUser.id);
+
           setFavorites(favs);
+          setFavoriteSource(IS_ONLINE_MODE ? "online" : "local");
         } catch (err) {
           localStorage.removeItem("user");
         }
@@ -47,23 +70,33 @@ export function AuthProvider({ children }) {
     initAuth();
   }, []);
 
-  const loginUser = (userData, options = {}) => {
+  const loginUser = async (userData, options = {}) => {
     const { showSuccessAlert = true } = options;
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
     if (userData.token) {
       localStorage.setItem("token", userData.token);
     }
-    getUserFavorites(userData.email, userData.id).then((favs) => {
+    try {
+      const favs = IS_ONLINE_MODE
+        ? await getUserFavoriteAPI()
+        : await getUserFavorites(userData.email, userData.id);
       setFavorites(favs);
-      if (showSuccessAlert) {
-        alertHelper.success(
-          "登入成功",
-          `歡迎回來，${userData.name || "成員"}！`,
-          true
-        );
-      }
-    });
+      setFavoriteSource(IS_ONLINE_MODE ? "online" : "local");
+    } catch (err) {
+      // online 模式不回退至 localStorage，避免混用舊資料。
+      console.error("讀取收藏失敗", err);
+      setFavorites([]);
+      setFavoriteSource(IS_ONLINE_MODE ? "online" : "local");
+    }
+
+    if (showSuccessAlert) {
+      alertHelper.success(
+        "登入成功",
+        `歡迎回來，${userData.name || "成員"}！`,
+        true
+      );
+    }
   };
 
   const logoutUser = () => {
@@ -87,17 +120,46 @@ export function AuthProvider({ children }) {
     });
   };
 
-  const toggleFavorite = (promptId) => {
+  const toggleFavorite = async (promptId) => {
     if (!user) return;
+
     const isAlreadyFav = favorites.includes(promptId);
 
-    setFavorites((prev) => {
-      const updated = prev.includes(promptId)
-        ? prev.filter((id) => id !== promptId)
-        : [...prev, promptId];
-      saveUserFavorites(user.email, updated);
-      return updated;
-    });
+    if (favoriteSource === "online") {
+      try {
+        const result = await toggleFavoriteAPI(promptId);
+
+        setFavorites((prev) =>
+          prev.includes(promptId)
+            ? prev.filter((id) => id !== promptId)
+            : [...prev, promptId]
+        );
+        if (typeof result?.favoriteCount === "number") {
+          setFavoriteCounts((prev) => ({
+            ...prev,
+            [promptId]: result.favoriteCount,
+          }));
+        }
+
+        if (!isAlreadyFav) {
+          alertHelper.success("已收藏", "已加入您的收藏清單", true);
+        } else {
+          alertHelper.success("已取消收藏", "已從您的收藏清單移除", true);
+        }
+      } catch (err) {
+        console.error("Failed to toggle favorite via API", err);
+        alertHelper.error("收藏失敗", "目前無法同步到伺服器", true);
+      }
+      return;
+    }
+
+    // local fallback 模式
+    const updated = favorites.includes(promptId)
+      ? favorites.filter((id) => id !== promptId)
+      : [...favorites, promptId];
+
+    setFavorites(updated);
+    saveUserFavorites(user.email, updated);
 
     const amount = isAlreadyFav ? -1 : 1;
     updateFavoriteCount(promptId, amount).catch((err) => {
@@ -111,8 +173,32 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const clearFavorites = () => {
+  const clearFavorites = async () => {
     if (!user) return;
+
+    if (favoriteSource === "online") {
+      try {
+        const results = await Promise.all(
+          favorites.map((favId) => toggleFavoriteAPI(favId))
+        );
+        setFavoriteCounts((prev) => {
+          const next = { ...prev };
+          favorites.forEach((favId, index) => {
+            const favoriteCount = results[index]?.favoriteCount;
+            if (typeof favoriteCount === "number") {
+              next[favId] = favoriteCount;
+            }
+          });
+          return next;
+        });
+        setFavorites([]);
+      } catch (err) {
+        console.error("Failed to clear favorites via API", err);
+        alertHelper.error("清空失敗", "目前無法同步到伺服器", true);
+      }
+      return;
+    }
+
     setFavorites([]);
     saveUserFavorites(user.email, []);
     favorites.forEach((favId) => {
@@ -122,6 +208,10 @@ export function AuthProvider({ children }) {
 
   const resetFavorites = () => {
     if (!user) return;
+    if (favoriteSource === "online") {
+      alertHelper.error("無法重設", "連線模式不使用本機預設收藏", true);
+      return;
+    }
     const defaults = [
       "prompt-uuid-0001-0000-000000000001",
       "prompt-uuid-0001-0000-000000000002",
@@ -142,6 +232,7 @@ export function AuthProvider({ children }) {
         logout: logoutUser,
         updateUser,
         favorites,
+        favoriteCounts,
         toggleFavorite,
         clearFavorites,
         resetFavorites,

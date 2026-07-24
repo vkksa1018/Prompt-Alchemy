@@ -1,5 +1,22 @@
 import { storage } from "../utils/storage";
 import { favoritesTable } from "./mockData";
+import { apiRequest } from "./apiClient.js";
+
+export async function getUserFavoriteAPI() {
+  const res = await apiRequest(`/favorites`, {
+    method: "GET",
+  });
+  const list = Array.isArray(res?.data) ? res.data : [];
+  console.log("用GET拿/favorites:", list.map((item) => item.id));
+  return list.map((item) => item.id);
+}
+export async function toggleFavoriteAPI(skillId) {
+  const res = await apiRequest(`/favorites/${skillId}/toggle`, {
+    method: "POST",
+  });
+  console.log("用POST拿/favorites/toggle:", res.data);
+  return res.data;
+}
 
 export function getUserFavorites(email, userDbId) {
   const storedFavs = storage.get(`favorites_${email}`);
