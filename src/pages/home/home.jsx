@@ -1,5 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { A11y, Keyboard, Pagination } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/pagination";
 import PromptCard from "../../components/PromptCard/promptCard";
 import { getPublishedPrompts } from "../../api/promptApi";
 import HeroDevice from "../../components/HeroDevice/heroDevice";
@@ -25,7 +29,7 @@ export default function Home() {
 
   const featuredPrompts = [...prompts]
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .slice(0, 3);
+    .slice(0, 9);
 
   const countByCategory = (categoryName) => {
     return prompts.filter((p) => p.category === categoryName).length;
@@ -40,7 +44,7 @@ export default function Home() {
       {/* Hero Zone */}
       <div
         data-pencil-name="Hero Zone"
-        className="relative box-border w-full max-w-350 h-auto shrink-0 flex flex-col md:flex-row gap-4 justify-between items-center py-8 border-b border-[#39FF14]/10 overflow-hidden"
+        className="relative box-border w-full max-w-350 h-auto shrink-0 flex flex-col md:flex-row gap-4 justify-between items-center py-24 border-b border-[#39FF14]/10 overflow-hidden"
       >
         <div
           aria-hidden="true"
@@ -357,11 +361,27 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+        <Swiper
+          className="featured-skills-carousel w-full"
+          modules={[A11y, Keyboard, Pagination]}
+          centeredSlides
+          loop={true}
+          pagination={{ clickable: true, dynamicBullets: true }}
+          keyboard={{ enabled: true }}
+          spaceBetween={24}
+          slidesPerView={1}
+          breakpoints={{
+            640: { slidesPerView: 2 },
+            768: { slidesPerView: 3 },
+          }}
+          aria-label="最新技能輪播"
+        >
           {featuredPrompts.map((prompt) => (
-            <PromptCard key={prompt.id} prompt={prompt} />
+            <SwiperSlide key={prompt.id} className="h-auto">
+              <PromptCard prompt={prompt} />
+            </SwiperSlide>
           ))}
-        </div>
+        </Swiper>
       </section>
     </div>
   );

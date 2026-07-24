@@ -173,3 +173,51 @@ code {
     rgba(10, 10, 10, 0) 75%
   );
 }
+
+.featured-skills-carousel {
+  box-sizing: border-box;
+  padding: 4px 48px 48px;
+}
+
+.featured-skills-carousel .swiper-slide {
+  display: flex;
+  height: auto;
+  opacity: 0.58;
+  transform: scale(0.94);
+  transition:
+    opacity 300ms ease,
+    transform 300ms ease;
+}
+
+.featured-skills-carousel .swiper-slide-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.featured-skills-carousel .swiper-slide > * {
+  width: 100%;
+}
+
+.featured-skills-carousel .swiper-pagination {
+  bottom: 8px;
+}
+
+.featured-skills-carousel .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  background: #7dcea0;
+  opacity: 0.45;
+}
+
+.featured-skills-carousel .swiper-pagination-bullet-active {
+  width: 22px;
+  border-radius: 999px;
+  background: #39ff14;
+  opacity: 1;
+}
+
+@media (max-width: 639px) {
+  .featured-skills-carousel {
+    padding-inline: 38px;
+  }
+}
