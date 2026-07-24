@@ -1,10 +1,16 @@
-import { createContext, useState, useContext, useRef, useCallback } from "react";
+import {
+  createContext,
+  useState,
+  useContext,
+  useRef,
+  useCallback,
+} from "react";
 import LoadingScreen from "../components/LoadingScreen/LoadingScreen";
 
 const LoadingContext = createContext(null);
 
 // 最短顯示時間 300ms，保證小鴨至少跑一趟
-const MIN_LOADING_MS = 300;
+const MIN_LOADING_MS = 500;
 
 export function LoadingProvider({ children }) {
   const [visible, setVisible] = useState(false);

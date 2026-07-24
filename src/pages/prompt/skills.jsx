@@ -21,9 +21,13 @@ const categoryMemoToast = Swal.mixin({
 
 export default function Skills() {
   const location = useLocation();
+  const routeCategory = location.state?.category;
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("全部");
+  const [selectedCategory, setSelectedCategory] = useState(
+    () => routeCategory || "全部",
+  );
   const [selectedTag, setSelectedTag] = useState(null);
+  const [handledLocationKey, setHandledLocationKey] = useState(location.key);
   const [sortBy, setSortBy] = useState("date"); // "date" | "popularity"
   const [isCategoryExpanded, setIsCategoryExpanded] = useState(false);
   const [isCompactScreen, setIsCompactScreen] = useState(
@@ -74,12 +78,10 @@ export default function Skills() {
     };
   }, []);
 
-  const [prevLocationState, setPrevLocationState] = useState(location.state);
-  if (location.state !== prevLocationState) {
-    setPrevLocationState(location.state);
-    if (location.state && location.state.category) {
-      setSelectedCategory(location.state.category);
-    }
+  if (location.key !== handledLocationKey) {
+    setHandledLocationKey(location.key);
+    setSelectedCategory(routeCategory || "全部");
+    setSelectedTag(null);
   }
 
   useEffect(() => {

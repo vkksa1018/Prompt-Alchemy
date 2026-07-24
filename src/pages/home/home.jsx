@@ -12,7 +12,7 @@ import {
   CodeXml,
   Database,
   ShieldCheck,
-  BugOff,
+  Palette,
   Languages,
   PocketKnife,
 } from "lucide-react";
@@ -240,10 +240,10 @@ export default function Home() {
               {countByCategory("資安相關")} 個技能
             </div>
           </div>
-          {/* 除錯技巧 */}
+          {/* 設計 / UX */}
           <div
-            onClick={() => handleCategoryClick("除錯技巧")}
-            data-pencil-name="除錯技巧"
+            onClick={() => handleCategoryClick("設計 / UX")}
+            data-pencil-name="設計 / UX"
             className="box-border w-full h-fit flex flex-col gap-2.5 p-[16px_14px] justify-start items-center bg-[#111827] border border-[#FFD700] rounded-xl cursor-pointer hover:bg-[#111827]/80 hover:scale-[1.02] active:scale-95 transition-all"
           >
             {/* <svg
@@ -258,7 +258,7 @@ export default function Home() {
                 fill="#FFD700"
               />
             </svg> */}
-            <BugOff
+            <Palette
               data-pencil-name="Category Icon"
               className="box-border w-7 h-7 shrink-0 text-[#FFD700]"
             />
@@ -266,13 +266,13 @@ export default function Home() {
               data-pencil-name="Category Title"
               className="text-[14px]/[normal] box-border text-[#E0F0E8] font-semibold text-left whitespace-nowrap"
             >
-              除錯技巧
+              設計 / UX
             </div>
             <div
               data-pencil-name="Category Count"
               className="text-[11px]/[normal] box-border text-[#51d688] font-normal text-left whitespace-nowrap"
             >
-              {countByCategory("除錯技巧")} 個技能
+              {countByCategory("設計 / UX")} 個技能
             </div>
           </div>
           {/* 翻譯助手 */}
