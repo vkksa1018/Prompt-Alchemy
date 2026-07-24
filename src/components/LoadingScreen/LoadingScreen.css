@@ -1,154 +1,155 @@
-/* Loading Overlay Container */
+/* ─────────────────────────────────────────
+   Loading Overlay
+───────────────────────────────────────── */
 .loading-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(6, 6, 8, 0.88);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  inset: 0;
+  background: rgba(4, 8, 14, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 99999;
-  animation: loading-fade-in 0.2s ease-out;
+  animation: fade-in 0.2s ease-out;
 }
 
-/* Fade-out triggered by prop */
 .loading-overlay.loading-fade-out {
-  animation: loading-fade-out 0.35s ease-in forwards;
+  animation: fade-out 0.35s ease-in forwards;
 }
 
-@keyframes loading-fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
+@keyframes fade-in  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
 
-@keyframes loading-fade-out {
-  from { opacity: 1; backdrop-filter: blur(12px); }
-  to   { opacity: 0; backdrop-filter: blur(0px); }
-}
-
-/* Container */
+/* ─────────────────────────────────────────
+   Container
+───────────────────────────────────────── */
 .loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 80%;
-  max-width: 500px;
+  gap: 20px;
 }
 
-/* Neon Green Track */
-.running-track {
-  position: relative;
-  width: 100%;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, #39FF14, transparent);
-  box-shadow: 0 0 10px #39FF14, 0 0 20px #39FF14;
-  margin-bottom: 32px;
+/* ─────────────────────────────────────────
+   Cauldron SVG Wrapper
+───────────────────────────────────────── */
+.cauldron-wrapper {
+  filter: drop-shadow(0 0 18px rgba(57, 255, 20, 0.35));
 }
 
-/* Duck Runner Wrapper */
-.duck-runner {
-  position: absolute;
-  bottom: 3px;
-  width: 60px;
-  height: 48px;
-  animation: run-duck 2.2s linear infinite;
+.cauldron-svg {
+  width: 160px;
+  height: 160px;
+  overflow: visible;
 }
 
-/* Wobble duck body while running */
-.duck-svg {
-  width: 100%;
-  height: 100%;
-  transform-origin: center bottom;
-  animation: wobble-duck 0.2s ease-in-out infinite alternate;
+/* ─────────────────────────────────────────
+   Smoke wisps — float up and fade out
+───────────────────────────────────────── */
+.smoke { stroke-dasharray: 60; }
+
+.smoke-l {
+  animation: smoke-rise 2.8s ease-in-out infinite;
+  animation-delay: 0s;
+}
+.smoke-m {
+  animation: smoke-rise 2.8s ease-in-out infinite;
+  animation-delay: 0.7s;
+}
+.smoke-r {
+  animation: smoke-rise 2.8s ease-in-out infinite;
+  animation-delay: 1.4s;
 }
 
-/* Feet running cycle */
-.foot-front {
-  transform-origin: 45px 66px;
-  animation: foot-swing-front 0.2s linear infinite;
+@keyframes smoke-rise {
+  0%   { stroke-dashoffset: 60; opacity: 0; transform: translateY(0);   }
+  20%  { opacity: 0.65; }
+  80%  { opacity: 0.3; }
+  100% { stroke-dashoffset: -20; opacity: 0; transform: translateY(-18px); }
 }
 
-.foot-back {
-  transform-origin: 58px 66px;
-  animation: foot-swing-back 0.2s linear infinite;
+/* ─────────────────────────────────────────
+   Liquid surface — gentle pulse glow
+───────────────────────────────────────── */
+.liquid-surface {
+  animation: liquid-pulse 1.8s ease-in-out infinite;
+  filter: url(#liquidBlur);
 }
 
-/* Duck runs left → right, flips, runs right → left */
-@keyframes run-duck {
-  0% {
-    left: -8%;
-    transform: scaleX(1);
-  }
-  48% {
-    transform: scaleX(1);
-  }
-  50% {
-    left: 100%;
-    transform: scaleX(-1);
-  }
-  98% {
-    transform: scaleX(-1);
-  }
-  100% {
-    left: -8%;
-    transform: scaleX(1);
-  }
+@keyframes liquid-pulse {
+  0%, 100% { opacity: 0.85; rx: 52; }
+  50%       { opacity: 1;    rx: 50; }
 }
 
-/* Duck body waddle */
-@keyframes wobble-duck {
-  0%   { transform: translateY(0) rotate(-3deg); }
-  100% { transform: translateY(-4px) rotate(3deg); }
+/* ─────────────────────────────────────────
+   Bubbles — pop up from inside the liquid
+───────────────────────────────────────── */
+.bubble {
+  animation: bubble-pop 1.6s ease-in infinite;
+}
+.bubble-1 { animation-delay: 0s;    }
+.bubble-2 { animation-delay: 0.35s; }
+.bubble-3 { animation-delay: 0.7s;  }
+.bubble-4 { animation-delay: 1.05s; }
+.bubble-5 { animation-delay: 1.4s;  }
+
+@keyframes bubble-pop {
+  0%   { transform: translateY(0)    scale(0.6); opacity: 0;   }
+  20%  { opacity: 0.9; }
+  60%  { transform: translateY(-22px) scale(1.1); opacity: 0.6; }
+  100% { transform: translateY(-38px) scale(0.3); opacity: 0;   }
 }
 
-/* Foot animations */
-@keyframes foot-swing-front {
-  0%, 100% { transform: rotate(-35deg); }
-  50%       { transform: rotate(35deg); }
+/* ─────────────────────────────────────────
+   Ladle — rotates around cauldron centre
+───────────────────────────────────────── */
+.ladle-group {
+  animation: ladle-stir 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  transform-origin: 100px 88px;
+  transform-box: fill-box;
 }
 
-@keyframes foot-swing-back {
-  0%, 100% { transform: rotate(35deg); }
-  50%       { transform: rotate(-35deg); }
+@keyframes ladle-stir {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-/* Loading Text with wave effect */
+/* ─────────────────────────────────────────
+   Loading text — bouncing wave
+───────────────────────────────────────── */
 .loading-text {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: #39FF14;
-  text-shadow: 0 0 8px rgba(57, 255, 20, 0.6);
-  letter-spacing: 0.15em;
+  text-shadow: 0 0 8px rgba(57, 255, 20, 0.55);
+  letter-spacing: 0.18em;
   display: flex;
   gap: 2px;
 }
 
 .loading-text span {
   display: inline-block;
-  animation: bounce-text 1.4s infinite ease-in-out;
+  animation: bounce-char 1.6s infinite ease-in-out;
 }
 
 .loading-text span:nth-child(1) { animation-delay: 0s; }
-.loading-text span:nth-child(2) { animation-delay: 0.1s; }
-.loading-text span:nth-child(3) { animation-delay: 0.2s; }
-.loading-text span:nth-child(4) { animation-delay: 0.3s; }
-.loading-text span:nth-child(5) { animation-delay: 0.4s; }
-.loading-text span:nth-child(6) { animation-delay: 0.5s; }
+.loading-text span:nth-child(2) { animation-delay: 0.12s; }
+.loading-text span:nth-child(3) { animation-delay: 0.24s; }
+.loading-text span:nth-child(4) { animation-delay: 0.36s; }
+.loading-text span:nth-child(5) { animation-delay: 0.48s; }
+.loading-text span:nth-child(6) { animation-delay: 0.60s; }
 
-@keyframes bounce-text {
-  0%, 80%, 100% {
+@keyframes bounce-char {
+  0%, 75%, 100% {
     transform: translateY(0);
-    opacity: 0.6;
+    color: #39FF14;
+    text-shadow: 0 0 8px rgba(57,255,20,0.55);
   }
-  40% {
-    transform: translateY(-8px);
-    opacity: 1;
+  38% {
+    transform: translateY(-9px);
     color: #ffffff;
-    text-shadow: 0 0 12px #39FF14, 0 0 20px #39FF14;
+    text-shadow: 0 0 14px #39FF14, 0 0 28px #39FF14;
   }
 }
