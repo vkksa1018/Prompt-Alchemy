@@ -21,8 +21,13 @@ export default function SkillDetail() {
   const [copiedPrompt, setCopiedPrompt] = useState(false);
   const [copiedExample, setCopiedExample] = useState(false);
 
-  useEffect(() => {
+  const [prevId, setPrevId] = useState(id);
+  if (id !== prevId) {
+    setPrevId(id);
     setLoading(true);
+  }
+
+  useEffect(() => {
     getPromptById(id).then((data) => {
       if (data) {
         setPromptData(data);
@@ -80,7 +85,7 @@ export default function SkillDetail() {
     if (!content) return null;
 
     const tokenPattern =
-      /(\[[^\]\n]+\]|\{[^}\n]+\}|【[^】\n]+】|\([^\)\n]+\))/g;
+      /(\[[^\]\n]+\]|\{[^}\n]+\}|【[^】\n]+】|\([^)\n]+\))/g;
     const parts = content.split(tokenPattern);
 
     return parts.map((part, index) => {
@@ -112,7 +117,7 @@ export default function SkillDetail() {
           </span>
         );
       }
-      if (/^\([^\)\n]+\)$/.test(part)) {
+      if (/^\([^)\n]+\)$/.test(part)) {
         return (
           <span key={index} className="text-[#ffab2e] text-[1.1em] font-bold">
             {part}

@@ -32,9 +32,14 @@ export default function AdminParametersPage() {
     });
   };
 
+  const [prevActiveTab, setPrevActiveTab] = useState(activeTab);
+  if (activeTab !== prevActiveTab) {
+    setPrevActiveTab(activeTab);
+    setLoading(true);
+  }
+
   useEffect(() => {
     let active = true;
-    setLoading(true);
     getParametersByType(activeTab).then((data) => {
       if (!active) return;
       setParameters(data);

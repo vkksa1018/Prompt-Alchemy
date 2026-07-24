@@ -60,11 +60,13 @@ export default function Skills() {
     });
   }, []);
 
-  useEffect(() => {
+  const [prevLocationState, setPrevLocationState] = useState(location.state);
+  if (location.state !== prevLocationState) {
+    setPrevLocationState(location.state);
     if (location.state && location.state.category) {
       setSelectedCategory(location.state.category);
     }
-  }, [location.state]);
+  }
 
   useEffect(() => {
     const onResize = () => {

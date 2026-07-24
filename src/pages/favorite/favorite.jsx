@@ -83,17 +83,13 @@ export default function Favorite() {
 
   const visibleTags = tags.filter((tag) => favoriteTagSet.has(tag.name));
 
-  useEffect(() => {
-    if (selectedCategory && !favoriteCategorySet.has(selectedCategory)) {
-      setSelectedCategory(null);
-    }
-  }, [selectedCategory, favoriteCategorySet]);
+  if (selectedCategory && !favoriteCategorySet.has(selectedCategory)) {
+    setSelectedCategory(null);
+  }
 
-  useEffect(() => {
-    if (selectedTag && !favoriteTagSet.has(selectedTag)) {
-      setSelectedTag(null);
-    }
-  }, [selectedTag, favoriteTagSet]);
+  if (selectedTag && !favoriteTagSet.has(selectedTag)) {
+    setSelectedTag(null);
+  }
 
   return (
     <div

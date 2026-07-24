@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   isSkillActive,
   createSkill,
@@ -8,6 +8,77 @@ import {
   loginAdmin,
 } from "./adminApi";
 import { getPublishedPrompts } from "./promptApi";
+import { skillItemsTable, getParameterName } from "./mockData";
+
+let mockBackendSkills = [];
+
+vi.mock("./apiClient", () => {
+  return {
+    apiRequest: vi.fn(async (endpoint, options = {}) => {
+      const method = options.method || "GET";
+      const body = typeof options.body === "string" ? JSON.parse(options.body) : options.body;
+
+      if (endpoint === "/auth/login" && method === "POST") {
+        return { status: "success", token: "mock-admin-token" };
+      }
+
+      if (endpoint === "/auth/me" && method === "GET") {
+        return { status: "success", user: { id: "admin-id", email: "admin@example.com", name: "James Admin", role: "admin" } };
+      }
+
+      if (endpoint === "/admin/skills" && method === "POST") {
+        const newSkill = { 
+          ...body, 
+          id: body.id || `prompt-uuid-mock-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          isActive: body.isActive ?? true,
+          is_active: body.isActive ?? true,
+        };
+        mockBackendSkills.push(newSkill);
+        return { status: "success", data: newSkill };
+      }
+
+      if (endpoint.startsWith("/admin/skills/") && method === "PUT") {
+        const id = endpoint.split("/").pop();
+        const idx = mockBackendSkills.findIndex(s => s.id === id);
+        if (idx >= 0) {
+          mockBackendSkills[idx] = { 
+            ...mockBackendSkills[idx], 
+            ...body,
+            isActive: body.isActive ?? mockBackendSkills[idx].isActive,
+            is_active: body.isActive ?? mockBackendSkills[idx].isActive,
+          };
+          return { status: "success", data: mockBackendSkills[idx] };
+        }
+        throw new Error("Skill not found");
+      }
+
+      if (endpoint.startsWith("/admin/skills/") && method === "GET") {
+        const id = endpoint.split("/").pop();
+        const skill = mockBackendSkills.find(s => s.id === id);
+        if (skill) {
+          return { status: "success", data: skill };
+        }
+        throw new Error("Skill not found");
+      }
+
+      if (endpoint.startsWith("/prompts") && method === "GET") {
+        const activePrompts = mockBackendSkills
+          .filter(s => s.isActive !== false && s.is_active !== false)
+          .map(s => ({
+            ...s,
+            // Format tags as `{ id, name }` for frontend mapRemoteTag
+            tags: (s.tags || []).map(t => {
+              if (typeof t === "object") return t;
+              return { id: t, name: getParameterName(t) || t };
+            }),
+          }));
+        return { status: "success", data: activePrompts };
+      }
+
+      return { status: "success", data: [] };
+    }),
+  };
+});
 
 describe("isSkillActive", () => {
   it("prefers camelCase isActive over snake_case", () => {
@@ -46,6 +117,10 @@ const mockSkillData = (overrides = {}) => ({
 describe("skill active field writes", () => {
   beforeEach(async () => {
     localStorage.clear();
+    mockBackendSkills = skillItemsTable.map((s) => ({
+      ...s,
+      isActive: s.is_active ?? true,
+    }));
     await loginAdmin({ email: "admin@example.com", password: "Admin1234" });
   });
 
@@ -97,6 +172,10 @@ describe("skill active field writes", () => {
 describe("deactivating a seeded skill hides it from the public list", () => {
   beforeEach(async () => {
     localStorage.clear();
+    mockBackendSkills = skillItemsTable.map((s) => ({
+      ...s,
+      isActive: s.is_active ?? true,
+    }));
     await loginAdmin({ email: "admin@example.com", password: "Admin1234" });
   });
 

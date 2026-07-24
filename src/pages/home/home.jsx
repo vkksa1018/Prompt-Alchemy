@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import PromptCard from "../../components/PromptCard/promptCard";
 import { getPublishedPrompts } from "../../api/promptApi";
 import HeroDevice from "../../components/HeroDevice/heroDevice";
-import useAuth from "../../hooks/useAuth";
 import {
   CodeXml,
   Database,
