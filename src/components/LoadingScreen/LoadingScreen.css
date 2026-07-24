@@ -1,0 +1,150 @@
+/* Loading Overlay Container */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(6, 6, 8, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+}
+
+/* Container */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80%;
+  max-width: 500px;
+}
+
+/* Neon Green Track */
+.running-track {
+  position: relative;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #39FF14, transparent);
+  box-shadow: 0 0 10px #39FF14, 0 0 20px #39FF14;
+  margin-bottom: 32px;
+}
+
+/* Duck Runner Wrapper */
+.duck-runner {
+  position: absolute;
+  bottom: 3px; /* sits on top of the track line */
+  width: 60px;
+  height: 48px;
+  animation: run-duck 3.5s linear infinite;
+}
+
+/* Wobble duck body while running */
+.duck-svg {
+  width: 100%;
+  height: 100%;
+  transform-origin: center bottom;
+  animation: wobble-duck 0.2s ease-in-out infinite alternate;
+}
+
+/* Feet running cycle transformation origins */
+.foot-front {
+  transform-origin: 45px 66px;
+  animation: foot-swing-front 0.2s linear infinite;
+}
+
+.foot-back {
+  transform-origin: 58px 66px;
+  animation: foot-swing-back 0.2s linear infinite;
+}
+
+/* Duck Running Back and Forth Across Screen */
+@keyframes run-duck {
+  0% {
+    left: -10%;
+    transform: scaleX(1); /* Face right */
+  }
+  48% {
+    transform: scaleX(1);
+  }
+  50% {
+    left: 100%;
+    transform: scaleX(-1); /* Face left */
+  }
+  98% {
+    transform: scaleX(-1);
+  }
+  100% {
+    left: -10%;
+    transform: scaleX(1); /* Face right */
+  }
+}
+
+/* Duck body waddle height & rotation */
+@keyframes wobble-duck {
+  0% {
+    transform: translateY(0) rotate(-3deg);
+  }
+  100% {
+    transform: translateY(-4px) rotate(3deg);
+  }
+}
+
+/* Paddling feet animations */
+@keyframes foot-swing-front {
+  0%, 100% {
+    transform: rotate(-35deg);
+  }
+  50% {
+    transform: rotate(35deg);
+  }
+}
+
+@keyframes foot-swing-back {
+  0%, 100% {
+    transform: rotate(35deg);
+  }
+  50% {
+    transform: rotate(-35deg);
+  }
+}
+
+/* Loading Text with wave effect */
+.loading-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #39FF14;
+  text-shadow: 0 0 8px rgba(57, 255, 20, 0.6);
+  letter-spacing: 0.15em;
+  display: flex;
+  gap: 2px;
+}
+
+.loading-text span {
+  display: inline-block;
+  animation: bounce-text 1.4s infinite ease-in-out;
+}
+
+.loading-text span:nth-child(1) { animation-delay: 0s; }
+.loading-text span:nth-child(2) { animation-delay: 0.1s; }
+.loading-text span:nth-child(3) { animation-delay: 0.2s; }
+.loading-text span:nth-child(4) { animation-delay: 0.3s; }
+.loading-text span:nth-child(5) { animation-delay: 0.4s; }
+.loading-text span:nth-child(6) { animation-delay: 0.5s; }
+
+@keyframes bounce-text {
+  0%, 80%, 100% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  40% {
+    transform: translateY(-8px);
+    opacity: 1;
+    color: #ffffff;
+    text-shadow: 0 0 12px #39FF14, 0 0 20px #39FF14;
+  }
+}
