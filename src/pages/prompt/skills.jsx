@@ -9,6 +9,7 @@ import {
   PUBLISHED_PROMPTS_UPDATED_EVENT,
 } from "../../api/promptApi";
 import { getTagStyles } from "../../utils/tagStyles";
+import { usePageLoading } from "../../hooks/usePageLoading";
 
 const categoryMemoToast = Swal.mixin({
   toast: true,
@@ -33,6 +34,9 @@ export default function Skills() {
   const [categories, setCategories] = useState([]);
   const [tags, setTags] = useState([]);
   const promptsRequestId = useRef(0);
+
+  // 資料就緒後關閉 loading
+  usePageLoading(prompts.length > 0);
 
   useEffect(() => {
     const loadPrompts = async () => {

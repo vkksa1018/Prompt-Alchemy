@@ -2,10 +2,13 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import { loginUser } from "../../api/authApi";
+import { usePageLoading } from "../../hooks/usePageLoading";
 
 export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
+  // 登入頁無需非同步資料，直接關閉 loading
+  usePageLoading(true);
 
   const [email, setEmail] = useState(() => localStorage.getItem("remembered_email") || "");
   const [password, setPassword] = useState("");

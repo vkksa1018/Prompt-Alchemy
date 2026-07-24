@@ -10,6 +10,7 @@ import {
 import useAuth from "../../hooks/useAuth";
 import { Search } from "lucide-react";
 import { getTagStyles } from "../../utils/tagStyles";
+import { usePageLoading } from "../../hooks/usePageLoading";
 
 export default function Favorite() {
   const navigate = useNavigate();
@@ -19,11 +20,16 @@ export default function Favorite() {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedTag, setSelectedTag] = useState(null);
+  const [initialized, setInitialized] = useState(false);
+
+  // 收藏頁在第一次 fetch 完成後關閉 loading
+  usePageLoading(initialized);
 
   useEffect(() => {
     getPublishedPrompts().then((list) => {
       const filtered = list.filter((prompt) => favorites.includes(prompt.id));
       setFavoritePrompts(filtered);
+      setInitialized(true);
     });
   }, [favorites]);
 

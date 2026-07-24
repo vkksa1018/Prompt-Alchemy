@@ -3,10 +3,12 @@ import { useNavigate, Link } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import { registerUser, loginUser } from "../../api/authApi";
 import { alertHelper } from "../../utils/sweetAlert";
+import { usePageLoading } from "../../hooks/usePageLoading";
 
 export default function Register() {
   const navigate = useNavigate();
   const { login } = useAuth();
+  usePageLoading(true); // 註冊頁無需非同步資料，直接關閉 loading
 
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");

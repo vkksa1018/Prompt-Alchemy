@@ -7,6 +7,7 @@ import "swiper/css/pagination";
 import PromptCard from "../../components/PromptCard/promptCard";
 import { getPublishedPrompts } from "../../api/promptApi";
 import HeroDevice from "../../components/HeroDevice/heroDevice";
+import { usePageLoading } from "../../hooks/usePageLoading";
 import {
   CodeXml,
   Database,
@@ -20,6 +21,9 @@ export default function Home() {
   const navigate = useNavigate();
 
   const [prompts, setPrompts] = useState([]);
+
+  // 資料就緒後關閉 loading
+  usePageLoading(prompts.length > 0);
 
   useEffect(() => {
     getPublishedPrompts().then((list) => {

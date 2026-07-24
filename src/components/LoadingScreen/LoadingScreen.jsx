@@ -1,14 +1,14 @@
 import "./LoadingScreen.css";
 
-export default function LoadingScreen() {
+export default function LoadingScreen({ fadeOut }) {
   return (
-    <div className="loading-overlay">
+    <div className={`loading-overlay ${fadeOut ? "loading-fade-out" : ""}`}>
       <div className="loading-container">
         {/* Track Line */}
         <div className="running-track">
           {/* Running Duck Container */}
           <div className="duck-runner">
-            <svg viewBox="0 0 100 80" className="duck-svg">
+            <svg viewBox="0 0 100 80" className="duck-svg" aria-hidden="true">
               {/* Body */}
               <path
                 d="M 20,50 Q 15,35 30,30 Q 55,20 70,35 Q 85,38 90,50 Q 80,68 50,68 Q 25,68 20,50 Z"
@@ -49,9 +49,9 @@ export default function LoadingScreen() {
             </svg>
           </div>
         </div>
-        
+
         {/* Loading text */}
-        <div className="loading-text">
+        <div className="loading-text" role="status" aria-live="polite" aria-label="載入中">
           <span>煉</span>
           <span>製</span>
           <span>中</span>

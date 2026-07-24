@@ -12,6 +12,22 @@
   justify-content: center;
   align-items: center;
   z-index: 99999;
+  animation: loading-fade-in 0.2s ease-out;
+}
+
+/* Fade-out triggered by prop */
+.loading-overlay.loading-fade-out {
+  animation: loading-fade-out 0.35s ease-in forwards;
+}
+
+@keyframes loading-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes loading-fade-out {
+  from { opacity: 1; backdrop-filter: blur(12px); }
+  to   { opacity: 0; backdrop-filter: blur(0px); }
 }
 
 /* Container */
@@ -36,10 +52,10 @@
 /* Duck Runner Wrapper */
 .duck-runner {
   position: absolute;
-  bottom: 3px; /* sits on top of the track line */
+  bottom: 3px;
   width: 60px;
   height: 48px;
-  animation: run-duck 3.5s linear infinite;
+  animation: run-duck 2.2s linear infinite;
 }
 
 /* Wobble duck body while running */
@@ -50,7 +66,7 @@
   animation: wobble-duck 0.2s ease-in-out infinite alternate;
 }
 
-/* Feet running cycle transformation origins */
+/* Feet running cycle */
 .foot-front {
   transform-origin: 45px 66px;
   animation: foot-swing-front 0.2s linear infinite;
@@ -61,55 +77,43 @@
   animation: foot-swing-back 0.2s linear infinite;
 }
 
-/* Duck Running Back and Forth Across Screen */
+/* Duck runs left → right, flips, runs right → left */
 @keyframes run-duck {
   0% {
-    left: -10%;
-    transform: scaleX(1); /* Face right */
+    left: -8%;
+    transform: scaleX(1);
   }
   48% {
     transform: scaleX(1);
   }
   50% {
     left: 100%;
-    transform: scaleX(-1); /* Face left */
+    transform: scaleX(-1);
   }
   98% {
     transform: scaleX(-1);
   }
   100% {
-    left: -10%;
-    transform: scaleX(1); /* Face right */
+    left: -8%;
+    transform: scaleX(1);
   }
 }
 
-/* Duck body waddle height & rotation */
+/* Duck body waddle */
 @keyframes wobble-duck {
-  0% {
-    transform: translateY(0) rotate(-3deg);
-  }
-  100% {
-    transform: translateY(-4px) rotate(3deg);
-  }
+  0%   { transform: translateY(0) rotate(-3deg); }
+  100% { transform: translateY(-4px) rotate(3deg); }
 }
 
-/* Paddling feet animations */
+/* Foot animations */
 @keyframes foot-swing-front {
-  0%, 100% {
-    transform: rotate(-35deg);
-  }
-  50% {
-    transform: rotate(35deg);
-  }
+  0%, 100% { transform: rotate(-35deg); }
+  50%       { transform: rotate(35deg); }
 }
 
 @keyframes foot-swing-back {
-  0%, 100% {
-    transform: rotate(35deg);
-  }
-  50% {
-    transform: rotate(-35deg);
-  }
+  0%, 100% { transform: rotate(35deg); }
+  50%       { transform: rotate(-35deg); }
 }
 
 /* Loading Text with wave effect */

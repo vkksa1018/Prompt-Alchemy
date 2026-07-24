@@ -8,13 +8,16 @@ function AppContent() {
   const { setIsLoading } = useLoading();
 
   useEffect(() => {
-    // 每次路徑切換時，觸發 800ms 的載入動畫
+    // 路由切換時啟動載入動畫
     setIsLoading(true);
-    const timer = setTimeout(() => {
+
+    // Fallback：若頁面沒有主動呼叫 setIsLoading(false)（例如後台靜態頁面），
+    // 800ms 後自動關閉，避免 loading 永遠跑不完。
+    const fallback = setTimeout(() => {
       setIsLoading(false);
     }, 800);
 
-    return () => clearTimeout(timer);
+    return () => clearTimeout(fallback);
   }, [location.pathname, setIsLoading]);
 
   return <Outlet />;

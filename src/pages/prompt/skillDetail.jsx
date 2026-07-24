@@ -10,6 +10,7 @@ import {
 } from "../../api/promptApi";
 import { Heart, Undo2 } from "lucide-react";
 import { getTagStyles } from "../../utils/tagStyles";
+import { usePageLoading } from "../../hooks/usePageLoading";
 
 export default function SkillDetail() {
   const { id } = useParams();
@@ -20,6 +21,9 @@ export default function SkillDetail() {
   const [loading, setLoading] = useState(true);
   const [copiedPrompt, setCopiedPrompt] = useState(false);
   const [copiedExample, setCopiedExample] = useState(false);
+
+  // 詳細頁資料就緒後關閉 loading overlay
+  usePageLoading(!loading);
 
   const [prevId, setPrevId] = useState(id);
   if (id !== prevId) {
