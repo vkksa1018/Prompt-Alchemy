@@ -1,22 +1,19 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import useAuth from "../../hooks/useAuth";
 
 export default function Profile() {
-  const navigate = useNavigate();
   const { user, updateUser } = useAuth();
 
-  const [name, setName] = useState("");
-  const [role, setRole] = useState("member");
+  const [name, setName] = useState(user?.name || "");
+  const [role, setRole] = useState(user?.role || "member");
   const [successMsg, setSuccessMsg] = useState("");
 
-  // Load user data on mount/change
-  useEffect(() => {
-    if (user) {
-      setName(user.name || "");
-      setRole(user.role || "member");
-    }
-  }, [user]);
+  const [prevUser, setPrevUser] = useState(user);
+  if (user !== prevUser) {
+    setPrevUser(user);
+    setName(user?.name || "");
+    setRole(user?.role || "member");
+  }
 
   const handleSave = (e) => {
     e.preventDefault();

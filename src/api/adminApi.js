@@ -12,6 +12,7 @@ import {
   usersTable,
 } from "./mockData";
 import { apiRequest } from "./apiClient";
+import { clearPublishedPromptsCache } from "./promptApi";
 
 const PARAMETERS_KEY = "admin_parameters";
 const SKILLS_KEY = "admin_skills";
@@ -165,8 +166,24 @@ function resolve(value) {
 
 // ---- 統一參數管理 (Parameters CRUD) -------------------------------------------
 
+const parametersCache = {};
+
+export function clearParametersCache(type = null) {
+  if (type) {
+    delete parametersCache[type];
+  } else {
+    for (const key in parametersCache) {
+      delete parametersCache[key];
+    }
+  }
+}
+
 export async function getParametersByType(type) {
+  if (parametersCache[type]) {
+    return parametersCache[type];
+  }
   const result = await apiRequest(`/admin/parameters?type=${type}`);
+  parametersCache[type] = result.data;
   return result.data;
 }
 
@@ -176,6 +193,7 @@ export function getCategories() {
 }
 
 export async function createParameter(type, data) {
+  clearParametersCache(type);
   const result = await apiRequest(`/admin/parameters`, {
     method: "POST",
     body: {
@@ -190,6 +208,7 @@ export async function createParameter(type, data) {
 }
 
 export async function updateParameter(id, data) {
+  clearParametersCache(); // 異動參數時清除快取，以防快取過期
   const result = await apiRequest(`/admin/parameters/${id}`, {
     method: "PUT",
     body: data,
@@ -198,6 +217,7 @@ export async function updateParameter(id, data) {
 }
 
 export async function disableParameter(id) {
+  clearParametersCache(); // 異動參數時清除快取
   const result = await apiRequest(`/admin/parameters/${id}`, {
     method: "DELETE",
   });
@@ -358,6 +378,7 @@ export async function getSkillById(id) {
 }
 
 export async function createSkill(data) {
+  clearPublishedPromptsCache();
   const result = await apiRequest(`/admin/skills`, {
     method: "POST",
     body: data,
@@ -370,6 +391,7 @@ export async function createSkill(data) {
 }
 
 export async function updateSkill(id, data) {
+  clearPublishedPromptsCache();
   const result = await apiRequest(`/admin/skills/${id}`, {
     method: "PUT",
     body: data,

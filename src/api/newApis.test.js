@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { getPublishedPrompts, getPromptById, incrementCopyCount, updateFavoriteCount, normalizeExampleOutput } from "./promptApi";
+import { getPublishedPrompts, getPromptById, incrementCopyCount, updateFavoriteCount, normalizeExampleOutput, clearPublishedPromptsCache } from "./promptApi";
 import { loginUser, registerUser, updateUserProfile, updateUserPassword } from "./authApi";
 import { getUserFavorites, saveUserFavorites } from "./favoriteApi";
 
@@ -102,6 +102,7 @@ describe("New Frontend Dynamic Mock APIs Tests", () => {
     localStorage.clear();
     mockUsers.length = 0;
     mockApiShouldFail.value = false;
+    clearPublishedPromptsCache();
   });
 
   describe("promptApi tests", () => {

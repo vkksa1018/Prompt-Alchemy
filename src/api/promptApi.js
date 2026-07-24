@@ -269,17 +269,36 @@ function getFallbackPrompts() {
   return list;
 }
 
+let publishedPromptsPromise = null;
+
+export function clearPublishedPromptsCache() {
+  publishedPromptsPromise = null;
+}
+
 export async function getPublishedPrompts(queryParams = {}) {
-  try {
-    const remoteList = await fetchRemotePrompts(queryParams);
-    if (remoteList.length > 0) {
-      return remoteList;
-    }
-  } catch (err) {
-    console.warn("Backend /prompts API notice, falling back to mock data:", err.message);
+  const isNoFilter = !queryParams.category && !queryParams.tag && !queryParams.search;
+  
+  if (isNoFilter && publishedPromptsPromise) {
+    return publishedPromptsPromise;
   }
 
-  return getFallbackPrompts();
+  const fetchPromise = (async () => {
+    try {
+      const remoteList = await fetchRemotePrompts(queryParams);
+      if (remoteList.length > 0) {
+        return remoteList;
+      }
+    } catch (err) {
+      console.warn("Backend /prompts API notice, falling back to mock data:", err.message);
+    }
+    return getFallbackPrompts();
+  })();
+
+  if (isNoFilter) {
+    publishedPromptsPromise = fetchPromise;
+  }
+
+  return fetchPromise;
 }
 
 function buildUniqueCategories(prompts) {
@@ -397,6 +416,8 @@ export async function incrementCopyCount(id) {
     return s;
   });
   storage.set(SKILLS_KEY, list);
+  
+  clearPublishedPromptsCache();
 
   try {
     const res = await apiRequest(`/prompts/${id}/copy`, { method: "POST" });
@@ -424,6 +445,9 @@ export function updateFavoriteCount(id, amount) {
     list.push({ id, favorite_count: Math.max(0, amount) });
   }
   storage.set(SKILLS_KEY, list);
+  
+  clearPublishedPromptsCache();
+  
   return Promise.resolve(true);
 }
 

@@ -1,10 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import { updateUserPassword } from "../../api/authApi";
 
 export default function Password() {
-  const navigate = useNavigate();
   const { user } = useAuth();
 
   const [currentPassword, setCurrentPassword] = useState("");
