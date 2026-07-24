@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { getPublishedPrompts, getPromptById, incrementCopyCount, updateFavoriteCount, normalizeExampleOutput, clearPublishedPromptsCache } from "./promptApi";
-import { loginUser, registerUser, updateUserProfile, updateUserPassword } from "./authApi";
+import { loginUser, registerUser } from "./authApi";
 import { getUserFavorites, saveUserFavorites } from "./favoriteApi";
 
 const { mockUsers, mockApiShouldFail } = vi.hoisted(() => {

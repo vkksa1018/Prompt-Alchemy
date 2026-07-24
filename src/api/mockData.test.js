@@ -5,7 +5,6 @@ import {
   getParametersByType,
   getPrompts,
   getPromptById,
-  parametersTable,
   skillItemsTable,
 } from "./mockData";
 
