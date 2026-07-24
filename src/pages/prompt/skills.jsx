@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
 import PromptCard from "../../components/PromptCard/promptCard";
@@ -6,6 +6,7 @@ import {
   getPublishedPrompts,
   getCategories,
   getTags,
+  PUBLISHED_PROMPTS_UPDATED_EVENT,
 } from "../../api/promptApi";
 import { getTagStyles } from "../../utils/tagStyles";
 
@@ -31,8 +32,17 @@ export default function Skills() {
   const [prompts, setPrompts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [tags, setTags] = useState([]);
+  const promptsRequestId = useRef(0);
 
   useEffect(() => {
+    const loadPrompts = async () => {
+      const requestId = ++promptsRequestId.current;
+      const list = await getPublishedPrompts();
+      if (requestId === promptsRequestId.current) {
+        setPrompts(list);
+      }
+    };
+
     // Load categories
     getCategories().then((cats) => {
       setCategories([
@@ -53,11 +63,11 @@ export default function Skills() {
       setTags(tgList);
     });
 
-    // Load prompts
-    getPublishedPrompts().then((list) => {
-      // console.log("Fetched lists:", list);
-      setPrompts(list);
-    });
+    loadPrompts();
+    window.addEventListener(PUBLISHED_PROMPTS_UPDATED_EVENT, loadPrompts);
+    return () => {
+      window.removeEventListener(PUBLISHED_PROMPTS_UPDATED_EVENT, loadPrompts);
+    };
   }, []);
 
   const [prevLocationState, setPrevLocationState] = useState(location.state);

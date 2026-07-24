@@ -3,6 +3,8 @@ import { IS_ONLINE_MODE } from "../config/runMode";
 import {
   getUserFavoriteAPI,
   toggleFavoriteAPI,
+  clearUserFavoritesAPI,
+  restoreDefaultFavoritesAPI,
   getUserFavorites,
   saveUserFavorites,
 } from "../api/favoriteApi";
@@ -11,7 +13,7 @@ import {
   getCurrentUser,
   logoutUser as apiLogoutUser,
 } from "../api/authApi";
-import { updateFavoriteCount } from "../api/promptApi";
+import { refreshPublishedPrompts, updateFavoriteCount } from "../api/promptApi";
 import { alertHelper } from "../utils/sweetAlert";
 
 export const AuthContext = createContext(null);
@@ -83,6 +85,10 @@ export function AuthProvider({ children }) {
         : await getUserFavorites(userData.email, userData.id);
       setFavorites(favs);
       setFavoriteSource(IS_ONLINE_MODE ? "online" : "local");
+      if (IS_ONLINE_MODE) {
+        // Registration may have added default favorites before this login.
+        refreshPublishedPrompts();
+      }
     } catch (err) {
       // online 模式不回退至 localStorage，避免混用舊資料。
       console.error("讀取收藏失敗", err);
@@ -140,6 +146,7 @@ export function AuthProvider({ children }) {
             [promptId]: result.favoriteCount,
           }));
         }
+        refreshPublishedPrompts();
 
         if (!isAlreadyFav) {
           alertHelper.success("已收藏", "已加入您的收藏清單", true);
@@ -173,25 +180,26 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const applyOnlineFavoriteState = (result) => {
+    if (!Array.isArray(result?.favoriteIds)) {
+      throw new Error("伺服器回傳的收藏資料格式不正確");
+    }
+
+    setFavorites(result.favoriteIds);
+    if (result.favoriteCounts && typeof result.favoriteCounts === "object") {
+      setFavoriteCounts((prev) => ({ ...prev, ...result.favoriteCounts }));
+    }
+  };
+
   const clearFavorites = async () => {
     if (!user) return;
 
     if (favoriteSource === "online") {
       try {
-        const results = await Promise.all(
-          favorites.map((favId) => toggleFavoriteAPI(favId))
-        );
-        setFavoriteCounts((prev) => {
-          const next = { ...prev };
-          favorites.forEach((favId, index) => {
-            const favoriteCount = results[index]?.favoriteCount;
-            if (typeof favoriteCount === "number") {
-              next[favId] = favoriteCount;
-            }
-          });
-          return next;
-        });
-        setFavorites([]);
+        const result = await clearUserFavoritesAPI();
+        applyOnlineFavoriteState(result);
+        refreshPublishedPrompts();
+        alertHelper.success("已清空收藏", "您的所有收藏已同步更新", true);
       } catch (err) {
         console.error("Failed to clear favorites via API", err);
         alertHelper.error("清空失敗", "目前無法同步到伺服器", true);
@@ -206,10 +214,18 @@ export function AuthProvider({ children }) {
     });
   };
 
-  const resetFavorites = () => {
+  const resetFavorites = async () => {
     if (!user) return;
     if (favoriteSource === "online") {
-      alertHelper.error("無法重設", "連線模式不使用本機預設收藏", true);
+      try {
+        const result = await restoreDefaultFavoritesAPI();
+        applyOnlineFavoriteState(result);
+        refreshPublishedPrompts();
+        alertHelper.success("已恢復預設收藏", "已套用官方預設收藏", true);
+      } catch (err) {
+        console.error("Failed to restore default favorites via API", err);
+        alertHelper.error("恢復失敗", "目前無法同步到伺服器", true);
+      }
       return;
     }
     const defaults = [

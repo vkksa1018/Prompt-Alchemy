@@ -278,6 +278,15 @@ export function clearPublishedPromptsCache() {
   publishedPromptsPromise = null;
 }
 
+export const PUBLISHED_PROMPTS_UPDATED_EVENT = "prompt-alchemy:prompts-updated";
+
+export function refreshPublishedPrompts() {
+  clearPublishedPromptsCache();
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(PUBLISHED_PROMPTS_UPDATED_EVENT));
+  }
+}
+
 export async function getPublishedPrompts(queryParams = {}) {
   const isNoFilter = !queryParams.category && !queryParams.tag && !queryParams.search;
   

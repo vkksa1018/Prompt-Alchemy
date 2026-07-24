@@ -18,6 +18,20 @@ export async function toggleFavoriteAPI(skillId) {
   return res.data;
 }
 
+export async function clearUserFavoritesAPI() {
+  const res = await apiRequest("/favorites", {
+    method: "DELETE",
+  });
+  return res.data;
+}
+
+export async function restoreDefaultFavoritesAPI() {
+  const res = await apiRequest("/favorites/defaults", {
+    method: "POST",
+  });
+  return res.data;
+}
+
 export function getUserFavorites(email, userDbId) {
   const storedFavs = storage.get(`favorites_${email}`);
   if (storedFavs) {
